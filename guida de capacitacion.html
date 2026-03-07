@@ -1,0 +1,282 @@
+x<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capacitación Freelancers - Servicios Digitales MX</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .step-number { background: #6366f1; color: white; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: bold; font-size: 14px; flex-shrink: 0; }
+        .sidebar-link:hover { background: #f1f5f9; border-left: 4px solid #6366f1; }
+        .glass-header { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); }
+        .check-item::before { content: "✓"; color: #22c55e; font-weight: bold; margin-right: 8px; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 leading-relaxed">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 glass-header border-b border-slate-200 py-4">
+        <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <div class="bg-[#6366f1] p-2 rounded-lg">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                </div>
+                <span class="font-extrabold text-slate-800 tracking-tight text-lg">Servicios Digitales MX</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <span class="hidden md:block text-slate-400 text-sm font-medium">Manual de Prospección v1.2</span>
+                <div class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-tighter">Activo</div>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-4 py-12 flex flex-col lg:flex-row gap-12">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="lg:w-1/4 hidden lg:block sticky top-28 h-fit">
+            <nav class="space-y-1">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 px-4">Módulos de Entrenamiento</p>
+                <a href="#mision" class="sidebar-link block px-4 py-3 rounded-r-xl text-sm font-medium text-slate-600 transition-all">1. Misión del Puesto</a>
+                <a href="#empresa" class="sidebar-link block px-4 py-3 rounded-r-xl text-sm font-medium text-slate-600 transition-all">2. Nuestra Solución</a>
+                <a href="#problemas" class="sidebar-link block px-4 py-3 rounded-r-xl text-sm font-medium text-slate-600 transition-all">3. Problemas que resolvemos</a>
+                <a href="#clientes" class="sidebar-link block px-4 py-3 rounded-r-xl text-sm font-medium text-slate-600 transition-all">4. Perfil del Cliente Ideal</a>
+                <a href="#fuentes" class="sidebar-link block px-4 py-3 rounded-r-xl text-sm font-medium text-slate-600 transition-all">5. Fuentes de Prospección</a>
+                <a href="#mensaje" class="sidebar-link block px-4 py-3 rounded-r-xl text-sm font-medium text-slate-600 transition-all">6. Guion de Apertura</a>
+                <a href="#preguntas" class="sidebar-link block px-4 py-3 rounded-r-xl text-sm font-medium text-slate-600 transition-all">7. Detección de Dolores</a>
+                <a href="#pitch" class="sidebar-link block px-4 py-3 rounded-r-xl text-sm font-medium text-slate-600 transition-all">8. Presentación Corta</a>
+                <a href="#metricas" class="sidebar-link block px-4 py-3 rounded-r-xl text-sm font-medium text-slate-600 transition-all">9. Métricas Diarias</a>
+                <a href="#mentalidad" class="sidebar-link block px-4 py-3 rounded-r-xl text-sm font-medium text-slate-600 transition-all">10. Mentalidad de Cierre</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="lg:w-3/4 space-y-20 pb-20">
+            
+            <!-- Módulo 1: Misión -->
+            <section id="mision" class="space-y-6">
+                <div class="flex items-center gap-4">
+                    <div class="step-number">1</div>
+                    <h2 class="text-3xl font-extrabold text-slate-900">Misión del Puesto</h2>
+                </div>
+                <div class="bg-indigo-600 rounded-3xl p-8 text-white shadow-xl shadow-indigo-100 relative overflow-hidden">
+                    <p class="text-xl font-medium leading-relaxed italic z-10 relative">
+                        "Tu trabajo no es vender tecnología. Es identificar negocios que están perdiendo clientes por desorganización y abrir conversación para que conozcan nuestra solución."
+                    </p>
+                    <svg class="absolute right-0 bottom-0 text-indigo-500 w-32 h-32 opacity-20 -mr-8 -mb-8" fill="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                </div>
+            </section>
+
+            <!-- Módulo 2: Nuestra Solución -->
+            <section id="empresa" class="space-y-6">
+                <div class="flex items-center gap-4">
+                    <div class="step-number">2</div>
+                    <h2 class="text-3xl font-extrabold text-slate-900">¿Qué hacemos realmente?</h2>
+                </div>
+                <p class="text-slate-600 text-lg">Analizamos cómo funciona el negocio, diseñamos la solución y convertimos su caos en un sistema digital profesional.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                        <h4 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" /></svg>
+                            Herramientas que implementamos
+                        </h4>
+                        <ul class="text-sm text-slate-600 space-y-3">
+                            <li class="check-item">Páginas web profesionales</li>
+                            <li class="check-item">Fichas técnicas automáticas vía WhatsApp</li>
+                            <li class="check-item">Paneles administrativos y seguimiento</li>
+                            <li class="check-item">Cotizadores digitales inmediatos</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                        <h4 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                            Resultados para el cliente
+                        </h4>
+                        <ul class="text-sm text-slate-600 space-y-3">
+                            <li class="check-item">Cierre de ventas más rápido</li>
+                            <li class="check-item">Cero pérdida de mensajes</li>
+                            <li class="check-item">Información 100% organizada</li>
+                            <li class="check-item">Imagen de empresa corporativa</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Módulo 3: Problemas (Dolores) -->
+            <section id="problemas" class="space-y-6">
+                <div class="flex items-center gap-4">
+                    <div class="step-number">3</div>
+                    <h2 class="text-3xl font-extrabold text-slate-900">El Caos que resolvemos</h2>
+                </div>
+                <p class="text-slate-500">Busca estas señales de alerta en el negocio:</p>
+                <div class="bg-red-50 border border-red-100 rounded-2xl p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="flex gap-3 text-red-700 text-sm font-medium">
+                        <span class="text-red-400">✖</span> Manejan todo en libretas o papel.
+                    </div>
+                    <div class="flex gap-3 text-red-700 text-sm font-medium">
+                        <span class="text-red-400">✖</span> Olvidan dar seguimiento a prospectos.
+                    </div>
+                    <div class="flex gap-3 text-red-700 text-sm font-medium">
+                        <span class="text-red-400">✖</span> No saben cuántos clientes tienen.
+                    </div>
+                    <div class="flex gap-3 text-red-700 text-sm font-medium">
+                        <span class="text-red-400">✖</span> Cotizan tarde porque les falta información.
+                    </div>
+                </div>
+            </section>
+
+            <!-- Módulo 4: Cliente Ideal -->
+            <section id="clientes" class="space-y-6">
+                <div class="flex items-center gap-4">
+                    <div class="step-number">4</div>
+                    <h2 class="text-3xl font-extrabold text-slate-900">¿A quién buscamos?</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-white p-5 rounded-2xl border border-slate-100 text-center">
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-tighter mb-2">Hogar</p>
+                        <p class="text-slate-800 font-bold text-sm">Técnicos de minisplit, plomeros, electricistas.</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-slate-100 text-center">
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-tighter mb-2">Automotriz</p>
+                        <p class="text-slate-800 font-bold text-sm">Talleres mecánicos y detallado automotriz.</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl border border-slate-100 text-center">
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-tighter mb-2">Comercial</p>
+                        <p class="text-slate-800 font-bold text-sm">Veterinarias, barberías, servicios de limpieza.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Módulo 5: Fuentes -->
+            <section id="fuentes" class="space-y-6">
+                <div class="flex items-center gap-4">
+                    <div class="step-number">5</div>
+                    <h2 class="text-3xl font-extrabold text-slate-900">Dónde encontrar prospectos</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="p-4 bg-blue-50 rounded-2xl border border-blue-100">
+                        <h5 class="font-bold text-blue-700 text-sm mb-1">Facebook</h5>
+                        <p class="text-[11px] text-blue-600">Marketplace y grupos de servicios locales.</p>
+                    </div>
+                    <div class="p-4 bg-green-50 rounded-2xl border border-green-100">
+                        <h5 class="font-bold text-green-700 text-sm mb-1">Google Maps</h5>
+                        <p class="text-[11px] text-green-600">Buscar "servicios en [Ciudad]".</p>
+                    </div>
+                    <div class="p-4 bg-pink-50 rounded-2xl border border-pink-100">
+                        <h5 class="font-bold text-pink-700 text-sm mb-1">Instagram</h5>
+                        <p class="text-[11px] text-pink-600">Perfiles de negocios pequeños.</p>
+                    </div>
+                    <div class="p-4 bg-indigo-50 rounded-2xl border border-indigo-100">
+                        <h5 class="font-bold text-indigo-700 text-sm mb-1">WhatsApp</h5>
+                        <p class="text-[11px] text-indigo-600">Contactos de Business compartidos.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Módulo 6: El Mensaje -->
+            <section id="mensaje" class="space-y-6">
+                <div class="flex items-center gap-4">
+                    <div class="step-number">6</div>
+                    <h2 class="text-3xl font-extrabold text-slate-900 text-slate-800">Guion de Apertura</h2>
+                </div>
+                <div class="bg-slate-900 rounded-3xl p-8 text-white relative">
+                    <div class="bg-slate-800 p-6 rounded-2xl font-mono text-sm leading-relaxed border-l-4 border-indigo-500 mb-6">
+                        "Buenas tardes. Vi su negocio y me pareció muy interesante. Nos dedicamos a ayudar a negocios de servicios a organizar sus cotizaciones, clientes y seguimiento para que no pierdan oportunidades. ¿Actualmente cómo manejan ustedes sus cotizaciones?"
+                    </div>
+                    <div class="flex items-center gap-2 text-xs text-indigo-400 font-bold">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" /></svg>
+                        EL OBJETIVO NO ES VENDER, ES AGENDAR UNA DEMOSTRACIÓN.
+                    </div>
+                </div>
+            </section>
+
+            <!-- Módulo 7: Preguntas Clave -->
+            <section id="preguntas" class="space-y-6">
+                <div class="flex items-center gap-4">
+                    <div class="step-number">7</div>
+                    <h2 class="text-3xl font-extrabold text-slate-900">Detección de Dolores (Preguntas Clave)</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="p-4 bg-white border border-slate-100 rounded-xl text-sm font-medium">¿Todo lo hacen por WhatsApp?</div>
+                    <div class="p-4 bg-white border border-slate-100 rounded-xl text-sm font-medium">¿Cómo registran a sus clientes hoy?</div>
+                    <div class="p-4 bg-white border border-slate-100 rounded-xl text-sm font-medium">¿Tienen página web profesional?</div>
+                    <div class="p-4 bg-white border border-slate-100 rounded-xl text-sm font-medium">¿Les ha pasado que pierden mensajes de clientes?</div>
+                </div>
+            </section>
+
+            <!-- Módulo 8: El Pitch -->
+            <section id="pitch" class="space-y-6">
+                <div class="flex items-center gap-4">
+                    <div class="step-number">8</div>
+                    <h2 class="text-3xl font-extrabold text-slate-900">Presentación del Sistema</h2>
+                </div>
+                <div class="bg-indigo-50 border border-indigo-100 rounded-3xl p-8">
+                    <h4 class="font-bold text-indigo-900 mb-4 uppercase text-xs tracking-widest">Lo que le dices al cliente:</h4>
+                    <p class="text-indigo-800 leading-relaxed italic">
+                        "Creamos un portal donde tu cliente entra y llena su ficha técnica solo. Así tú recibes toda la información lista para cotizar sin estar preguntando todo por WhatsApp. Organizamos tus clientes y cotizaciones para que trabajes con más orden y cierres más ventas."
+                    </p>
+                    <div class="mt-6 flex items-center gap-4">
+                        <div class="flex -space-x-2">
+                            <div class="w-8 h-8 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-[10px] font-bold">PDF</div>
+                            <div class="w-8 h-8 rounded-full bg-slate-300 border-2 border-white flex items-center justify-center text-[10px] font-bold">WEB</div>
+                            <div class="w-8 h-8 rounded-full bg-slate-400 border-2 border-white flex items-center justify-center text-[10px] font-bold">QR</div>
+                        </div>
+                        <p class="text-xs text-indigo-500 font-bold uppercase tracking-tighter">Usa material visual: Fotos y videos del sistema.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Módulo 9: Métricas -->
+            <section id="metricas" class="space-y-6">
+                <div class="flex items-center gap-4">
+                    <div class="step-number">9</div>
+                    <h2 class="text-3xl font-extrabold text-slate-900">Métricas de Trabajo</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-3xl shadow-sm text-center">
+                        <span class="block text-4xl font-black text-indigo-600 mb-2">20-40</span>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase">Contactos nuevos</span>
+                    </div>
+                    <div class="bg-white p-6 rounded-3xl shadow-sm text-center">
+                        <span class="block text-4xl font-black text-indigo-600 mb-2">10</span>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase">Chats Activos</span>
+                    </div>
+                    <div class="bg-white p-6 rounded-3xl shadow-sm text-center">
+                        <span class="block text-4xl font-black text-indigo-600 mb-2">2-5</span>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase">Interesados</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Módulo 10: Mentalidad -->
+            <section id="mentalidad" class="space-y-6">
+                <div class="flex items-center gap-4">
+                    <div class="step-number">10</div>
+                    <h2 class="text-3xl font-extrabold text-slate-900 text-slate-800">Filosofía y Mentalidad</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-slate-900 p-6 rounded-3xl text-white">
+                        <h5 class="font-bold mb-2">No vendemos webs</h5>
+                        <p class="text-xs text-slate-400 leading-relaxed">Ayudamos a negocios a organizar su operación y vender mejor. La tecnología es solo el vehículo.</p>
+                    </div>
+                    <div class="bg-indigo-600 p-6 rounded-3xl text-white">
+                        <h5 class="font-bold mb-2">Resiliencia</h5>
+                        <p class="text-xs text-indigo-100 leading-relaxed">No todos van a comprar. Pero cada conversación es una oportunidad para encontrar al cliente que realmente nos necesita.</p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-12">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-slate-400 text-xs font-bold uppercase tracking-widest italic mb-2">Servicios Digitales MX</p>
+            <p class="text-slate-300 text-[10px]">Entrenamiento diseñado para resultados reales. Prohibida su reproducción sin autorización.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
