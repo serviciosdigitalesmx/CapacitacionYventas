@@ -1,6 +1,10 @@
 
         // ================== AUTH + BACKEND ==================
-        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxfTsZDlIuSosrVfj8fbIucl64kBqQdmyXhywjy3szq8VjZ4w7g4xkKPXWjI8S7OXk9/exec'; // Ej: https://script.google.com/macros/s/XXXX/exec
+        const APP_SCRIPT_URLS = [
+            'https://script.google.com/macros/s/AKfycbyRbMCH6FiE9nL_EdCpKVqmTZzt62kExX-YDaG1m_4JlKoh39BFlLAt8qLIweyi_CSN/exec',
+            'https://script.google.com/macros/s/AKfycbxfTsZDlIuSosrVfj8fbIucl64kBqQdmyXhywjy3szq8VjZ4w7g4xkKPXWjI8S7OXk9/exec'
+        ];
+        let activeBackendUrl = APP_SCRIPT_URLS[0];
         const APP_TOKEN = '446c0599e6fed1bd0408d31e746e727a31829fdedf957972';
         let currentUser = null;
         let saveTimer = null;
@@ -20,17 +24,24 @@
         }
 
         async function callBackend(payload) {
-            if (!APP_SCRIPT_URL) return null;
-            try {
-                const res = await fetch(APP_SCRIPT_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(Object.assign({ token: APP_TOKEN }, payload))
-                });
-                return await res.json();
-            } catch (e) {
-                return null;
+            if (!APP_SCRIPT_URLS.length) return null;
+            const urls = [activeBackendUrl].concat(APP_SCRIPT_URLS.filter((u) => u !== activeBackendUrl));
+            for (let i = 0; i < urls.length; i++) {
+                const url = urls[i];
+                try {
+                    const res = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(Object.assign({ token: APP_TOKEN }, payload))
+                    });
+                    const data = await res.json();
+                    activeBackendUrl = url;
+                    return data;
+                } catch (e) {
+                    // intentar siguiente backend
+                }
             }
+            return null;
         }
 
         async function validateCredentials(username, password) {
@@ -927,7 +938,7 @@
             const ok = await validateCredentials(username, password);
             if (!ok) {
                 loginError.classList.remove('hidden');
-                loginError.innerText = 'Usuario o contraseña incorrectos.';
+                loginError.innerText = 'No se pudo iniciar sesión. Revisa usuario/contraseña o backend.';
                 return;
             }
 
