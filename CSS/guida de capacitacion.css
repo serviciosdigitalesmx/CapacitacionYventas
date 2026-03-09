@@ -1,10 +1,28 @@
 
         body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
         .step-number { background: #6366f1; color: white; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: bold; font-size: 14px; flex-shrink: 0; }
-        .sidebar-link:hover { background: #f1f5f9; border-left: 4px solid #6366f1; }
+        .sidebar-link { transition: all 0.2s; }
+        .sidebar-link:hover, .sidebar-link.active { background: #f1f5f9; border-left: 4px solid #6366f1; font-weight: 600; color: #1e293b; }
         .glass-header { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); }
-        .check-item::before { content: "✓"; color: #22c55e; font-weight: bold; margin-right: 8px; }
-        .niche-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
-        .niche-card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        .checklist-item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+        .checklist-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: #6366f1; }
+        .semaforo-verde { background-color: #dcfce7; border-left: 6px solid #22c55e; }
+        .semaforo-amarillo { background-color: #fef9c3; border-left: 6px solid #eab308; }
+        .semaforo-rojo { background-color: #fee2e2; border-left: 6px solid #ef4444; }
+        .progress-bar { height: 8px; background-color: #e2e8f0; border-radius: 999px; overflow: hidden; }
+        .progress-fill { height: 100%; background-color: #6366f1; width: 0%; border-radius: 999px; transition: width 0.3s; }
+        .copy-btn { cursor: pointer; transition: all 0.2s; }
+        .copy-btn:active { transform: scale(0.95); }
+        .handoff-card { background: #f8fafc; border: 1px dashed #94a3b8; }
+        .active-section { scroll-margin-top: 100px; }
+        #sidebar-mobile { display: none; }
+        .badge-vencido { background-color: #fee2e2; color: #b91c1c; font-size: 0.6rem; padding: 2px 6px; border-radius: 999px; }
+        .badge-hoy { background-color: #fef3c7; color: #92400e; font-size: 0.6rem; padding: 2px 6px; border-radius: 999px; }
+        @media (max-width: 1024px) {
+            #sidebar-desktop { display: none; }
+            #sidebar-mobile { display: block; position: sticky; top: 80px; z-index: 40; }
+            .sidebar-mobile-menu { display: none; }
+            .sidebar-mobile-menu.open { display: block; background: white; border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 0.5rem; }
+        }
     
 
