@@ -343,48 +343,60 @@
 
                 <section id="entrenamiento" class="tab-content hidden animate-fade-in">
                     <div class="mb-8">
-                        <h1 class="text-3xl font-bold text-white mb-2">Protocolo de Entrenamiento</h1>
-                        <p class="text-slate-400">Certificación interna y evaluación de competencias</p>
+                        <h1 class="text-3xl font-bold text-white mb-2">Entrenamiento Freelance</h1>
+                        <p class="text-slate-400">Panel interactivo con minijuegos y psicología aplicada</p>
                     </div>
-                    <div class="glass-panel rounded-xl border border-slate-700/50 p-6 mb-6">
-                        <div class="flex items-center justify-between mb-4">
+
+                    <div class="glass-panel rounded-2xl border border-slate-700/50 p-6 mb-6">
+                        <div class="flex items-center justify-between gap-4 mb-4">
                             <div>
-                                <h3 class="text-lg font-semibold text-white">Progreso de Certificación</h3>
-                                <p class="text-sm text-slate-400">Módulo: Fundamentos de Operación</p>
+                                <h3 class="text-lg font-semibold text-white">Progreso global</h3>
+                                <p class="text-sm text-slate-400">Completa cajones para subir de nivel</p>
                             </div>
-                            <span class="text-3xl font-bold text-emerald-400" id="global-progress">0%</span>
+                            <div class="bg-indigo-500/20 text-indigo-300 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-2">
+                                <span>🔓 Nivel</span>
+                                <span id="nivelActual">1</span>/5
+                            </div>
                         </div>
                         <div class="w-full h-3 bg-slate-800 rounded-full overflow-hidden">
-                            <div id="progress-bar" class="h-full bg-gradient-to-r from-indigo-500 to-emerald-500 transition-all duration-500" style="width: 0%"></div>
+                            <div id="progresoGlobalTrain" class="h-full bg-gradient-to-r from-indigo-500 to-emerald-500 transition-all duration-500" style="width: 0%"></div>
                         </div>
                     </div>
-                    <div class="glass-panel rounded-xl border border-slate-700/50 p-6 lg:p-8" id="quiz-container">
-                        <div id="quiz-intro" class="text-center py-12">
-                            <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-indigo-500/20 to-emerald-500/20 flex items-center justify-center">
-                                <i data-lucide="brain" class="w-10 h-10 text-indigo-400"></i>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                        <aside class="lg:col-span-1">
+                            <div class="glass-panel rounded-2xl p-4 border border-slate-700/50">
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">🗂️ Cajones de entrenamiento</p>
+                                <nav class="space-y-1" id="modulosNav">
+                                    <a href="#" data-modulo="1" class="modulo-link block px-3 py-2 rounded-xl text-sm font-medium transition-all bg-indigo-500/20 text-indigo-300 border-l-4 border-indigo-500">1. Misión (acertijo inicial)</a>
+                                    <a href="#" data-modulo="2" class="modulo-link block px-3 py-2 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800/60">2. Nuestra solución (psicología)</a>
+                                    <a href="#" data-modulo="3" class="modulo-link block px-3 py-2 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800/60">3. Problemas (juego de reflejos)</a>
+                                    <a href="#" data-modulo="4" class="modulo-link block px-3 py-2 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800/60">4. Nichos (memory match)</a>
+                                    <a href="#" data-modulo="5" class="modulo-link block px-3 py-2 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800/60">5. Fuentes (clic rápido)</a>
+                                    <a href="#" data-modulo="6" class="modulo-link block px-3 py-2 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800/60">6. Guion (ordenar frase)</a>
+                                    <a href="#" data-modulo="7" class="modulo-link block px-3 py-2 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800/60">7. Detección (caso práctico)</a>
+                                    <a href="#" data-modulo="8" class="modulo-link block px-3 py-2 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800/60">8. Pitch (decisión rápida)</a>
+                                    <a href="#" data-modulo="9" class="modulo-link block px-3 py-2 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800/60">9. Métricas (cálculo mental)</a>
+                                    <a href="#" data-modulo="10" class="modulo-link block px-3 py-2 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800/60">10. Mentalidad (test psicología)</a>
+                                </nav>
+                                <div class="mt-4 text-center text-[10px] text-slate-500">Completa cada cajón para avanzar</div>
                             </div>
-                            <h3 class="text-2xl font-bold text-white mb-3">Evaluación de Conocimientos</h3>
-                            <p class="text-slate-400 max-w-md mx-auto mb-8">Completa esta evaluación para validar tu comprensión de los protocolos operativos. Necesitas 80% para aprobar.</p>
-                            <button id="start-quiz-btn" class="px-8 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition-all transform hover:scale-105">Iniciar Evaluación</button>
-                        </div>
-                        <div id="quiz-question" class="hidden">
-                            <div class="flex items-center justify-between mb-6">
-                                <span class="text-sm text-slate-400">Pregunta <span id="current-q">1</span> de <span id="total-q">5</span></span>
-                                <span class="px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-400 text-sm font-medium" id="quiz-score">Puntuación: 0</span>
+                        </aside>
+
+                        <main class="lg:col-span-3 space-y-6">
+                            <div class="game-card p-8 text-center border border-slate-700/50" id="gameContent">
+                                <p class="text-slate-400">Selecciona un módulo del panel izquierdo</p>
                             </div>
-                            <h4 class="text-xl font-semibold text-white mb-6" id="question-text">¿Pregunta aquí?</h4>
-                            <div class="space-y-3" id="options-container"></div>
-                        </div>
-                        <div id="quiz-results" class="hidden text-center py-12">
-                            <div id="result-icon" class="w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center"></div>
-                            <h3 class="text-2xl font-bold text-white mb-2" id="result-title">¡Evaluación Completada!</h3>
-                            <p class="text-slate-400 mb-2">Tu puntuación: <span id="final-score" class="text-white font-bold">0/5</span></p>
-                            <p class="text-sm text-slate-500 mb-8" id="result-message">Mensaje de resultado</p>
-                            <div class="flex gap-3 justify-center">
-                                <button id="retry-quiz-btn" class="px-6 py-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-medium transition-colors">Reintentar</button>
-                                <button id="sync-results-btn" class="px-6 py-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium transition-colors flex items-center gap-2"><i data-lucide="cloud-upload" class="w-4 h-4"></i>Sincronizar</button>
+                            <div id="psicoBox" class="bg-indigo-500/10 border border-indigo-500/30 rounded-2xl p-5 hidden">
+                                <div class="flex items-start gap-4">
+                                    <span class="text-2xl">🧠</span>
+                                    <div>
+                                        <h4 class="font-bold text-indigo-200 text-sm">Píldora psicológica</h4>
+                                        <p id="psicoText" class="text-sm text-indigo-100"></p>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                        </main>
                     </div>
                 </section>
 
