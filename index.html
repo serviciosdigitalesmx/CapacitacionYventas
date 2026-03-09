@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Indice de Capacitacion y Ventas</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #475569;
+      --line: #e2e8f0;
+      --brand: #0ea5e9;
+      --brand-dark: #0284c7;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+      color: var(--text);
+    }
+    .wrap {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 40px 20px 56px;
+    }
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(1.7rem, 3vw, 2.3rem);
+    }
+    .subtitle {
+      margin: 0 0 24px;
+      color: var(--muted);
+    }
+    .grid {
+      display: grid;
+      gap: 14px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 18px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+    }
+    .card h2 {
+      margin: 0 0 8px;
+      font-size: 1.1rem;
+    }
+    .card p {
+      margin: 0 0 12px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+    a.btn {
+      display: inline-block;
+      text-decoration: none;
+      color: #fff;
+      background: var(--brand);
+      padding: 10px 14px;
+      border-radius: 9px;
+      font-weight: 600;
+    }
+    a.btn:hover {
+      background: var(--brand-dark);
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <h1>Indice General</h1>
+    <p class="subtitle">Selecciona un apartado para abrir su contenido.</p>
+
+    <section class="grid">
+      <article class="card">
+        <h2>Contrato</h2>
+        <p>Documento de contrato y clausulas comerciales.</p>
+        <a class="btn" href="./HTML/contrato.html">Abrir apartado</a>
+      </article>
+
+      <article class="card">
+        <h2>Comisiones Barra Comercial Promedio</h2>
+        <p>Tabla y estructura de comisiones para equipo comercial.</p>
+        <a class="btn" href="./HTML/Comisiones%20barra%20comercial%20promedio.html">Abrir apartado</a>
+      </article>
+
+      <article class="card">
+        <h2>Guia de Capacitacion</h2>
+        <p>Contenido de induccion y capacitacion del proceso comercial.</p>
+        <a class="btn" href="./HTML/guida%20de%20capacitacion.html">Abrir apartado</a>
+      </article>
+    </section>
+  </main>
+</body>
+</html>
