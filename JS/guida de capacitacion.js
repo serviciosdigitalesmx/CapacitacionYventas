@@ -355,11 +355,34 @@
 
         // ================== CHECKLIST DIARIO (autoguardado) ==================
         const checkboxes = document.querySelectorAll('.check-dia');
+        const miniChecks = [
+            document.getElementById('mini-chk1'),
+            document.getElementById('mini-chk2'),
+            document.getElementById('mini-chk3')
+        ].filter(Boolean);
         const savedChecks = obtenerDeStorage('checklist', [false, false, false, false, false, false]);
         checkboxes.forEach((cb, i) => { cb.checked = savedChecks[i] || false; });
 
+        function syncMiniChecklist() {
+            miniChecks.forEach((mini, i) => {
+                mini.checked = checkboxes[i] ? checkboxes[i].checked : false;
+            });
+        }
+        syncMiniChecklist();
+
         checkboxes.forEach((cb, i) => {
             cb.addEventListener('change', () => {
+                const estados = Array.from(checkboxes).map(c => c.checked);
+                guardarEnStorage('checklist', estados);
+                syncMiniChecklist();
+                actualizarProgresoGlobal();
+            });
+        });
+
+        miniChecks.forEach((mini, i) => {
+            mini.addEventListener('change', () => {
+                if (!checkboxes[i]) return;
+                checkboxes[i].checked = mini.checked;
                 const estados = Array.from(checkboxes).map(c => c.checked);
                 guardarEnStorage('checklist', estados);
                 actualizarProgresoGlobal();
@@ -398,6 +421,8 @@
             document.getElementById('progresoGlobal').style.width = total + '%';
             document.getElementById('porcentajeProgreso').innerText = total + '%';
             document.getElementById('leyendaProgreso').innerText = `30% checklist · 30% evaluación · 40% CRM (10+ pros)`;
+            const miniProgress = document.getElementById('miniProgress');
+            if (miniProgress) miniProgress.style.width = total + '%';
         }
 
         // ================== RANKING PROPIO ==================
@@ -524,6 +549,82 @@
         menuToggle.addEventListener('click', () => {
             mobileMenu.classList.toggle('open');
         });
+
+        // ================== TABS PRINCIPALES ==================
+        const TAB_SECTIONS = {
+            entrenamiento: ['ruta', 'calificacion', 'seguimiento', 'objeciones', 'guiones-giro', 'kpis', 'disciplina', 'casos', 'rol', 'plan-dias'],
+            operacion: ['crm', 'comisiones', 'ranking', 'evaluacion', 'psicologia', 'errores', 'frases-prohibidas', 'roleplay', 'crecimiento', 'post-demo', 'handoff', 'herramientas', 'inicio-rapido', 'preguntas-frecuentes', 'scripts', 'comunicado-equipo'],
+            progreso: ['dashboard-inicio', 'checklist', 'mi-semana']
+        };
+        const tabButtons = document.querySelectorAll('[data-tab-target]');
+        const allTabSectionIds = Array.from(new Set(Object.values(TAB_SECTIONS).flat()));
+
+        function prepareSectionAccordions() {
+            allTabSectionIds.forEach((id) => {
+                const section = document.getElementById(id);
+                if (!section || section.dataset.prepared === '1') return;
+                if (section.children.length < 2) {
+                    section.dataset.prepared = '1';
+                    return;
+                }
+                const head = section.firstElementChild;
+                const body = document.createElement('div');
+                body.className = 'section-body';
+                while (section.children.length > 1) {
+                    body.appendChild(section.children[1]);
+                }
+                section.appendChild(body);
+                head.classList.add('section-head-toggle');
+                head.addEventListener('click', () => section.classList.toggle('section-collapsed'));
+                section.dataset.prepared = '1';
+            });
+        }
+
+        function expandFirstVisible(tabName) {
+            const ids = TAB_SECTIONS[tabName] || [];
+            let firstOpen = false;
+            ids.forEach((id) => {
+                const section = document.getElementById(id);
+                if (!section) return;
+                if (!firstOpen) {
+                    section.classList.remove('section-collapsed');
+                    firstOpen = true;
+                } else {
+                    section.classList.add('section-collapsed');
+                }
+            });
+        }
+
+        function setActiveTab(tabName) {
+            allTabSectionIds.forEach((id) => {
+                const section = document.getElementById(id);
+                if (!section) return;
+                section.classList.toggle('tab-hidden', !(TAB_SECTIONS[tabName] || []).includes(id));
+            });
+            tabButtons.forEach((btn) => {
+                btn.classList.toggle('is-active', btn.dataset.tabTarget === tabName);
+            });
+            expandFirstVisible(tabName);
+        }
+
+        tabButtons.forEach((btn) => {
+            btn.addEventListener('click', () => setActiveTab(btn.dataset.tabTarget));
+        });
+
+        function tabForSection(id) {
+            return Object.keys(TAB_SECTIONS).find((tab) => TAB_SECTIONS[tab].includes(id));
+        }
+
+        document.querySelectorAll('a[href^="#"]').forEach((link) => {
+            link.addEventListener('click', () => {
+                const targetId = (link.getAttribute('href') || '').replace('#', '');
+                const tab = tabForSection(targetId);
+                if (tab) setActiveTab(tab);
+            });
+        });
+
+        prepareSectionAccordions();
+        setActiveTab('progreso');
 
         // ================== BOTONES "SIGUIENTE TEMA" ==================
         const flowOrder = [
