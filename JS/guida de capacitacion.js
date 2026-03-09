@@ -24,7 +24,7 @@ const dom = {};
 function initDomReferences() {
     const ids = [
         'loginModal', 'loginUsername', 'loginPassword', 'loginBtn', 'loginError',
-        'mainHeader', 'sidebar-mobile', 'appShell', 'mobileBottomNav', 'mainFooter',
+        'mainHeader', 'sidebar-mobile', 'sidebar-desktop', 'appShell', 'mobileBottomNav', 'mainFooter',
         'loggedUserDisplay', 'logoutBtn', 'progresoGlobal', 'porcentajeProgreso',
         'leyendaProgreso', 'miniProgress', 'diaActual', 'actividadDia', 'objetivoDia',
         'selectorDia', 'marcarDiaCompletado', 'alertasSeguimiento', 'survivalAlert',
@@ -1174,7 +1174,7 @@ function setupModuleAccordions(container) {
         toggle.addEventListener('click', () => {
             const mod = Number(toggle.dataset.module || 0);
             if (mod && !unlockedModules[mod]) {
-                alert('Ese modulo sigue bloqueado por hitos de operacion.');
+                alert(toggle.dataset.lockReason || 'Ese modulo sigue bloqueado por hitos de operacion.');
                 return;
             }
             module.classList.toggle('is-open');
@@ -1261,17 +1261,25 @@ function applyModuleLocks() {
         const mod = Number(button.dataset.module);
         const unlocked = !!unlockedModules[mod];
         button.classList.toggle('is-locked', !unlocked);
+        const lockReason = mod === 4
+            ? 'Modulo 4 bloqueado: requiere 5 prospectos activos, 1 demo y certificacion aprobada.'
+            : 'Modulo habilitado.';
+        button.dataset.lockReason = unlocked ? 'Modulo habilitado.' : lockReason;
 
-        let chip = button.querySelector('.lock-chip');
-        if (!unlocked && !chip) {
-            chip = document.createElement('span');
-            chip.className = 'lock-chip';
-            button.appendChild(chip);
+        let icon = button.querySelector('.module-lock-icon');
+        const arrow = button.querySelector('.module-arrow');
+        if (!icon) {
+            icon = document.createElement('span');
+            icon.className = 'module-lock-icon';
+            if (arrow) {
+                button.insertBefore(icon, arrow);
+            } else {
+                button.appendChild(icon);
+            }
         }
-        if (chip) {
-            chip.textContent = mod === 4 ? 'hito pendiente' : 'bloqueado';
-            if (unlocked) chip.remove();
-        }
+        icon.textContent = unlocked ? '🔓' : '🔒';
+        icon.setAttribute('aria-label', unlocked ? 'modulo desbloqueado' : 'modulo bloqueado');
+        icon.setAttribute('title', unlocked ? 'Desbloqueado' : 'Bloqueado');
     });
 
     sidebarLinks.forEach((link) => {
@@ -1662,6 +1670,7 @@ function initEventListeners() {
 document.addEventListener('DOMContentLoaded', () => {
     initDomReferences();
     initEventListeners();
+    setupModuleAccordions(dom['sidebar-desktop']);
 
     sections = $$('.active-section');
     sidebarLinks = $$('.sidebar-link');
