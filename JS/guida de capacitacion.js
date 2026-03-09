@@ -160,7 +160,8 @@
                        (filtroEtapa === '' || p.etapa === filtroEtapa) &&
                        (filtroSemaforo === '' || p.semaforo === filtroSemaforo) &&
                        (filtroResponsable === '' || (p.responsable || 'Sin asignar') === filtroResponsable) &&
-                       (filtroCanal === '' || (p.canal || '').toLowerCase().includes(filtroCanal));
+                       (filtroCanal === '' || (p.canal || '').toLowerCase().includes(filtroCanal)) &&
+                       !p.archivado;
             });
 
             filtrados = ordenarProspectos(filtrados);
@@ -205,8 +206,7 @@
                             <div class="text-xs text-slate-400">Creado: ${fechaAlta} | Últ. act: ${fechaAct}</div>
                         </div>
                         <div class="flex gap-2">
-                            <button class="bg-yellow-500 text-white px-3 py-1 rounded text-xs" onclick="editarProspecto(${indexReal})">Editar</button>
-                            <button class="bg-red-500 text-white px-3 py-1 rounded text-xs" onclick="eliminarProspecto(${indexReal})">Eliminar</button>
+                            <button class="bg-slate-700 text-white px-3 py-1 rounded text-xs" onclick="archivarProspecto(${indexReal})">Archivar</button>
                         </div>
                     `;
                     lista.appendChild(div);
@@ -264,12 +264,13 @@
             document.getElementById('editandoTexto').innerText = `Editando: ${p.nombre}`;
         };
 
-        window.eliminarProspecto = function(index) {
-            if (confirm('¿Seguro que quieres eliminar este prospecto?')) {
-                prospectos.splice(index, 1);
-                guardarEnStorage('prospectos', prospectos);
-                renderCRM();
-            }
+        window.archivarProspecto = function(index) {
+            if (!prospectos[index]) return;
+            prospectos[index].archivado = true;
+            prospectos[index].etapa = 'Descartado';
+            prospectos[index].fechaActualizacion = new Date().toLocaleString();
+            guardarEnStorage('prospectos', prospectos);
+            renderCRM();
         };
 
         document.getElementById('crmForm').addEventListener('submit', (e) => {
@@ -347,76 +348,6 @@
         document.getElementById('filtroSemaforo').addEventListener('change', renderCRM);
         document.getElementById('filtroResponsable').addEventListener('change', renderCRM);
         document.getElementById('filtroCanal').addEventListener('input', renderCRM);
-
-        document.getElementById('exportarCRM').addEventListener('click', () => {
-            let csv = "Nombre,Giro,Contacto,Responsable,Semaforo,Etapa,Canal,ProximoSeguimiento,Notas,Problema,Objecion,NivelInteres,Horario,MensajeEnviado,Respondio,DemoAgendada,Cerrado,Evidencia,FechaAlta,FechaActualizacion\n";
-            prospectos.forEach(p => {
-                csv += `"${p.nombre}","${p.giro}","${p.contacto}","${p.responsable || ''}","${p.semaforo}","${p.etapa}","${p.canal || ''}","${p.proximoSeguimiento || ''}","${p.notas || ''}","${p.problema || ''}","${p.objecion || ''}","${p.nivelInteres || ''}","${p.horario || ''}","${p.mensajeEnviado || false}","${p.respondio || false}","${p.demoAgendada || false}","${p.cerrado || false}","${p.evidencia || ''}","${p.fechaAlta || ''}","${p.fechaActualizacion || ''}"\n`;
-            });
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'prospectos.csv';
-            a.click();
-            URL.revokeObjectURL(url);
-        });
-
-        document.getElementById('exportarJSON').addEventListener('click', () => {
-            const data = JSON.stringify(prospectos, null, 2);
-            const blob = new Blob([data], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'prospectos_backup.json';
-            a.click();
-            URL.revokeObjectURL(url);
-        });
-
-        document.getElementById('btnImportar').addEventListener('click', () => {
-            document.getElementById('importarJSON').click();
-        });
-        document.getElementById('importarJSON').addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-                try {
-                    const datos = JSON.parse(ev.target.result);
-                    if (Array.isArray(datos)) {
-                        // Validar estructura mínima
-                        const valido = datos.every(d => d.nombre && d.giro && d.contacto);
-                        if (!valido) {
-                            alert('El archivo contiene objetos incompletos (deben tener nombre, giro y contacto).');
-                            return;
-                        }
-                        if (confirm('¿Deseas mezclar con los prospectos existentes? (Se evitarán duplicados por contacto). Cancelar para reemplazar todo.')) {
-                            const existentesContactos = new Set(prospectos.map(p => p.contacto));
-                            const nuevos = datos.filter(p => !existentesContactos.has(p.contacto));
-                            prospectos = [...prospectos, ...nuevos];
-                        } else {
-                            prospectos = datos;
-                        }
-                        guardarEnStorage('prospectos', prospectos);
-                        renderCRM();
-                        alert('Datos importados correctamente.');
-                    } else {
-                        alert('El archivo no contiene un array válido.');
-                    }
-                } catch (ex) {
-                    alert('Error al leer el archivo.');
-                }
-            };
-            reader.readAsText(file);
-        });
-
-        document.getElementById('limpiarCRM').addEventListener('click', () => {
-            if (confirm('¿Borrar TODOS los prospectos?')) {
-                prospectos = [];
-                guardarEnStorage('prospectos', prospectos);
-                renderCRM();
-            }
-        });
 
         // ================== CHECKLIST DIARIO (autoguardado) ==================
         const checkboxes = document.querySelectorAll('.check-dia');
@@ -595,19 +526,6 @@
             diaActual = parseInt(e.target.value);
             guardarEnStorage('diaActual', diaActual);
             actualizarDiaHeader();
-        });
-
-        // ================== RESET DE DEMO ==================
-        document.getElementById('resetDemo').addEventListener('click', () => {
-            if (confirm('¿Resetear checklist, evaluación y día? (Los prospectos del CRM se conservan)')) {
-                guardarEnStorage('checklist', defaultState().checklist);
-                guardarEnStorage('evaluacion', defaultState().evaluacion);
-                guardarEnStorage('diaActual', defaultState().diaActual);
-                cargarChecklist();
-                cargarEvaluacion();
-                cargarDia();
-                actualizarProgresoGlobal();
-            }
         });
 
         // ================== SIDEBAR MÓVIL + MÓDULOS ==================
