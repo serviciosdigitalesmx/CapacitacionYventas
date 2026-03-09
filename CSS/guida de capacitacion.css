@@ -29,6 +29,7 @@ body {
     color: var(--text);
     background: var(--bg-accent);
     scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
 }
 
 h1, h2, h3, h4, .module-toggle, .tab-btn, .login-box h2 {
@@ -618,6 +619,7 @@ h1, h2, h3, h4, .module-toggle, .tab-btn, .login-box h2 {
     filter: grayscale(0.1);
 }
 
+/* ========== OPTIMIZACIONES MOVIL ========== */
 @media (max-width: 1024px) {
     #sidebar-desktop {
         display: none;
@@ -626,12 +628,14 @@ h1, h2, h3, h4, .module-toggle, .tab-btn, .login-box h2 {
     #sidebar-mobile {
         display: block;
         position: sticky;
-        top: 80px;
+        top: 70px;
         z-index: 40;
     }
 
     .sidebar-mobile-menu {
         display: none;
+        max-height: 80vh;
+        overflow-y: auto;
     }
 
     .sidebar-mobile-menu.open {
@@ -639,7 +643,7 @@ h1, h2, h3, h4, .module-toggle, .tab-btn, .login-box h2 {
         padding: 0.55rem;
         border-radius: 0.95rem;
         border: 1px solid var(--border);
-        background: rgba(255, 255, 255, 0.94);
+        background: rgba(255, 255, 255, 0.98);
         box-shadow: var(--shadow-md);
     }
 
@@ -659,5 +663,45 @@ h1, h2, h3, h4, .module-toggle, .tab-btn, .login-box h2 {
 
     .conversion-panel {
         grid-template-columns: 1fr;
+    }
+
+    /* Ajustes de espaciado y fuente para movil */
+    .step-number {
+        width: 28px;
+        height: 28px;
+        font-size: 0.75rem;
+    }
+
+    h2 {
+        font-size: 1.5rem !important;
+    }
+
+    .crm-card__actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .crm-action-btn {
+        padding: 0.7rem 1rem;
+        font-size: 0.85rem;
+    }
+
+    .tab-btn {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.7rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .glass-header .flex.justify-between {
+        flex-wrap: wrap;
+    }
+    .glass-header .flex.items-center.gap-4 {
+        margin-top: 0.5rem;
+        width: 100%;
+        justify-content: space-between;
+    }
+    #actividadDia {
+        max-width: 120px;
     }
 }

@@ -1,126 +1,54 @@
 'use strict';
 
-// ================== AUTH + BACKEND ==================
+// ================== CONFIGURACIÓN ==================
 const APP_SCRIPT_URLS = [
     'https://script.google.com/macros/s/AKfycbyJG_s8t1lV6TQkKeTN7W6EEWtA9l9TWEHaLmYG09IxPNybAONORYyoDbPp5KKOAQim/exec'
 ];
 let activeBackendUrl = APP_SCRIPT_URLS[0];
 const APP_TOKEN = '446c0599e6fed1bd0408d31e746e727a31829fdedf957972';
 const BACKEND_TIMEOUT_MS = 10000;
-const STATE_SYNC_DEBOUNCE_MS = 900;
+const STATE_SYNC_DEBOUNCE_MS = 300; // Reducido para mayor capacidad de respuesta
 const LOCAL_CACHE_VERSION = 2;
 const LOCAL_CACHE_PREFIX = 'capacitacionyventas:user:';
 const ALLOWED_SEMAFOROS = ['Verde', 'Amarillo', 'Rojo'];
 const ALLOWED_ETAPAS = ['Nuevo', 'Contactado', 'Respondió', 'Seguimiento 1', 'Seguimiento 2', 'Demo agendada', 'Cerrado', 'Descartado'];
 const ALLOWED_INTERES = ['Alto', 'Medio', 'Bajo'];
 
+// ================== UTILERÍAS DOM ==================
 const $ = (id) => document.getElementById(id);
 const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
 
-const dom = {
-    loginModal: $('loginModal'),
-    loginUsername: $('loginUsername'),
-    loginPassword: $('loginPassword'),
-    loginBtn: $('loginBtn'),
-    loginError: $('loginError'),
-    mainHeader: $('mainHeader'),
-    sidebarMobile: $('sidebar-mobile'),
-    appShell: $('appShell'),
-    mobileBottomNav: $('mobileBottomNav'),
-    mainFooter: $('mainFooter'),
-    loggedUserDisplay: $('loggedUserDisplay'),
-    logoutBtn: $('logoutBtn'),
-    progresoGlobal: $('progresoGlobal'),
-    porcentajeProgreso: $('porcentajeProgreso'),
-    leyendaProgreso: $('leyendaProgreso'),
-    miniProgress: $('miniProgress'),
-    diaActual: $('diaActual'),
-    actividadDia: $('actividadDia'),
-    objetivoDia: $('objetivoDia'),
-    selectorDia: $('selectorDia'),
-    marcarDiaCompletado: $('marcarDiaCompletado'),
-    alertasSeguimiento: $('alertasSeguimiento'),
-    survivalAlert: $('survivalAlert'),
-    pauseOverlay: $('pauseOverlay'),
-    statsResponsable: $('statsResponsable'),
-    filtroResponsable: $('filtroResponsable'),
-    buscarCRM: $('buscarCRM'),
-    filtroEtapa: $('filtroEtapa'),
-    filtroSemaforo: $('filtroSemaforo'),
-    filtroCanal: $('filtroCanal'),
-    crmLista: $('crmLista'),
-    crmForm: $('crmForm'),
-    crmNombre: $('crmNombre'),
-    crmGiro: $('crmGiro'),
-    crmContacto: $('crmContacto'),
-    crmResponsable: $('crmResponsable'),
-    crmSemaforo: $('crmSemaforo'),
-    crmEtapa: $('crmEtapa'),
-    crmCanal: $('crmCanal'),
-    crmProximoSeguimiento: $('crmProximoSeguimiento'),
-    crmNotas: $('crmNotas'),
-    crmProblema: $('crmProblema'),
-    crmObjecion: $('crmObjecion'),
-    crmNivelInteres: $('crmNivelInteres'),
-    crmHorario: $('crmHorario'),
-    crmMensajeEnviado: $('crmMensajeEnviado'),
-    crmRespondio: $('crmRespondio'),
-    crmDemoAgendada: $('crmDemoAgendada'),
-    crmCerrado: $('crmCerrado'),
-    crmEvidencia: $('crmEvidencia'),
-    crmIndex: $('crmIndex'),
-    btnSubmitCRM: $('btnSubmitCRM'),
-    modoEdicion: $('modoEdicion'),
-    editandoTexto: $('editandoTexto'),
-    cancelarEdicion: $('cancelarEdicion'),
-    crmLockedNotice: $('crmLockedNotice'),
-    crmLockStatus: $('crmLockStatus'),
-    crmWorkspace: $('crmWorkspace'),
-    crmAccessBadge: $('crmAccessBadge'),
-    dashboardCrmCard: $('dashboardCrmCard'),
-    dashboardCrmStatus: $('dashboardCrmStatus'),
-    quickActionCrm: $('quickActionCrm'),
-    fundamentosStatus: $('fundamentosStatus'),
-    fundamentosProgressLabel: $('fundamentosProgressLabel'),
-    fundamentosProgressFill: $('fundamentosProgressFill'),
-    puntajeEval: $('puntajeEval'),
-    estadoEval: $('estadoEval'),
-    actualizarKPIs: $('actualizarKPIs'),
-    kpi1: $('kpi1'),
-    kpi2: $('kpi2'),
-    kpi3: $('kpi3'),
-    kpi4: $('kpi4'),
-    kpi5: $('kpi5'),
-    conversionRateValue: $('conversionRateValue'),
-    conversionRateFill: $('conversionRateFill'),
-    conversionRateCaption: $('conversionRateCaption'),
-    conversionRateRatio: $('conversionRateRatio'),
-    conversionRateTrend: $('conversionRateTrend'),
-    tuRanking: $('tuRanking'),
-    menuToggle: $('menuToggle'),
-    mobileMenu: $('mobileMenu'),
-    quizContainer: $('quizContainer'),
-    quizResultado: $('quizResultado'),
-    btnEvaluarQuiz: $('btnEvaluarQuiz'),
-    btnGenerarGuion: $('btnGenerarGuion'),
-    btnCopiarGuionGenerado: $('btnCopiarGuionGenerado'),
-    scriptTipo: $('scriptTipo'),
-    scriptNegocio: $('scriptNegocio'),
-    scriptGenerado: $('scriptGenerado'),
-    calcVentas: $('calcVentas'),
-    calcComisionProm: $('calcComisionProm'),
-    calcVentasVal: $('calcVentasVal'),
-    calcResultado: $('calcResultado')
-};
+// ================== OBJETO DOM (se llena después de que el DOM esté listo) ==================
+const dom = {};
 
-const checkboxes = $$('.check-dia');
-const evalItems = $$('.eval-item');
-const miniChecks = ['mini-chk1', 'mini-chk2', 'mini-chk3'].map($).filter(Boolean);
-const tabButtons = $$('[data-tab-target]');
-const sections = $$('.active-section');
-const sidebarLinks = $$('.sidebar-link');
-const rankingCells = dom.tuRanking ? dom.tuRanking.querySelectorAll('td') : [];
+function initDomReferences() {
+    const ids = [
+        'loginModal', 'loginUsername', 'loginPassword', 'loginBtn', 'loginError',
+        'mainHeader', 'sidebar-mobile', 'appShell', 'mobileBottomNav', 'mainFooter',
+        'loggedUserDisplay', 'logoutBtn', 'progresoGlobal', 'porcentajeProgreso',
+        'leyendaProgreso', 'miniProgress', 'diaActual', 'actividadDia', 'objetivoDia',
+        'selectorDia', 'marcarDiaCompletado', 'alertasSeguimiento', 'survivalAlert',
+        'pauseOverlay', 'statsResponsable', 'filtroResponsable', 'buscarCRM',
+        'filtroEtapa', 'filtroSemaforo', 'filtroCanal', 'crmLista', 'crmForm',
+        'crmNombre', 'crmGiro', 'crmContacto', 'crmResponsable', 'crmSemaforo',
+        'crmEtapa', 'crmCanal', 'crmProximoSeguimiento', 'crmNotas', 'crmProblema',
+        'crmObjecion', 'crmNivelInteres', 'crmHorario', 'crmMensajeEnviado',
+        'crmRespondio', 'crmDemoAgendada', 'crmCerrado', 'crmEvidencia', 'crmIndex',
+        'btnSubmitCRM', 'modoEdicion', 'editandoTexto', 'cancelarEdicion',
+        'crmLockedNotice', 'crmLockStatus', 'crmWorkspace', 'crmAccessBadge',
+        'dashboardCrmCard', 'dashboardCrmStatus', 'quickActionCrm', 'fundamentosStatus',
+        'fundamentosProgressLabel', 'fundamentosProgressFill', 'puntajeEval',
+        'estadoEval', 'actualizarKPIs', 'kpi1', 'kpi2', 'kpi3', 'kpi4', 'kpi5',
+        'conversionRateValue', 'conversionRateFill', 'conversionRateCaption',
+        'conversionRateRatio', 'conversionRateTrend', 'tuRanking', 'menuToggle',
+        'mobileMenu', 'quizContainer', 'quizResultado', 'btnEvaluarQuiz',
+        'btnGenerarGuion', 'btnCopiarGuionGenerado', 'scriptTipo', 'scriptNegocio',
+        'scriptGenerado', 'calcVentas', 'calcComisionProm', 'calcVentasVal', 'calcResultado'
+    ];
+    ids.forEach(id => dom[id] = $(id));
+}
 
+// ================== VARIABLES GLOBALES ==================
 let currentUser = null;
 let userState = defaultState();
 let prospectos = [];
@@ -135,6 +63,16 @@ let unlockedModules = { 1: true, 2: true, 3: true, 4: false };
 let prospectInsights = buildProspectInsights([]);
 let crmRenderHandle = 0;
 
+// Referencias a elementos comunes (se llenan después)
+let checkboxes = [];
+let evalItems = [];
+let miniChecks = [];
+let tabButtons = [];
+let sections = [];
+let sidebarLinks = [];
+let rankingCells = [];
+
+// ================== FUNCIONES BASE ==================
 function defaultState() {
     return {
         prospectos: [],
@@ -254,7 +192,7 @@ function cloneValue(value) {
         try {
             return structuredClone(value);
         } catch (error) {
-            // fallback below
+            // fallback
         }
     }
     return JSON.parse(JSON.stringify(value));
@@ -494,6 +432,22 @@ function scheduleBackendSync() {
         void flushBackendSync();
     }, STATE_SYNC_DEBOUNCE_MS);
 }
+
+// ================== PERSISTENCIA AL CERRAR PESTAÑA ==================
+window.addEventListener('beforeunload', () => {
+    if (currentUser && pendingSyncState && pendingSyncSnapshot) {
+        // Usar sendBeacon para intentar guardar incluso si la página se cierra
+        const url = activeBackendUrl;
+        const payload = {
+            token: APP_TOKEN,
+            action: 'saveState',
+            username: currentUser,
+            state: JSON.stringify(normalizeClientState(pendingSyncState))
+        };
+        const body = new URLSearchParams(payload);
+        navigator.sendBeacon(url, body);
+    }
+});
 
 function guardarEnStorage(key, value) {
     const nextState = cloneValue(userState || defaultState());
@@ -1210,10 +1164,6 @@ function checkSurvivalMode() {
 }
 
 // ================== SIDEBAR MOVIL + MODULOS ==================
-const desktopNavSource = document.querySelector('#sidebar-desktop nav');
-const desktopNav = desktopNavSource ? desktopNavSource.cloneNode(true) : null;
-if (dom.mobileMenu && desktopNav) dom.mobileMenu.innerHTML = desktopNav.innerHTML;
-
 function setupModuleAccordions(container) {
     if (!container) return;
     $$('.module', container).forEach((module) => {
@@ -1230,8 +1180,18 @@ function setupModuleAccordions(container) {
     });
 }
 
-setupModuleAccordions(desktopNavSource);
-setupModuleAccordions(dom.mobileMenu);
+function refreshMobileMenu() {
+    if (!dom.mobileMenu) return;
+    const desktopNavSource = document.querySelector('#sidebar-desktop nav');
+    if (desktopNavSource) {
+        const clone = desktopNavSource.cloneNode(true);
+        dom.mobileMenu.innerHTML = '';
+        dom.mobileMenu.appendChild(clone);
+        setupModuleAccordions(dom.mobileMenu);
+        // Re-aplicar locks después de clonar
+        applyModuleLocks();
+    }
+}
 
 // ================== TABS PRINCIPALES ==================
 const SECTION_TO_MODULE = {
@@ -1362,10 +1322,7 @@ function tabForSection(id) {
     return Object.keys(TAB_SECTIONS).find((tab) => TAB_SECTIONS[tab].includes(id));
 }
 
-function decorateSectionTitles() {
-    // Se omite decoracion adicional para mantener una interfaz mas sobria.
-}
-
+// ================== EVENTOS DE NAVEGACIÓN ==================
 $$('a[href^="#"]').forEach((link) => {
     link.addEventListener('click', (event) => {
         const targetId = (link.getAttribute('href') || '').replace('#', '');
@@ -1400,7 +1357,7 @@ sections.forEach((section) => observer.observe(section));
 // ================== LOGIN / LOGOUT ==================
 function setAppVisible(visible) {
     if (dom.mainHeader) dom.mainHeader.style.display = visible ? '' : 'none';
-    if (dom.sidebarMobile) dom.sidebarMobile.style.display = visible ? '' : 'none';
+    if (dom['sidebar-mobile']) dom['sidebar-mobile'].style.display = visible ? '' : 'none';
     if (dom.appShell) dom.appShell.style.display = visible ? 'flex' : 'none';
     if (dom.mobileBottomNav) dom.mobileBottomNav.style.display = visible ? '' : 'none';
     if (dom.mainFooter) dom.mainFooter.style.display = visible ? '' : 'none';
@@ -1466,6 +1423,7 @@ async function doLogin() {
         setAppVisible(true);
 
         await hydrateUserState();
+        refreshMobileMenu(); // Asegura que el menú móvil tenga los módulos
         scheduleRenderCRM();
         actualizarProgresoGlobal();
         actualizarKPIsReales();
@@ -1504,136 +1462,142 @@ function doLogout() {
     resetCrmForm();
 }
 
-// ================== INIT DE EVENTOS ==================
-if (dom.crmCerrado) dom.crmCerrado.addEventListener('change', onCrmStageAssist);
-if (dom.crmDemoAgendada) dom.crmDemoAgendada.addEventListener('change', onCrmStageAssist);
-if (dom.crmRespondio) dom.crmRespondio.addEventListener('change', onCrmStageAssist);
-if (dom.crmMensajeEnviado) dom.crmMensajeEnviado.addEventListener('change', onCrmStageAssist);
+// ================== INICIALIZACIÓN DE EVENTOS ==================
+function initEventListeners() {
+    if (dom.crmCerrado) dom.crmCerrado.addEventListener('change', onCrmStageAssist);
+    if (dom.crmDemoAgendada) dom.crmDemoAgendada.addEventListener('change', onCrmStageAssist);
+    if (dom.crmRespondio) dom.crmRespondio.addEventListener('change', onCrmStageAssist);
+    if (dom.crmMensajeEnviado) dom.crmMensajeEnviado.addEventListener('change', onCrmStageAssist);
 
-if (dom.crmForm) dom.crmForm.addEventListener('submit', guardarProspectoDesdeFormulario);
-if (dom.cancelarEdicion) dom.cancelarEdicion.addEventListener('click', resetCrmForm);
+    if (dom.crmForm) dom.crmForm.addEventListener('submit', guardarProspectoDesdeFormulario);
+    if (dom.cancelarEdicion) dom.cancelarEdicion.addEventListener('click', resetCrmForm);
 
-[dom.buscarCRM, dom.filtroEtapa, dom.filtroSemaforo, dom.filtroResponsable, dom.filtroCanal].forEach((node) => {
-    if (!node) return;
-    node.addEventListener(node.tagName === 'SELECT' ? 'change' : 'input', scheduleRenderCRM);
-});
-
-checkboxes.forEach((checkbox, index) => {
-    checkbox.addEventListener('change', () => onChecklistChange(index, checkbox.checked));
-});
-
-miniChecks.forEach((mini, index) => {
-    mini.addEventListener('change', () => {
-        if (!checkboxes[index]) return;
-        checkboxes[index].checked = mini.checked;
-        onChecklistChange(index, mini.checked);
+    [dom.buscarCRM, dom.filtroEtapa, dom.filtroSemaforo, dom.filtroResponsable, dom.filtroCanal].forEach((node) => {
+        if (!node) return;
+        node.addEventListener(node.tagName === 'SELECT' ? 'change' : 'input', scheduleRenderCRM);
     });
-});
 
-evalItems.forEach((checkbox) => {
-    checkbox.addEventListener('change', () => {
-        const estados = evalItems.map((item) => item.checked);
-        guardarEnStorage('evaluacion', estados);
-        actualizarPuntajeEval();
-        actualizarProgresoGlobal();
-        applyModuleLocks();
+    checkboxes = $$('.check-dia');
+    checkboxes.forEach((checkbox, index) => {
+        checkbox.addEventListener('change', () => onChecklistChange(index, checkbox.checked));
     });
-});
 
-if (dom.actualizarKPIs) dom.actualizarKPIs.addEventListener('click', actualizarKPIsReales);
-if (dom.marcarDiaCompletado) {
-    dom.marcarDiaCompletado.addEventListener('click', () => {
-        if (diaActual < 7) {
-            diaActual += 1;
+    miniChecks = ['mini-chk1', 'mini-chk2', 'mini-chk3'].map($).filter(Boolean);
+    miniChecks.forEach((mini, index) => {
+        mini.addEventListener('change', () => {
+            if (!checkboxes[index]) return;
+            checkboxes[index].checked = mini.checked;
+            onChecklistChange(index, mini.checked);
+        });
+    });
+
+    evalItems = $$('.eval-item');
+    evalItems.forEach((checkbox) => {
+        checkbox.addEventListener('change', () => {
+            const estados = evalItems.map((item) => item.checked);
+            guardarEnStorage('evaluacion', estados);
+            actualizarPuntajeEval();
+            actualizarProgresoGlobal();
+            applyModuleLocks();
+        });
+    });
+
+    if (dom.actualizarKPIs) dom.actualizarKPIs.addEventListener('click', actualizarKPIsReales);
+    if (dom.marcarDiaCompletado) {
+        dom.marcarDiaCompletado.addEventListener('click', () => {
+            if (diaActual < 7) {
+                diaActual += 1;
+                guardarEnStorage('diaActual', diaActual);
+                actualizarDiaHeader();
+                alert('Dia actualizado. Sigue con el siguiente bloque.');
+            } else {
+                alert('Completaste los 7 dias del plan.');
+            }
+        });
+    }
+    if (dom.selectorDia) {
+        dom.selectorDia.addEventListener('change', (event) => {
+            diaActual = clampNumber(event.target.value, 1, 7, 1);
             guardarEnStorage('diaActual', diaActual);
             actualizarDiaHeader();
-            alert('Dia actualizado. Sigue con el siguiente bloque.');
-        } else {
-            alert('Completaste los 7 dias del plan.');
-        }
-    });
-}
-if (dom.selectorDia) {
-    dom.selectorDia.addEventListener('change', (event) => {
-        diaActual = clampNumber(event.target.value, 1, 7, 1);
-        guardarEnStorage('diaActual', diaActual);
-        actualizarDiaHeader();
-    });
-}
-
-if (dom.btnGenerarGuion) dom.btnGenerarGuion.addEventListener('click', generarGuion);
-if (dom.btnCopiarGuionGenerado) dom.btnCopiarGuionGenerado.addEventListener('click', () => { void copiarGuionGenerado(); });
-
-if (dom.calcVentas) dom.calcVentas.addEventListener('input', actualizarCalculadora);
-if (dom.calcComisionProm) dom.calcComisionProm.addEventListener('input', actualizarCalculadora);
-
-if (dom.btnEvaluarQuiz) dom.btnEvaluarQuiz.addEventListener('click', evaluarQuiz);
-
-if (dom.menuToggle && dom.mobileMenu) {
-    dom.menuToggle.addEventListener('click', () => {
-        dom.mobileMenu.classList.toggle('open');
-    });
-}
-
-tabButtons.forEach((button) => {
-    button.addEventListener('click', () => setActiveTab(button.dataset.tabTarget));
-});
-
-document.addEventListener('click', (event) => {
-    const copyButton = event.target.closest('[data-copy-script]');
-    if (copyButton) {
-        event.preventDefault();
-        void handleCopyScript(copyButton);
-        return;
+        });
     }
 
-    const crmAction = event.target.closest('[data-crm-action]');
-    if (crmAction) {
-        event.preventDefault();
-        const index = Number(crmAction.getAttribute('data-prospect-index'));
-        if (crmAction.getAttribute('data-crm-action') === 'edit') {
-            editarProspecto(index);
-        } else if (crmAction.getAttribute('data-crm-action') === 'archive') {
-            archivarProspecto(index);
-        }
-        return;
+    if (dom.btnGenerarGuion) dom.btnGenerarGuion.addEventListener('click', generarGuion);
+    if (dom.btnCopiarGuionGenerado) dom.btnCopiarGuionGenerado.addEventListener('click', () => { void copiarGuionGenerado(); });
+
+    if (dom.calcVentas) dom.calcVentas.addEventListener('input', actualizarCalculadora);
+    if (dom.calcComisionProm) dom.calcComisionProm.addEventListener('input', actualizarCalculadora);
+
+    if (dom.btnEvaluarQuiz) dom.btnEvaluarQuiz.addEventListener('click', evaluarQuiz);
+
+    if (dom.menuToggle && dom.mobileMenu) {
+        dom.menuToggle.addEventListener('click', () => {
+            dom.mobileMenu.classList.toggle('open');
+        });
     }
 
-    const lockedCrmTrigger = event.target.closest('[data-requires-crm]');
-    if (lockedCrmTrigger) {
-        const access = getSectionAccessState('crm');
-        if (access.locked) {
+    tabButtons = $$('[data-tab-target]');
+    tabButtons.forEach((button) => {
+        button.addEventListener('click', () => setActiveTab(button.dataset.tabTarget));
+    });
+
+    document.addEventListener('click', (event) => {
+        const copyButton = event.target.closest('[data-copy-script]');
+        if (copyButton) {
             event.preventDefault();
-            alert(access.reason);
+            void handleCopyScript(copyButton);
+            return;
         }
-    }
-});
 
-if (dom.loginBtn) dom.loginBtn.addEventListener('click', doLogin);
-if (dom.loginPassword) {
-    dom.loginPassword.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') doLogin();
+        const crmAction = event.target.closest('[data-crm-action]');
+        if (crmAction) {
+            event.preventDefault();
+            const index = Number(crmAction.getAttribute('data-prospect-index'));
+            if (crmAction.getAttribute('data-crm-action') === 'edit') {
+                editarProspecto(index);
+            } else if (crmAction.getAttribute('data-crm-action') === 'archive') {
+                archivarProspecto(index);
+            }
+            return;
+        }
+
+        const lockedCrmTrigger = event.target.closest('[data-requires-crm]');
+        if (lockedCrmTrigger) {
+            const access = getSectionAccessState('crm');
+            if (access.locked) {
+                event.preventDefault();
+                alert(access.reason);
+            }
+        }
     });
-}
-if (dom.logoutBtn) dom.logoutBtn.addEventListener('click', doLogout);
 
-// Limpieza defensiva: elimina cualquier boton viejo "Entendido, ir a ..."
-$$('a,button').forEach((element) => {
-    const text = (element.textContent || '').trim();
-    if (text.startsWith('Entendido, ir a')) {
-        element.remove();
+    if (dom.loginBtn) dom.loginBtn.addEventListener('click', doLogin);
+    if (dom.loginPassword) {
+        dom.loginPassword.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') doLogin();
+        });
     }
-});
+    if (dom.logoutBtn) dom.logoutBtn.addEventListener('click', doLogout);
+}
 
-// ================== ESTADO INICIAL ==================
-renderQuiz();
-prepareSectionAccordions();
-decorateSectionTitles();
-actualizarCalculadora();
-cargarChecklist();
-cargarEvaluacion();
-cargarDia();
-updateCrmAccessUi();
-applyModuleLocks();
-setActiveTab('progreso');
-setAppVisible(false);
+// ================== INICIALIZACIÓN GENERAL ==================
+document.addEventListener('DOMContentLoaded', () => {
+    initDomReferences();
+    initEventListeners();
+
+    sections = $$('.active-section');
+    sidebarLinks = $$('.sidebar-link');
+    rankingCells = dom.tuRanking ? dom.tuRanking.querySelectorAll('td') : [];
+
+    renderQuiz();
+    prepareSectionAccordions();
+    actualizarCalculadora();
+    cargarChecklist();
+    cargarEvaluacion();
+    cargarDia();
+    updateCrmAccessUi();
+    applyModuleLocks();
+    setActiveTab('progreso');
+    setAppVisible(false);
+});
