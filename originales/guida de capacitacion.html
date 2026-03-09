@@ -145,6 +145,7 @@
                         <a href="#ranking" class="sidebar-link block px-3 py-2 rounded-r-xl text-sm font-medium">13. Ranking semanal</a>
                         <a href="#crecimiento" class="sidebar-link block px-3 py-2 rounded-r-xl text-sm font-medium">19. Niveles de crecimiento</a>
                         <a href="#evaluacion" class="sidebar-link block px-3 py-2 rounded-r-xl text-sm font-medium">14. Evaluación</a>
+                        <a href="#comunicado-equipo" class="sidebar-link block px-3 py-2 rounded-r-xl text-sm font-medium">Comunicado al equipo</a>
                     </div>
                 </div>
             </nav>
@@ -802,6 +803,25 @@
                 </div>
             </section>
 
+            <section id="comunicado-equipo" class="active-section space-y-4 bg-white p-6 rounded-3xl border border-slate-200">
+                <h2 class="text-2xl font-extrabold text-slate-900">📣 Comunicado al equipo</h2>
+                <p class="text-sm text-slate-600">3 versiones listas para enviar por WhatsApp, Slack o correo. Solo copia y pega.</p>
+                <div class="space-y-3 text-sm">
+                    <div class="bg-slate-50 p-3 rounded-xl font-mono flex justify-between items-start gap-3" data-script="Equipo, actualizamos la estructura de la guía. Ahora está dividida en 4 módulos lógicos para que su entrenamiento sea más rápido y ordenado. Revisen el nuevo orden en el menú principal.">
+                        <span class="leading-relaxed">"Equipo, actualizamos la estructura de la guía. Ahora está dividida en 4 módulos lógicos para que su entrenamiento sea más rápido y ordenado. Revisen el nuevo orden en el menú principal."</span>
+                        <button class="copy-btn bg-indigo-200 text-indigo-800 px-3 py-1 rounded-lg text-xs whitespace-nowrap" onclick="copiarTexto(this)">Copiar</button>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-xl font-mono flex justify-between items-start gap-3" data-script="Hola a todos. Notamos que la guía tenía demasiada información junta, así que la reorganizamos por etapas: desde lo básico hasta cómo escalar sus comisiones. Es mucho más intuitivo ahora, denle una vuelta.">
+                        <span class="leading-relaxed">"Hola a todos. Notamos que la guía tenía demasiada información junta, así que la reorganizamos por etapas: desde lo básico hasta cómo escalar sus comisiones. Es mucho más intuitivo ahora, denle una vuelta."</span>
+                        <button class="copy-btn bg-indigo-200 text-indigo-800 px-3 py-1 rounded-lg text-xs whitespace-nowrap" onclick="copiarTexto(this)">Copiar</button>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-xl font-mono flex justify-between items-start gap-3" data-script="Jesús, optimicé la arquitectura de información del Bootcamp. Reduje la fricción cognitiva agrupando las 22 secciones en 4 pilares estratégicos. Esto facilitará el onboarding de nuevos freelancers y mejorará la retención del proceso operativo. Ya está listo para implementarse.">
+                        <span class="leading-relaxed">"Jesús, optimicé la arquitectura de información del Bootcamp. Reduje la fricción cognitiva agrupando las 22 secciones en 4 pilares estratégicos. Esto facilitará el onboarding de nuevos freelancers y mejorará la retención del proceso operativo. Ya está listo para implementarse."</span>
+                        <button class="copy-btn bg-indigo-200 text-indigo-800 px-3 py-1 rounded-lg text-xs whitespace-nowrap" onclick="copiarTexto(this)">Copiar</button>
+                    </div>
+                </div>
+            </section>
+
             <!-- DASHBOARD PERSONAL (KPIs reales) -->
             <section class="space-y-4 bg-indigo-50 p-6 rounded-3xl">
                 <h2 class="text-2xl font-extrabold text-indigo-800">📊 Mi semana (desde CRM)</h2>
@@ -1386,7 +1406,7 @@
             'dashboard-inicio', 'rol', 'psicologia', 'herramientas', 'frases-prohibidas',
             'ruta', 'calificacion', 'guiones-giro', 'objeciones', 'seguimiento',
             'inicio-rapido', 'plan-dias', 'crm', 'kpis', 'handoff',
-            'comisiones', 'ranking', 'crecimiento', 'evaluacion'
+            'comisiones', 'ranking', 'crecimiento', 'evaluacion', 'comunicado-equipo'
         ];
         const sectionTitleMap = {
             'rol': 'Rol exacto',
@@ -1406,7 +1426,8 @@
             'comisiones': 'Comisiones',
             'ranking': 'Ranking semanal',
             'crecimiento': 'Niveles de crecimiento',
-            'evaluacion': 'Evaluación final'
+            'evaluacion': 'Evaluación final',
+            'comunicado-equipo': 'comunicado al equipo'
         };
 
         flowOrder.forEach((id, idx) => {

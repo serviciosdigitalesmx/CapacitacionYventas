@@ -530,7 +530,7 @@
             'dashboard-inicio', 'rol', 'psicologia', 'herramientas', 'frases-prohibidas',
             'ruta', 'calificacion', 'guiones-giro', 'objeciones', 'seguimiento',
             'inicio-rapido', 'plan-dias', 'crm', 'kpis', 'handoff',
-            'comisiones', 'ranking', 'crecimiento', 'evaluacion'
+            'comisiones', 'ranking', 'crecimiento', 'evaluacion', 'comunicado-equipo'
         ];
         const sectionTitleMap = {
             'rol': 'Rol exacto',
@@ -550,7 +550,8 @@
             'comisiones': 'Comisiones',
             'ranking': 'Ranking semanal',
             'crecimiento': 'Niveles de crecimiento',
-            'evaluacion': 'Evaluación final'
+            'evaluacion': 'Evaluación final',
+            'comunicado-equipo': 'comunicado al equipo'
         };
 
         flowOrder.forEach((id, idx) => {
