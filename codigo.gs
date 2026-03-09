@@ -22,8 +22,10 @@ const DEFAULT_SPREADSHEET_ID = ''; // Opcional. Si está vacío se crea automát
 
 const SHEET_USERS = 'Usuarios';
 const SHEET_STATE = 'EstadoUsuario';
+const SHEET_EVENTS = 'Eventos';
 const USERS_HEADER = ['username', 'password', 'activo', 'rol', 'updatedAt'];
 const STATE_HEADER = ['username', 'stateJson', 'updatedAt'];
+const EVENTS_HEADER = ['username', 'tipo', 'detalleJson', 'createdAt'];
 
 const FALLBACK_USERS = [
   ['freelancer1', 'pass1'], ['freelancer2', 'pass2'], ['freelancer3', 'pass3'], ['freelancer4', 'pass4'], ['freelancer5', 'pass5'],
@@ -70,6 +72,8 @@ function handleRequest_(e) {
         return loadState_(ss, params);
       case 'saveState':
         return saveState_(ss, params);
+      case 'notifyEvent':
+        return notifyEvent_(ss, params);
       default:
         return jsonResponse_({ success: false, error: 'Acción no válida' });
     }
@@ -156,6 +160,25 @@ function saveState_(ss, params) {
   return jsonResponse_({ success: true, message: 'Estado guardado' });
 }
 
+function notifyEvent_(ss, params) {
+  const username = normalizeUsername_(params.username);
+  const tipo = String(params.tipo || '').trim();
+  if (!username || !tipo) {
+    return jsonResponse_({ success: false, error: 'username y tipo requeridos' });
+  }
+  if (!userExistsAndActive_(ss, username)) {
+    return jsonResponse_({ success: false, error: 'Usuario no válido' });
+  }
+
+  let detalle = params.detalle || {};
+  if (typeof detalle === 'string') {
+    try { detalle = JSON.parse(detalle); } catch (e) { detalle = { raw: detalle }; }
+  }
+  const eventsSheet = ss.getSheetByName(SHEET_EVENTS);
+  eventsSheet.appendRow([username, tipo, JSON.stringify(detalle || {}), isoNow_()]);
+  return jsonResponse_({ success: true, message: 'Evento registrado' });
+}
+
 // =========================
 // Setup schema
 // =========================
@@ -180,6 +203,7 @@ function ensureSchema_(ss) {
   try {
     ensureSheet_(ss, SHEET_USERS, USERS_HEADER);
     ensureSheet_(ss, SHEET_STATE, STATE_HEADER);
+    ensureSheet_(ss, SHEET_EVENTS, EVENTS_HEADER);
     ensureDefaultUsers_(ss.getSheetByName(SHEET_USERS));
   } finally {
     lock.releaseLock();
@@ -306,7 +330,14 @@ function normalizeState_(state) {
     prospectos: Array.isArray(state.prospectos) ? state.prospectos : [],
     checklist: Array.isArray(state.checklist) ? state.checklist : [false, false, false, false, false, false],
     evaluacion: Array.isArray(state.evaluacion) ? state.evaluacion : [false, false, false, false, false],
-    diaActual: Number(state.diaActual || 1)
+    diaActual: Number(state.diaActual || 1),
+    onboardingStartedAt: String(state.onboardingStartedAt || ''),
+    survivalPaused: !!state.survivalPaused,
+    checklistNotificado: !!state.checklistNotificado,
+    certificacion: {
+      aprobada: !!(state.certificacion && state.certificacion.aprobada),
+      puntaje: Number((state.certificacion && state.certificacion.puntaje) || 0)
+    }
   };
 
   if (!isFinite(out.diaActual) || out.diaActual < 1) out.diaActual = 1;
@@ -319,6 +350,11 @@ function normalizeState_(state) {
   out.evaluacion = out.evaluacion.slice(0, 5);
   while (out.evaluacion.length < 5) out.evaluacion.push(false);
   out.evaluacion = out.evaluacion.map(function(v) { return !!v; });
+
+  if (!isFinite(out.certificacion.puntaje) || out.certificacion.puntaje < 0) {
+    out.certificacion.puntaje = 0;
+  }
+  if (out.certificacion.puntaje > 10) out.certificacion.puntaje = 10;
 
   return out;
 }

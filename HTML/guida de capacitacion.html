@@ -64,6 +64,7 @@
             </div>
             <!-- Alertas de seguimiento -->
             <div id="alertasSeguimiento" class="mt-2 text-sm text-orange-700 bg-orange-50 p-2 rounded-xl hidden"></div>
+            <div id="survivalAlert" class="mt-2 text-sm text-red-700 bg-red-50 p-2 rounded-xl hidden"></div>
         </div>
     </header>
 
@@ -86,7 +87,7 @@
                 <a href="#dashboard-inicio" class="sidebar-link block px-4 py-2 rounded-r-xl text-sm font-medium">⚡ Dashboard de inicio</a>
 
                 <div class="module is-open">
-                    <button class="module-toggle" type="button">Módulo 1: Lo básico <span class="module-arrow">▾</span></button>
+                    <button class="module-toggle" type="button" data-module="1">Módulo 1: Lo básico <span class="module-arrow">▾</span></button>
                     <div class="module-content space-y-1">
                         <a href="#rol" class="sidebar-link block px-3 py-2 rounded-r-xl text-sm font-medium">1. Rol exacto</a>
                         <a href="#psicologia" class="sidebar-link block px-3 py-2 rounded-r-xl text-sm font-medium">2. Psicología</a>
@@ -96,7 +97,7 @@
                 </div>
 
                 <div class="module">
-                    <button class="module-toggle" type="button">Módulo 2: Cómo hacerlo <span class="module-arrow">▾</span></button>
+                    <button class="module-toggle" type="button" data-module="2">Módulo 2: Cómo hacerlo <span class="module-arrow">▾</span></button>
                     <div class="module-content space-y-1">
                         <a href="#ruta" class="sidebar-link block px-3 py-2 rounded-r-xl text-sm font-medium">1. Ruta operativa</a>
                         <a href="#calificacion" class="sidebar-link block px-3 py-2 rounded-r-xl text-sm font-medium">2. Calificación</a>
@@ -107,7 +108,7 @@
                 </div>
 
                 <div class="module">
-                    <button class="module-toggle" type="button">Módulo 3: Trabajo diario <span class="module-arrow">▾</span></button>
+                    <button class="module-toggle" type="button" data-module="3">Módulo 3: Trabajo diario <span class="module-arrow">▾</span></button>
                     <div class="module-content space-y-1">
                         <a href="#inicio-rapido" class="sidebar-link block px-3 py-2 rounded-r-xl text-sm font-medium">Inicio rápido</a>
                         <a href="#plan-dias" class="sidebar-link block px-3 py-2 rounded-r-xl text-sm font-medium">1. Plan día a día</a>
@@ -118,7 +119,7 @@
                 </div>
 
                 <div class="module">
-                    <button class="module-toggle" type="button">Módulo 4: Resultados <span class="module-arrow">▾</span></button>
+                    <button class="module-toggle" type="button" data-module="4">Módulo 4: Resultados <span class="module-arrow">▾</span></button>
                     <div class="module-content space-y-1">
                         <a href="#comisiones" class="sidebar-link block px-3 py-2 rounded-r-xl text-sm font-medium">1. Comisiones</a>
                         <a href="#ranking" class="sidebar-link block px-3 py-2 rounded-r-xl text-sm font-medium">2. Ranking semanal</a>
@@ -146,12 +147,38 @@
                     <h2 class="text-3xl font-extrabold text-slate-900">Protocolo de Operación: Servicios Digitales MX</h2>
                 </div>
                 <p class="text-slate-700">Empieza por este panel: define tu día, abre herramientas y arranca ejecución en CRM.</p>
+                <div class="bg-white border border-indigo-200 rounded-2xl p-4">
+                    <p class="text-xs font-bold uppercase tracking-wider text-indigo-600">Misión inicial (día 1)</p>
+                    <p class="font-bold text-slate-800 mt-1">Entender el servicio y registrar tu primer prospecto de prueba.</p>
+                    <ul class="list-disc pl-5 text-sm text-slate-700 mt-2">
+                        <li>Completa 2 checks del checklist.</li>
+                        <li>Registra 1 prospecto en CRM.</li>
+                        <li>Pasa a Módulo 2 automáticamente.</li>
+                    </ul>
+                </div>
                 <div class="flex flex-wrap gap-2">
                     <span class="kid-chip">1. Mira tu meta</span>
                     <span class="kid-chip">2. Haz tareas cortas</span>
                     <span class="kid-chip">3. Registra todo</span>
                 </div>
                 <div class="kid-tip">Tip rápido: abre solo una sección, complétala y luego pasa a la siguiente.</div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div class="bg-white border border-slate-200 rounded-2xl p-4">
+                        <p class="text-xs font-bold uppercase text-slate-500">Micro-cápsula 01</p>
+                        <p class="font-semibold">Cómo abrir conversación en 60s</p>
+                        <p class="text-xs text-slate-500 mt-1">Lee el script, practica 2 veces, envía 1 mensaje real.</p>
+                    </div>
+                    <div class="bg-white border border-slate-200 rounded-2xl p-4">
+                        <p class="text-xs font-bold uppercase text-slate-500">Micro-cápsula 02</p>
+                        <p class="font-semibold">Cómo detectar dolor rápido</p>
+                        <p class="text-xs text-slate-500 mt-1">Haz 3 preguntas y clasifica verde/amarillo/rojo.</p>
+                    </div>
+                    <div class="bg-white border border-slate-200 rounded-2xl p-4">
+                        <p class="text-xs font-bold uppercase text-slate-500">Micro-cápsula 03</p>
+                        <p class="font-semibold">Cómo pedir demo sin presión</p>
+                        <p class="text-xs text-slate-500 mt-1">Usa cierre suave y agenda siguiente paso.</p>
+                    </div>
+                </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <a href="#inicio-rapido" class="bg-white border border-slate-200 rounded-2xl p-4 hover:border-indigo-400">
                         <p class="text-xs text-indigo-600 font-bold uppercase">Paso 1</p>
@@ -285,6 +312,20 @@
                 </div>
             </section>
 
+            <section id="battle-cards" class="active-section space-y-4">
+                <div class="flex items-center gap-4">
+                    <div class="step-number">B</div>
+                    <h2 class="text-3xl font-extrabold text-slate-900">Battle Cards (objeciones México)</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="bg-white p-4 rounded-xl border border-slate-200"><span class="font-bold">“Está caro.”</span><br>“Te entiendo. Justo por eso lo vemos como inversión: recuperas tiempo y cierras más rápido.”</div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200"><span class="font-bold">“Lo veo después.”</span><br>“Va. ¿Te parece si lo dejamos agendado de una vez para no perder el hilo?”</div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200"><span class="font-bold">“Ya tengo a alguien.”</span><br>“Perfecto, ¿te está funcionando al 100? Si no, te muestro una opción rápida.”</div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200"><span class="font-bold">“No tengo tiempo.”</span><br>“Son 5 minutos y te digo si sí te conviene o no.”</div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200"><span class="font-bold">“Mándame precio.”</span><br>“Te lo doy exacto cuando vea tu caso en 5 minutos. Así no te doy humo.”</div>
+                </div>
+            </section>
+
             <!-- ========== 5. GUIONES POR GIRO ========= -->
             <section id="guiones-giro" class="active-section space-y-4">
                 <div class="flex items-center gap-4">
@@ -296,6 +337,26 @@
                     <div class="bg-white p-5 rounded-2xl border-l-4 border-green-400"><span class="font-bold text-green-700">Veterinaria</span><br>"Hola, soy de Servicios Digitales MX. Ayudamos a veterinarias a recibir la información de la mascota (síntomas, edad) antes de la consulta para agilizar la atención. ¿Te interesaría conocer cómo?"</div>
                     <div class="bg-white p-5 rounded-2xl border-l-4 border-red-400"><span class="font-bold text-red-700">Taquería / Comida</span><br>"Qué tal, veo que tomas pedidos por WhatsApp. Te comparto una herramienta que usan negocios como el tuyo para que el cliente seleccione su pedido en un menú digital y tú recibas todo ordenado. ¿Te puedo explicar?"</div>
                     <div class="bg-white p-5 rounded-2xl border-l-4 border-purple-400"><span class="font-bold text-purple-700">Técnico (minisplit, etc.)</span><br>"Hola, ¿cómo estás? Te contacto porque muchos técnicos pierden tiempo preguntando la falla, marca, dirección por mensaje. Nosotros creamos un sistema donde el cliente llena una ficha con foto y datos, y tú cotizas más rápido. ¿Te sirve?"</div>
+                </div>
+            </section>
+
+            <section id="generador-guiones" class="active-section space-y-4">
+                <div class="flex items-center gap-4">
+                    <div class="step-number">G</div>
+                    <h2 class="text-3xl font-extrabold text-slate-900">Generador de guiones</h2>
+                </div>
+                <div class="bg-white p-6 rounded-3xl border border-slate-200 space-y-3">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                        <select id="scriptTipo" class="p-2 border rounded-xl">
+                            <option value="comercio">Comercio</option>
+                            <option value="servicios">Servicios</option>
+                            <option value="marca_personal">Marca personal</option>
+                        </select>
+                        <input id="scriptNegocio" class="p-2 border rounded-xl" placeholder="Nombre del negocio">
+                        <button id="btnGenerarGuion" class="bg-indigo-600 text-white px-4 py-2 rounded-xl">Generar guion</button>
+                    </div>
+                    <textarea id="scriptGenerado" class="w-full p-3 border rounded-xl min-h-[110px]" placeholder="Aquí saldrá el mensaje listo para WhatsApp..."></textarea>
+                    <button id="btnCopiarGuionGenerado" class="bg-slate-800 text-white px-4 py-2 rounded-xl text-sm">Copiar guion</button>
                 </div>
             </section>
 
@@ -539,6 +600,21 @@
                 </div>
             </section>
 
+            <section id="calculadora-comision" class="active-section space-y-4">
+                <div class="flex items-center gap-4">
+                    <div class="step-number">C</div>
+                    <h2 class="text-3xl font-extrabold text-slate-900">Calculadora de comisiones</h2>
+                </div>
+                <div class="bg-white p-6 rounded-3xl border border-slate-200 space-y-3">
+                    <label class="text-sm font-semibold">¿Cuántas ventas planeas cerrar este mes?</label>
+                    <input id="calcVentas" type="range" min="0" max="30" value="5" class="w-full">
+                    <div class="text-sm">Ventas planeadas: <span id="calcVentasVal" class="font-bold">5</span></div>
+                    <label class="text-sm font-semibold">Comisión promedio por cierre (MXN)</label>
+                    <input id="calcComisionProm" type="number" value="500" class="p-2 border rounded-xl w-full md:w-64">
+                    <div class="bg-indigo-50 p-3 rounded-xl text-indigo-900">Proyección: <span id="calcResultado" class="font-extrabold">$2,500 MXN</span></div>
+                </div>
+            </section>
+
             <!-- ========== 13. RANKING SEMANAL ========= -->
             <section id="ranking" class="active-section space-y-4">
                 <div class="flex items-center gap-4">
@@ -577,6 +653,21 @@
                     </div>
                     <div class="mt-4 p-3 bg-indigo-50 rounded-xl">
                         Puntaje: <span id="puntajeEval">0</span>/5 - Estado: <span id="estadoEval">No aprobado</span>
+                    </div>
+                </div>
+            </section>
+
+            <section id="certificacion" class="active-section space-y-4">
+                <div class="flex items-center gap-4">
+                    <div class="step-number">10</div>
+                    <h2 class="text-3xl font-extrabold text-slate-900">Examen de certificación (10 preguntas)</h2>
+                </div>
+                <div class="bg-white p-6 rounded-3xl border border-slate-200">
+                    <p class="text-sm text-slate-600 mb-3">Debes aprobar para operar cierres con clientes reales.</p>
+                    <div id="quizContainer" class="space-y-3"></div>
+                    <div class="mt-4 flex items-center gap-2">
+                        <button id="btnEvaluarQuiz" class="bg-indigo-600 text-white px-4 py-2 rounded-xl">Evaluar examen</button>
+                        <span id="quizResultado" class="text-sm font-semibold"></span>
                     </div>
                 </div>
             </section>
@@ -887,6 +978,14 @@
             <p class="text-slate-300 text-[10px]">Sistema de entrenamiento persistente y operativo. Datos sincronizados en la nube con tu backend de App Script.</p>
         </div>
     </footer>
+
+    <div id="pauseOverlay" class="hidden fixed inset-0 bg-slate-900/80 z-[9998] p-4">
+        <div class="max-w-xl mx-auto mt-24 bg-white rounded-2xl p-6">
+            <h3 class="text-xl font-extrabold text-slate-900">Acceso pausado por KPI de supervivencia</h3>
+            <p class="text-sm text-slate-600 mt-2">En las primeras 48 horas debías registrar al menos 5 prospectos. Tu acceso está pausado hasta validación del administrador.</p>
+            <p class="text-sm text-slate-600 mt-2">Contacta a tu líder para reactivar tu cuenta.</p>
+        </div>
+    </div>
 
         <script src="../JS/guida de capacitacion.js"></script>
 </body>

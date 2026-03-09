@@ -11,7 +11,11 @@
                 prospectos: [],
                 checklist: [false, false, false, false, false, false],
                 evaluacion: [false, false, false, false, false],
-                diaActual: 1
+                diaActual: 1,
+                onboardingStartedAt: '',
+                survivalPaused: false,
+                certificacion: { aprobada: false, puntaje: 0 },
+                checklistNotificado: false
             };
         }
 
@@ -44,12 +48,26 @@
             await callBackend({ action: 'saveState', username, state });
         }
 
+        async function notifyEvent(tipo, detalle) {
+            if (!currentUser) return;
+            await callBackend({
+                action: 'notifyEvent',
+                username: currentUser,
+                tipo: tipo,
+                detalle: detalle || {}
+            });
+        }
+
         function collectUserState() {
             return {
                 prospectos: prospectos || [],
                 checklist: obtenerDeStorage('checklist', defaultState().checklist),
                 evaluacion: obtenerDeStorage('evaluacion', defaultState().evaluacion),
-                diaActual: obtenerDeStorage('diaActual', defaultState().diaActual)
+                diaActual: obtenerDeStorage('diaActual', defaultState().diaActual),
+                onboardingStartedAt: obtenerDeStorage('onboardingStartedAt', ''),
+                survivalPaused: !!obtenerDeStorage('survivalPaused', false),
+                certificacion: obtenerDeStorage('certificacion', defaultState().certificacion),
+                checklistNotificado: !!obtenerDeStorage('checklistNotificado', false)
             };
         }
 
@@ -218,6 +236,8 @@
             actualizarAlertasSeguimiento();
             actualizarStatsResponsable();
             actualizarFiltrosResponsable();
+            applyModuleLocks();
+            checkSurvivalMode();
         }
 
         // Coherencia etapa-checkbox
@@ -304,6 +324,11 @@
                 alert('WhatsApp debe tener 10 dígitos.');
                 return;
             }
+            const cert = obtenerDeStorage('certificacion', defaultState().certificacion);
+            if (cerrado && !(cert && cert.aprobada)) {
+                alert('Debes aprobar la certificación (8/10) antes de marcar cierres.');
+                return;
+            }
             const existe = prospectos.find((p, i) => p.contacto === contacto && i !== index);
             if (existe) {
                 alert('Ya existe un prospecto con ese WhatsApp.');
@@ -377,6 +402,14 @@
                 guardarEnStorage('checklist', estados);
                 syncMiniChecklist();
                 actualizarProgresoGlobal();
+                applyModuleLocks();
+                if (estados[i]) {
+                    notifyEvent('checklist_item_done', { item: i + 1 });
+                }
+                if (estados.every(Boolean) && !obtenerDeStorage('checklistNotificado', false)) {
+                    guardarEnStorage('checklistNotificado', true);
+                    notifyEvent('checklist_completo', { total: estados.length });
+                }
             });
         });
 
@@ -387,6 +420,7 @@
                 const estados = Array.from(checkboxes).map(c => c.checked);
                 guardarEnStorage('checklist', estados);
                 actualizarProgresoGlobal();
+                applyModuleLocks();
             });
         });
 
@@ -415,6 +449,7 @@
                 guardarEnStorage('evaluacion', estados);
                 actualizarPuntajeEval();
                 actualizarProgresoGlobal();
+                applyModuleLocks();
             });
         });
 
@@ -528,6 +563,126 @@
             actualizarDiaHeader();
         });
 
+        // ================== GENERADOR DE GUIONES ==================
+        const SCRIPT_TEMPLATES = {
+            comercio: 'Hola {negocio}, vi su negocio y les contacto porque ayudamos a comercios a ordenar mensajes y cotizaciones en un solo flujo. ¿Te puedo mostrar un ejemplo de 5 minutos?',
+            servicios: 'Hola {negocio}, trabajamos con negocios de servicios para que reciban datos completos del cliente antes de cotizar y así responder más rápido. ¿Te explico cómo?',
+            marca_personal: 'Hola {negocio}, ayudamos a marcas personales a convertir mensajes en citas ordenadas sin perder oportunidades. ¿Te comparto una idea breve?'
+        };
+
+        function generarGuion() {
+            const tipo = (document.getElementById('scriptTipo') || {}).value || 'comercio';
+            const negocio = ((document.getElementById('scriptNegocio') || {}).value || 'tu negocio').trim();
+            const base = SCRIPT_TEMPLATES[tipo] || SCRIPT_TEMPLATES.comercio;
+            const salida = base.replace('{negocio}', negocio || 'tu negocio');
+            const box = document.getElementById('scriptGenerado');
+            if (box) box.value = salida;
+        }
+
+        const btnGenerar = document.getElementById('btnGenerarGuion');
+        if (btnGenerar) btnGenerar.addEventListener('click', generarGuion);
+        const btnCopiarGenerado = document.getElementById('btnCopiarGuionGenerado');
+        if (btnCopiarGenerado) {
+            btnCopiarGenerado.addEventListener('click', async () => {
+                const box = document.getElementById('scriptGenerado');
+                const value = box ? box.value : '';
+                if (!value) return;
+                await navigator.clipboard.writeText(value);
+                btnCopiarGenerado.innerText = 'Copiado';
+                setTimeout(() => { btnCopiarGenerado.innerText = 'Copiar guion'; }, 1200);
+            });
+        }
+
+        // ================== CALCULADORA COMISIONES ==================
+        function actualizarCalculadora() {
+            const ventas = Number((document.getElementById('calcVentas') || {}).value || 0);
+            const comisionProm = Number((document.getElementById('calcComisionProm') || {}).value || 0);
+            const total = ventas * comisionProm;
+            const val = document.getElementById('calcVentasVal');
+            const res = document.getElementById('calcResultado');
+            if (val) val.innerText = String(ventas);
+            if (res) res.innerText = `$${total.toLocaleString('es-MX')} MXN`;
+        }
+
+        const calcVentas = document.getElementById('calcVentas');
+        const calcComisionProm = document.getElementById('calcComisionProm');
+        if (calcVentas) calcVentas.addEventListener('input', actualizarCalculadora);
+        if (calcComisionProm) calcComisionProm.addEventListener('input', actualizarCalculadora);
+        actualizarCalculadora();
+
+        // ================== CERTIFICACION (10 PREGUNTAS) ==================
+        const QUIZ_QUESTIONS = [
+            { q: '¿Qué haces primero con un prospecto nuevo?', a: 'registrar', o: ['mandar precio directo', 'registrar', 'cerrar venta'] },
+            { q: 'Si te dicen "está caro", ¿qué haces?', a: 'valor', o: ['discutir', 'valor', 'colgar'] },
+            { q: '¿Cuándo cuenta la comisión de cierre?', a: 'liquida', o: ['al agendar', 'liquida', 'al primer mensaje'] },
+            { q: '¿Cuántos prospectos mínimo en 48h para no pausa?', a: 'cinco', o: ['uno', 'cinco', 'diez'] },
+            { q: '¿Qué no debes hacer?', a: 'prometer', o: ['prometer', 'seguir proceso', 'registrar crm'] },
+            { q: 'Semáforo rojo significa:', a: 'descartar', o: ['cerrar', 'descartar', 'bono'] },
+            { q: 'El follow-up ideal es:', a: 'persistente', o: ['solo 1 mensaje', 'persistente', 'nunca'] },
+            { q: 'Si no está certificado:', a: 'no_cierre', o: ['puede cerrar', 'no_cierre', 'puede cobrar cierre'] },
+            { q: 'Dato clave en CRM:', a: 'contacto', o: ['solo nombre', 'contacto', 'solo giro'] },
+            { q: 'Meta del día 1:', a: 'primer_prospecto', o: ['cerrar 3 ventas', 'primer_prospecto', 'ignorar checklist'] }
+        ];
+
+        function renderQuiz() {
+            const wrap = document.getElementById('quizContainer');
+            if (!wrap) return;
+            wrap.innerHTML = '';
+            QUIZ_QUESTIONS.forEach((item, idx) => {
+                const card = document.createElement('div');
+                card.className = 'bg-slate-50 border border-slate-200 rounded-xl p-3';
+                card.innerHTML = `
+                    <p class="text-sm font-semibold">${idx + 1}. ${item.q}</p>
+                    <select class="quiz-select p-2 border rounded-xl mt-2 w-full" data-quiz-index="${idx}">
+                        <option value="">Selecciona...</option>
+                        ${item.o.map((opt) => `<option value="${opt}">${opt.replace('_', ' ')}</option>`).join('')}
+                    </select>
+                `;
+                wrap.appendChild(card);
+            });
+        }
+
+        function evaluarQuiz() {
+            const answers = Array.from(document.querySelectorAll('.quiz-select')).map((s) => s.value);
+            let ok = 0;
+            QUIZ_QUESTIONS.forEach((q, i) => { if (answers[i] === q.a) ok += 1; });
+            const aprobada = ok >= 8;
+            guardarEnStorage('certificacion', { aprobada: aprobada, puntaje: ok });
+            syncCertResult();
+            applyModuleLocks();
+        }
+
+        function syncCertResult() {
+            const cert = obtenerDeStorage('certificacion', defaultState().certificacion);
+            const out = document.getElementById('quizResultado');
+            if (!out) return;
+            out.innerText = cert.aprobada ? `Aprobado (${cert.puntaje}/10)` : `No aprobado (${cert.puntaje}/10)`;
+        }
+
+        renderQuiz();
+        const btnEvaluarQuiz = document.getElementById('btnEvaluarQuiz');
+        if (btnEvaluarQuiz) btnEvaluarQuiz.addEventListener('click', evaluarQuiz);
+
+        // ================== KPI SUPERVIVENCIA (48H) ==================
+        function checkSurvivalMode() {
+            const started = obtenerDeStorage('onboardingStartedAt', '');
+            const startTs = started ? Date.parse(started) : Date.now();
+            const now = Date.now();
+            const activeProspects = prospectos.filter((p) => !p.archivado).length;
+            const shouldPause = (now - startTs) > (48 * 60 * 60 * 1000) && activeProspects < 5;
+            guardarEnStorage('survivalPaused', shouldPause);
+            const alertDiv = document.getElementById('survivalAlert');
+            if (alertDiv) {
+                alertDiv.classList.toggle('hidden', !shouldPause);
+                alertDiv.innerText = shouldPause
+                    ? 'KPI de supervivencia: acceso pausado. En 48h debías registrar 5 prospectos.'
+                    : '';
+            }
+            const overlay = document.getElementById('pauseOverlay');
+            if (overlay) overlay.classList.toggle('hidden', !shouldPause);
+            return shouldPause;
+        }
+
         // ================== SIDEBAR MÓVIL + MÓDULOS ==================
         const menuToggle = document.getElementById('menuToggle');
         const mobileMenu = document.getElementById('mobileMenu');
@@ -540,6 +695,11 @@
                 const toggle = module.querySelector('.module-toggle');
                 if (!toggle) return;
                 toggle.addEventListener('click', () => {
+                    const mod = Number(toggle.dataset.module || 0);
+                    if (mod && !unlockedModules[mod]) {
+                        alert('Completa los pasos del módulo anterior para desbloquear.');
+                        return;
+                    }
                     module.classList.toggle('is-open');
                 });
             });
@@ -555,13 +715,68 @@
         }
 
         // ================== TABS PRINCIPALES ==================
+        const SECTION_TO_MODULE = {
+            rol: 1, psicologia: 1, herramientas: 1, 'frases-prohibidas': 1,
+            ruta: 2, calificacion: 2, 'guiones-giro': 2, 'generador-guiones': 2, objeciones: 2, 'battle-cards': 2, seguimiento: 2,
+            'inicio-rapido': 3, 'plan-dias': 3, crm: 3, kpis: 3, handoff: 3, checklist: 3, 'mi-semana': 3, certificacion: 3,
+            comisiones: 4, 'calculadora-comision': 4, ranking: 4, crecimiento: 4, evaluacion: 4, 'post-demo': 4, 'comunicado-equipo': 4
+        };
         const TAB_SECTIONS = {
-            entrenamiento: ['ruta', 'calificacion', 'seguimiento', 'objeciones', 'guiones-giro', 'kpis', 'disciplina', 'casos', 'rol', 'plan-dias'],
-            operacion: ['crm', 'comisiones', 'ranking', 'evaluacion', 'psicologia', 'errores', 'frases-prohibidas', 'roleplay', 'crecimiento', 'post-demo', 'handoff', 'herramientas', 'inicio-rapido', 'preguntas-frecuentes', 'scripts', 'comunicado-equipo'],
+            entrenamiento: ['ruta', 'calificacion', 'seguimiento', 'objeciones', 'battle-cards', 'guiones-giro', 'generador-guiones', 'kpis', 'disciplina', 'casos', 'rol', 'plan-dias'],
+            operacion: ['crm', 'comisiones', 'calculadora-comision', 'ranking', 'evaluacion', 'certificacion', 'psicologia', 'errores', 'frases-prohibidas', 'roleplay', 'crecimiento', 'post-demo', 'handoff', 'herramientas', 'inicio-rapido', 'preguntas-frecuentes', 'scripts', 'comunicado-equipo'],
             progreso: ['dashboard-inicio', 'checklist', 'mi-semana']
         };
         const tabButtons = document.querySelectorAll('[data-tab-target]');
         const allTabSectionIds = Array.from(new Set(Object.values(TAB_SECTIONS).flat()));
+        let unlockedModules = { 1: true, 2: false, 3: false, 4: false };
+
+        function computeUnlockedModules() {
+            const checksDone = (obtenerDeStorage('checklist', defaultState().checklist) || []).filter(Boolean).length;
+            const evalBase = (obtenerDeStorage('evaluacion', defaultState().evaluacion) || [])[0] === true;
+            const activeProspects = prospectos.filter((p) => !p.archivado).length;
+            const demos = prospectos.filter((p) => p.demoAgendada).length;
+            const cert = obtenerDeStorage('certificacion', defaultState().certificacion);
+            const certOk = !!(cert && cert.aprobada);
+
+            unlockedModules = {
+                1: true,
+                2: checksDone >= 2 && evalBase,
+                3: activeProspects >= 1,
+                4: activeProspects >= 5 && demos >= 1 && certOk
+            };
+        }
+
+        function applyModuleLocks() {
+            computeUnlockedModules();
+            document.querySelectorAll('.module-toggle[data-module]').forEach((btn) => {
+                const mod = Number(btn.dataset.module);
+                const unlocked = !!unlockedModules[mod];
+                btn.classList.toggle('is-locked', !unlocked);
+                if (!unlocked && !btn.querySelector('.lock-chip')) {
+                    const chip = document.createElement('span');
+                    chip.className = 'lock-chip';
+                    chip.textContent = 'bloqueado';
+                    btn.appendChild(chip);
+                }
+                if (unlocked) {
+                    const chip = btn.querySelector('.lock-chip');
+                    if (chip) chip.remove();
+                }
+            });
+
+            document.querySelectorAll('.sidebar-link').forEach((link) => {
+                const href = (link.getAttribute('href') || '').replace('#', '');
+                const mod = SECTION_TO_MODULE[href];
+                if (!mod) return;
+                const unlocked = !!unlockedModules[mod];
+                link.classList.toggle('is-locked', !unlocked);
+                if (!unlocked) {
+                    link.setAttribute('title', 'Completa pasos previos para desbloquear');
+                } else {
+                    link.removeAttribute('title');
+                }
+            });
+        }
 
         function prepareSectionAccordions() {
             allTabSectionIds.forEach((id) => {
@@ -603,7 +818,10 @@
             allTabSectionIds.forEach((id) => {
                 const section = document.getElementById(id);
                 if (!section) return;
-                section.classList.toggle('tab-hidden', !(TAB_SECTIONS[tabName] || []).includes(id));
+                const inTab = (TAB_SECTIONS[tabName] || []).includes(id);
+                const mod = SECTION_TO_MODULE[id];
+                const locked = mod ? !unlockedModules[mod] : false;
+                section.classList.toggle('tab-hidden', !(inTab && !locked));
             });
             tabButtons.forEach((btn) => {
                 btn.classList.toggle('is-active', btn.dataset.tabTarget === tabName);
@@ -623,9 +841,9 @@
         function decorateSectionTitles() {
             const titleIcons = {
                 ruta: '🧭', calificacion: '🚦', seguimiento: '🔁', objeciones: '🗣️',
-                'guiones-giro': '📝', kpis: '📊', disciplina: '⚖️', casos: '📂',
+                'guiones-giro': '📝', 'generador-guiones': '🧩', 'battle-cards': '🛡️', kpis: '📊', disciplina: '⚖️', casos: '📂',
                 rol: '🎯', 'plan-dias': '📅', crm: '🗃️', comisiones: '💰',
-                ranking: '🏆', evaluacion: '✅', psicologia: '🧠', errores: '❌',
+                'calculadora-comision': '🧮', ranking: '🏆', evaluacion: '✅', certificacion: '🎓', psicologia: '🧠', errores: '❌',
                 'frases-prohibidas': '🚫', roleplay: '🎭', crecimiento: '📈',
                 'post-demo': '📞', handoff: '🤝', herramientas: '🛠️',
                 'inicio-rapido': '⚡', checklist: '📋', 'preguntas-frecuentes': '❓',
@@ -642,8 +860,14 @@
         }
 
         document.querySelectorAll('a[href^="#"]').forEach((link) => {
-            link.addEventListener('click', () => {
+            link.addEventListener('click', (e) => {
                 const targetId = (link.getAttribute('href') || '').replace('#', '');
+                const mod = SECTION_TO_MODULE[targetId];
+                if (mod && !unlockedModules[mod]) {
+                    e.preventDefault();
+                    alert('Este módulo está bloqueado. Completa los pasos previos.');
+                    return;
+                }
                 const tab = tabForSection(targetId);
                 if (tab) setActiveTab(tab);
             });
@@ -651,6 +875,7 @@
 
         prepareSectionAccordions();
         decorateSectionTitles();
+        applyModuleLocks();
         setActiveTab('progreso');
 
         // ================== INTERSECTION OBSERVER (desktop y móvil) ==================
@@ -684,10 +909,15 @@
         async function hydrateUserState() {
             const remoteState = await cargarDatosDesdeBackend(currentUser);
             userState = Object.assign(defaultState(), remoteState || {});
+            if (!userState.onboardingStartedAt) {
+                userState.onboardingStartedAt = new Date().toISOString();
+                scheduleBackendSync();
+            }
             prospectos = Array.isArray(userState.prospectos) ? userState.prospectos : [];
             cargarChecklist();
             cargarEvaluacion();
             cargarDia();
+            syncCertResult();
         }
 
         async function doLogin() {
@@ -712,6 +942,8 @@
             actualizarProgresoGlobal();
             actualizarKPIsReales();
             actualizarAlertasSeguimiento();
+            applyModuleLocks();
+            checkSurvivalMode();
             setActiveTab('progreso');
         }
 
