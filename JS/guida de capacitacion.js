@@ -818,6 +818,14 @@
             document.getElementById('loginModal').classList.remove('hidden');
         });
 
+        // Limpieza defensiva: elimina cualquier botón viejo "Entendido, ir a ..."
+        document.querySelectorAll('a,button').forEach((el) => {
+            const txt = (el.textContent || '').trim();
+            if (txt.startsWith('Entendido, ir a')) {
+                el.remove();
+            }
+        });
+
         // Estado inicial
         setAppVisible(false);
     
