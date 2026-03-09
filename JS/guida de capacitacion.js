@@ -43,7 +43,8 @@ function initDomReferences() {
         'conversionRateRatio', 'conversionRateTrend', 'tuRanking', 'menuToggle',
         'mobileMenu', 'quizContainer', 'quizResultado', 'btnEvaluarQuiz',
         'btnGenerarGuion', 'btnCopiarGuionGenerado', 'scriptTipo', 'scriptNegocio',
-        'scriptGenerado', 'calcVentas', 'calcComisionProm', 'calcVentasVal', 'calcResultado'
+        'scriptGenerado', 'calcVentas', 'calcComisionProm', 'calcVentasVal', 'calcResultado',
+        'modulePrevBtn', 'moduleNextBtn', 'moduleProgress', 'moduleTitle'
     ];
     ids.forEach(id => dom[id] = $(id));
 }
@@ -59,6 +60,7 @@ let pendingSyncState = null;
 let pendingSyncSnapshot = '';
 let lastSyncedSnapshot = '';
 let activeTabName = 'progreso';
+let tabSectionIndexMap = { entrenamiento: 0, operacion: 0, progreso: 0 };
 let unlockedModules = { 1: true, 2: true, 3: true, 4: false };
 let prospectInsights = buildProspectInsights([]);
 let crmRenderHandle = 0;
@@ -1283,39 +1285,79 @@ function prepareSectionAccordions() {
     });
 }
 
-function expandFirstVisible(tabName) {
-    let opened = false;
-    (TAB_SECTIONS[tabName] || []).forEach((id) => {
+function getTabVisibleSectionIds(tabName) {
+    return (TAB_SECTIONS[tabName] || []).filter((id) => {
         const section = $(id);
-        if (!section || section.classList.contains('tab-hidden')) return;
-        if (!opened) {
-            section.classList.remove('section-collapsed');
-            opened = true;
-        } else {
-            section.classList.add('section-collapsed');
-        }
+        if (!section) return false;
+        const access = getSectionAccessState(id);
+        const mod = SECTION_TO_MODULE[id];
+        const moduleLocked = mod ? !unlockedModules[mod] : false;
+        return !access.locked && !moduleLocked;
     });
 }
 
-function setActiveTab(tabName) {
+function getSectionDisplayTitle(sectionId) {
+    const section = $(sectionId);
+    if (!section) return 'Bloque';
+    const heading = section.querySelector('h2');
+    if (!heading) return 'Bloque';
+    return limitText(heading.textContent || 'Bloque', 110) || 'Bloque';
+}
+
+function syncModuleProgressUi(tabName, visibleIds, activeIndex) {
+    const hasSections = visibleIds.length > 0;
+    const total = hasSections ? visibleIds.length : 0;
+    const current = hasSections ? (activeIndex + 1) : 0;
+    const activeId = hasSections ? visibleIds[activeIndex] : '';
+
+    if (dom.moduleProgress) dom.moduleProgress.innerText = `${current} / ${total}`;
+    if (dom.moduleTitle) dom.moduleTitle.innerText = hasSections ? getSectionDisplayTitle(activeId) : 'Sin bloques disponibles';
+    if (dom.modulePrevBtn) dom.modulePrevBtn.disabled = !hasSections || activeIndex <= 0;
+    if (dom.moduleNextBtn) dom.moduleNextBtn.disabled = !hasSections || activeIndex >= (visibleIds.length - 1);
+
+    sidebarLinks.forEach((link) => {
+        link.classList.toggle('active', hasSections && link.getAttribute('href') === `#${activeId}`);
+    });
+}
+
+function setActiveTab(tabName, preferredSectionId) {
     activeTabName = tabName;
+    const visibleIds = getTabVisibleSectionIds(tabName);
+
+    let nextIndex = clampNumber(tabSectionIndexMap[tabName], 0, Math.max(visibleIds.length - 1, 0), 0);
+    if (preferredSectionId) {
+        const targetIndex = visibleIds.indexOf(preferredSectionId);
+        if (targetIndex >= 0) nextIndex = targetIndex;
+    }
+    tabSectionIndexMap[tabName] = nextIndex;
+
+    const activeId = visibleIds[nextIndex] || '';
 
     allTabSectionIds.forEach((id) => {
         const section = $(id);
         if (!section) return;
-
-        const inTab = (TAB_SECTIONS[tabName] || []).includes(id);
-        const access = getSectionAccessState(id);
-        const mod = SECTION_TO_MODULE[id];
-        const moduleLocked = mod ? !unlockedModules[mod] : false;
-        section.classList.toggle('tab-hidden', !(inTab && !access.locked && !moduleLocked));
+        const isActive = id === activeId;
+        section.classList.toggle('tab-hidden', !isActive);
+        if (isActive) section.classList.remove('section-collapsed');
     });
 
     tabButtons.forEach((button) => {
         button.classList.toggle('is-active', button.dataset.tabTarget === tabName);
     });
 
-    expandFirstVisible(tabName);
+    syncModuleProgressUi(tabName, visibleIds, nextIndex);
+}
+
+function shiftTabSection(delta) {
+    const visibleIds = getTabVisibleSectionIds(activeTabName);
+    if (!visibleIds.length) return;
+
+    const currentIndex = clampNumber(tabSectionIndexMap[activeTabName], 0, visibleIds.length - 1, 0);
+    const nextIndex = clampNumber(currentIndex + delta, 0, visibleIds.length - 1, currentIndex);
+    if (nextIndex === currentIndex) return;
+
+    tabSectionIndexMap[activeTabName] = nextIndex;
+    setActiveTab(activeTabName, visibleIds[nextIndex]);
 }
 
 function tabForSection(id) {
@@ -1337,7 +1379,7 @@ $$('a[href^="#"]').forEach((link) => {
         }
 
         const tab = tabForSection(targetId);
-        if (tab) setActiveTab(tab);
+        if (tab) setActiveTab(tab, targetId);
     });
 });
 
@@ -1442,6 +1484,7 @@ function doLogout() {
     currentUser = null;
     userState = defaultState();
     prospectos = [];
+    tabSectionIndexMap = { entrenamiento: 0, operacion: 0, progreso: 0 };
     diaActual = 1;
     syncInFlight = false;
     pendingSyncState = null;
@@ -1539,8 +1582,10 @@ function initEventListeners() {
 
     tabButtons = $$('[data-tab-target]');
     tabButtons.forEach((button) => {
-        button.addEventListener('click', () => setActiveTab(button.dataset.tabTarget));
+        button.addEventListener('click', () => setActiveTab(button.dataset.tabTarget, ''));
     });
+    if (dom.modulePrevBtn) dom.modulePrevBtn.addEventListener('click', () => shiftTabSection(-1));
+    if (dom.moduleNextBtn) dom.moduleNextBtn.addEventListener('click', () => shiftTabSection(1));
 
     document.addEventListener('click', (event) => {
         const copyButton = event.target.closest('[data-copy-script]');

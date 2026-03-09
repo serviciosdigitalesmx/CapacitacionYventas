@@ -301,6 +301,58 @@ h1, h2, h3, h4, .module-toggle, .tab-btn, .login-box h2 {
     border-color: transparent;
 }
 
+.module-progress-nav {
+    position: sticky;
+    top: 136px;
+    z-index: 29;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+    padding: 0.65rem 0.85rem;
+    border-radius: 1rem;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(14px);
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+}
+
+.module-progress-nav__btn {
+    border: 1px solid rgba(15, 23, 42, 0.1);
+    background: rgba(255, 255, 255, 0.96);
+    color: var(--text);
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 0.52rem 0.85rem;
+}
+
+.module-progress-nav__btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.module-progress-nav__meta {
+    flex: 1 1 auto;
+    text-align: center;
+}
+
+.module-progress-nav__title {
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.module-progress-nav__counter {
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--primary-strong);
+}
+
 .tab-hidden {
     display: none !important;
 }
@@ -765,6 +817,21 @@ h1, h2, h3, h4, .module-toggle, .tab-btn, .login-box h2 {
         background: rgba(255, 255, 255, 0.95);
         border-top: 1px solid var(--border);
         backdrop-filter: blur(12px);
+    }
+
+    .module-progress-nav {
+        top: 122px;
+        padding: 0.5rem 0.6rem;
+        gap: 0.5rem;
+    }
+
+    .module-progress-nav__btn {
+        font-size: 0.68rem;
+        padding: 0.45rem 0.62rem;
+    }
+
+    .module-progress-nav__title {
+        font-size: 0.76rem;
     }
 
     .conversion-panel {
