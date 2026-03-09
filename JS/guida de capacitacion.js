@@ -2,20 +2,18 @@
         // ================== AUTH + BACKEND ==================
         const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxfTsZDlIuSosrVfj8fbIucl64kBqQdmyXhywjy3szq8VjZ4w7g4xkKPXWjI8S7OXk9/exec'; // Ej: https://script.google.com/macros/s/XXXX/exec
         const APP_TOKEN = '446c0599e6fed1bd0408d31e746e727a31829fdedf957972';
-        const FALLBACK_USERS = [
-            { username: 'freelancer1', password: 'pass1' }, { username: 'freelancer2', password: 'pass2' },
-            { username: 'freelancer3', password: 'pass3' }, { username: 'freelancer4', password: 'pass4' },
-            { username: 'freelancer5', password: 'pass5' }, { username: 'freelancer6', password: 'pass6' },
-            { username: 'freelancer7', password: 'pass7' }, { username: 'freelancer8', password: 'pass8' },
-            { username: 'freelancer9', password: 'pass9' }, { username: 'freelancer10', password: 'pass10' },
-            { username: 'freelancer11', password: 'pass11' }, { username: 'freelancer12', password: 'pass12' },
-            { username: 'freelancer13', password: 'pass13' }, { username: 'freelancer14', password: 'pass14' },
-            { username: 'freelancer15', password: 'pass15' }, { username: 'freelancer16', password: 'pass16' },
-            { username: 'freelancer17', password: 'pass17' }, { username: 'freelancer18', password: 'pass18' },
-            { username: 'freelancer19', password: 'pass19' }, { username: 'freelancer20', password: 'pass20' }
-        ];
         let currentUser = null;
         let saveTimer = null;
+        let userState = null;
+
+        function defaultState() {
+            return {
+                prospectos: [],
+                checklist: [false, false, false, false, false, false],
+                evaluacion: [false, false, false, false, false],
+                diaActual: 1
+            };
+        }
 
         async function callBackend(payload) {
             if (!APP_SCRIPT_URL) return null;
@@ -33,8 +31,7 @@
 
         async function validateCredentials(username, password) {
             const remote = await callBackend({ action: 'login', username, password });
-            if (remote && remote.success === true) return true;
-            return FALLBACK_USERS.some(u => u.username === username && u.password === password);
+            return !!(remote && remote.success === true);
         }
 
         async function cargarDatosDesdeBackend(username) {
@@ -50,9 +47,9 @@
         function collectUserState() {
             return {
                 prospectos: prospectos || [],
-                checklist: obtenerDeStorage('checklist', [false, false, false, false, false, false]),
-                evaluacion: obtenerDeStorage('evaluacion', [false, false, false, false, false]),
-                diaActual: obtenerDeStorage('diaActual', 1)
+                checklist: obtenerDeStorage('checklist', defaultState().checklist),
+                evaluacion: obtenerDeStorage('evaluacion', defaultState().evaluacion),
+                diaActual: obtenerDeStorage('diaActual', defaultState().diaActual)
             };
         }
 
@@ -79,14 +76,14 @@
         // ================== PERSISTENCIA GENERAL ==================
         function guardarEnStorage(key, value) {
             if (!currentUser) return;
-            localStorage.setItem(`${currentUser}_${key}`, JSON.stringify(value));
+            if (!userState) userState = defaultState();
+            userState[key] = value;
             scheduleBackendSync();
         }
 
         function obtenerDeStorage(key, defaultValue) {
-            if (!currentUser) return defaultValue;
-            const item = localStorage.getItem(`${currentUser}_${key}`);
-            return item ? JSON.parse(item) : defaultValue;
+            if (!userState) return defaultValue;
+            return (typeof userState[key] === 'undefined') ? defaultValue : userState[key];
         }
 
         // ================== CRM AVANZADO ==================
@@ -415,8 +412,8 @@
 
         document.getElementById('limpiarCRM').addEventListener('click', () => {
             if (confirm('¿Borrar TODOS los prospectos?')) {
-                localStorage.removeItem(`${currentUser}_prospectos`);
                 prospectos = [];
+                guardarEnStorage('prospectos', prospectos);
                 renderCRM();
             }
         });
@@ -603,9 +600,9 @@
         // ================== RESET DE DEMO ==================
         document.getElementById('resetDemo').addEventListener('click', () => {
             if (confirm('¿Resetear checklist, evaluación y día? (Los prospectos del CRM se conservan)')) {
-                localStorage.removeItem(`${currentUser}_checklist`);
-                localStorage.removeItem(`${currentUser}_evaluacion`);
-                localStorage.removeItem(`${currentUser}_diaActual`);
+                guardarEnStorage('checklist', defaultState().checklist);
+                guardarEnStorage('evaluacion', defaultState().evaluacion);
+                guardarEnStorage('diaActual', defaultState().diaActual);
                 cargarChecklist();
                 cargarEvaluacion();
                 cargarDia();
@@ -768,13 +765,8 @@
 
         async function hydrateUserState() {
             const remoteState = await cargarDatosDesdeBackend(currentUser);
-            if (remoteState) {
-                if (Array.isArray(remoteState.prospectos)) localStorage.setItem(`${currentUser}_prospectos`, JSON.stringify(remoteState.prospectos));
-                if (Array.isArray(remoteState.checklist)) localStorage.setItem(`${currentUser}_checklist`, JSON.stringify(remoteState.checklist));
-                if (Array.isArray(remoteState.evaluacion)) localStorage.setItem(`${currentUser}_evaluacion`, JSON.stringify(remoteState.evaluacion));
-                if (remoteState.diaActual) localStorage.setItem(`${currentUser}_diaActual`, JSON.stringify(remoteState.diaActual));
-            }
-            prospectos = obtenerDeStorage('prospectos', []);
+            userState = Object.assign(defaultState(), remoteState || {});
+            prospectos = Array.isArray(userState.prospectos) ? userState.prospectos : [];
             cargarChecklist();
             cargarEvaluacion();
             cargarDia();
@@ -811,6 +803,7 @@
         });
         document.getElementById('logoutBtn').addEventListener('click', () => {
             currentUser = null;
+            userState = null;
             setAppVisible(false);
             document.getElementById('loginUsername').value = '';
             document.getElementById('loginPassword').value = '';
@@ -829,4 +822,3 @@
         // Estado inicial
         setAppVisible(false);
     
-
