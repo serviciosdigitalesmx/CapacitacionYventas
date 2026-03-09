@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRFIX · Ecosistema de Digitalización</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        body { background-color: #f1f5f9; }
+        
+        .market-toggle-bg { background: rgba(0,0,0,0.05); }
+        .market-active { background: white; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        
+        /* Tema Dark (Elite) */
+        .theme-elite { background-color: #020617; color: #f8fafc; }
+        .theme-elite .glass-card { 
+            background: rgba(15, 23, 42, 0.6); 
+            backdrop-filter: blur(12px); 
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+        }
+        .theme-elite .gold-text {
+            background: linear-gradient(135deg, #fcd34d 0%, #d97706 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Tema Light (General) */
+        .theme-general { background-color: #f8fafc; color: #1e293b; }
+        .theme-general .glass-card { 
+            background: white; 
+            border: 1px solid #e2e8f0; 
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+        }
+
+        .shimmer {
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            background-size: 200% 100%;
+            animation: shimmer 3s infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- Switcher de Mercado (Fijo arriba) -->
+    <div class="fixed top-6 left-1/2 -translate-x-1/2 z-50">
+        <div class="market-toggle-bg p-1.5 rounded-full flex gap-1 backdrop-blur-md border border-white/20">
+            <button id="btn-general" onclick="setMarket('general')" class="px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest market-active text-slate-900">
+                Mercado General
+            </button>
+            <button id="btn-elite" onclick="setMarket('elite')" class="px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest text-slate-500">
+                Mercado Elite (SPGG)
+            </button>
+        </div>
+    </div>
+
+    <!-- Contenido Principal -->
+    <main id="market-container" class="theme-general pt-28 pb-20 px-4 min-h-screen">
+        
+        <!-- Header -->
+        <div class="max-w-5xl mx-auto text-center mb-16">
+            <h1 id="main-title" class="text-4xl md:text-6xl font-extrabold mb-6 tracking-tight leading-tight">
+                Digitalizamos su Negocio: <br><span class="text-indigo-600" id="title-accent">Orden y Control</span>
+            </h1>
+            <p id="main-desc" class="text-slate-500 text-lg max-w-3xl mx-auto font-light">
+                Transformamos su taller en una empresa moderna. No es un sistema, es la evolución digital de su forma de trabajar.
+            </p>
+        </div>
+
+        <!-- Grid de Planes / Inversiones -->
+        <div class="max-w-[1400px] mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
+            
+            <!-- TARJETA 1 -->
+            <div class="glass-card rounded-[2.5rem] p-8 flex flex-col">
+                <div class="mb-6">
+                    <span class="text-[10px] uppercase font-black tracking-[0.2em] text-indigo-500">Etapa I</span>
+                    <h3 id="p1-name" class="text-xl font-bold mt-2">Digitalización Operativa</h3>
+                    <p id="p1-desc" class="text-slate-500 text-xs mt-2">Mapeo y migración de procesos manuales a una infraestructura digital sólida.</p>
+                </div>
+                <div class="mb-8 p-6 bg-slate-500/5 rounded-3xl border border-black/5 text-center">
+                    <p class="text-[9px] uppercase tracking-widest font-bold opacity-50 mb-1">Inversión de Implementación</p>
+                    <p id="p1-price" class="text-3xl font-black mb-3">$800</p>
+                    <div class="h-px bg-black/5 mb-3"></div>
+                    <p class="text-[9px] uppercase tracking-widest font-bold opacity-50 mb-1">Comisión Promotor</p>
+                    <p id="p1-comm" class="text-lg font-bold text-green-600">$250</p>
+                </div>
+                <ul class="space-y-4 mb-8 flex-grow text-xs opacity-80" id="p1-list">
+                    <li class="flex gap-2">✓ Estandarización de Procesos Base</li>
+                    <li class="flex gap-2 text-indigo-500 font-bold">✓ Eliminación de Errores Manuales</li>
+                    <li class="flex gap-2">✓ Institucionalización de Marca</li>
+                </ul>
+            </div>
+
+            <!-- TARJETA 2 -->
+            <div class="glass-card rounded-[2.5rem] p-8 flex flex-col border-indigo-500/20 ring-1 ring-indigo-500/10">
+                <div class="mb-6">
+                    <span class="text-[10px] uppercase font-black tracking-[0.2em] text-indigo-500">Etapa II</span>
+                    <h3 id="p2-name" class="text-xl font-bold mt-2">Control de Gestión</h3>
+                    <p id="p2-desc" class="text-slate-500 text-xs mt-2">Optimización de flujos y visibilidad de rendimiento en tiempo real.</p>
+                </div>
+                <div class="mb-8 p-6 bg-indigo-500/5 rounded-3xl border border-indigo-500/10 text-center">
+                    <p class="text-[9px] uppercase tracking-widest font-bold opacity-50 mb-1">Inversión de Implementación</p>
+                    <p id="p2-price" class="text-3xl font-black mb-3">$1,500</p>
+                    <div class="h-px bg-black/5 mb-3"></div>
+                    <p class="text-[9px] uppercase tracking-widest font-bold opacity-50 mb-1">Comisión Promotor</p>
+                    <p id="p2-comm" class="text-lg font-bold text-green-600">$450</p>
+                </div>
+                <ul class="space-y-4 mb-8 flex-grow text-xs opacity-80" id="p2-list">
+                    <li class="flex gap-2">✓ Omnicanalidad de Comunicación</li>
+                    <li class="flex gap-2 text-indigo-500 font-bold">✓ Control de Ciclo de Vida del Servicio</li>
+                    <li class="flex gap-2">✓ Ecosistema de Autogestión</li>
+                </ul>
+            </div>
+
+            <!-- TARJETA 3 -->
+            <div class="glass-card rounded-[2.5rem] p-8 flex flex-col relative overflow-hidden">
+                <div id="p3-shimmer" class="hidden absolute inset-0 shimmer pointer-events-none opacity-20"></div>
+                <div class="mb-6">
+                    <span class="text-[10px] uppercase font-black tracking-[0.2em] text-indigo-500">Etapa III</span>
+                    <h3 id="p3-name" class="text-xl font-bold mt-2">Blindaje de Marca</h3>
+                    <p id="p3-desc" class="text-slate-500 text-xs mt-2">Cultura de transparencia y evidencia multimedia para protección total del negocio.</p>
+                </div>
+                <div class="mb-8 p-6 bg-slate-500/5 rounded-3xl border border-black/5 text-center">
+                    <p class="text-[9px] uppercase tracking-widest font-bold opacity-50 mb-1">Inversión de Implementación</p>
+                    <p id="p3-price" class="text-3xl font-black mb-3">$2,800</p>
+                    <div class="h-px bg-black/5 mb-3"></div>
+                    <p class="text-[9px] uppercase tracking-widest font-bold opacity-50 mb-1">Comisión Promotor</p>
+                    <p id="p3-comm" class="text-lg font-bold text-green-600">$800</p>
+                </div>
+                <ul class="space-y-4 mb-8 flex-grow text-xs opacity-80" id="p3-list">
+                    <li class="flex gap-2 font-bold text-indigo-500">✓ Blindaje Multimedia de Procesos</li>
+                    <li class="flex gap-2">✓ Inteligencia Operativa Basada en Datos</li>
+                    <li class="flex gap-2">✓ Trazabilidad de Valor Percibido</li>
+                </ul>
+            </div>
+
+            <!-- TARJETA 4 -->
+            <div class="glass-card rounded-[2.5rem] p-8 flex flex-col">
+                <div class="mb-6">
+                    <span class="text-[10px] uppercase font-black tracking-[0.2em] text-indigo-500">Etapa IV</span>
+                    <h3 id="p4-name" class="text-xl font-bold mt-2">Crecimiento Escalar</h3>
+                    <p id="p4-desc" class="text-slate-500 text-xs mt-2">Integración multisucursal y arquitectura a la medida para expansión masiva.</p>
+                </div>
+                <div class="mb-8 p-6 bg-slate-500/5 rounded-3xl border border-black/5 text-center">
+                    <p class="text-[9px] uppercase tracking-widest font-bold opacity-50 mb-1">Inversión de Implementación</p>
+                    <p id="p4-price" class="text-2xl font-black mb-3 uppercase tracking-tighter">Cotización</p>
+                    <div class="h-px bg-black/5 mb-3"></div>
+                    <p class="text-[9px] uppercase tracking-widest font-bold opacity-50 mb-1">Comisión Promotor</p>
+                    <p id="p4-comm" class="text-lg font-bold text-green-600">25%</p>
+                </div>
+                <ul class="space-y-4 mb-8 flex-grow text-xs opacity-80" id="p4-list">
+                    <li class="flex gap-2">✓ Arquitectura Multisucursal</li>
+                    <li class="flex gap-2">✓ Personalización de Marca (White Label)</li>
+                    <li class="flex gap-2 font-bold text-indigo-500">✓ Reingeniería Operativa Completa</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Pilares Estratégicos -->
+        <div class="max-w-4xl mx-auto border-t border-black/10 pt-16 text-center">
+            <h4 class="text-xs font-bold opacity-40 uppercase tracking-[0.4em] mb-12">Principios de la Solución</h4>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div>
+                    <p class="font-black text-xl mb-1" id="pil-1">ORDEN</p>
+                    <p class="text-[10px] opacity-60 font-bold uppercase tracking-wider">Metodología Unificada</p>
+                </div>
+                <div>
+                    <p class="font-black text-xl mb-1" id="pil-2">CONTROL</p>
+                    <p class="text-[10px] opacity-60 font-bold uppercase tracking-wider">Visibilidad Ejecutiva</p>
+                </div>
+                <div>
+                    <p class="font-black text-xl mb-1" id="pil-3">VALOR</p>
+                    <p class="text-[10px] opacity-60 font-bold uppercase tracking-wider">Prestigio de Marca</p>
+                </div>
+                <div>
+                    <p class="font-black text-xl mb-1" id="pil-4">DATOS</p>
+                    <p class="text-[10px] opacity-60 font-bold uppercase tracking-wider">Inteligencia Real</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        function setMarket(type) {
+            const container = document.getElementById('market-container');
+            const btnGeneral = document.getElementById('btn-general');
+            const btnElite = document.getElementById('btn-elite');
+            const p3Shimmer = document.getElementById('p3-shimmer');
+            
+            // Actualización de UI
+            if (type === 'elite') {
+                container.className = 'theme-elite pt-28 pb-20 px-4 min-h-screen';
+                btnElite.className = 'px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest market-active text-slate-900';
+                btnGeneral.className = 'px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-white';
+                
+                // Textos San Pedro
+                document.getElementById('main-title').innerHTML = 'Arquitectura Digital: <br>La Evolución de su <span class="gold-text">Modelo de Negocio</span>';
+                document.getElementById('main-desc').innerText = 'No instalamos herramientas; digitalizamos su operación. Transformamos procesos manuales en activos tecnológicos de alto rendimiento.';
+                
+                // Precios y Planes Elite
+                updatePlan('p1', 'Cimentación Digital', 'Estructura fundamental para blindaje operativo inicial.', '$25,000', '$5,000');
+                updatePlan('p2', 'Estructura de Control', 'Arquitectura de procesos para visibilidad y optimización de flujos.', '$35,000', '$8,500');
+                updatePlan('p3', 'Blindaje & Transparencia', 'Cultura de evidencia multimedia y blindaje multimedia irrefutable.', '$45,000', '$12,000');
+                updatePlan('p4', 'Arquitectura Corporativa', 'Digitalización de modelos de expansión y multisucursal a medida.', 'COTIZACIÓN', '25%');
+                
+                p3Shimmer.classList.remove('hidden');
+            } else {
+                container.className = 'theme-general pt-28 pb-20 px-4 min-h-screen';
+                btnGeneral.className = 'px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest market-active text-slate-900';
+                btnElite.className = 'px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-slate-800';
+                
+                // Textos Mercado General
+                document.getElementById('main-title').innerHTML = 'Digitalizamos su Negocio: <span class="text-indigo-600">Orden y Control</span>';
+                document.getElementById('main-desc').innerText = 'Transformamos su taller en una empresa moderna. No es un sistema, es la evolución digital de su forma de trabajar.';
+                
+                // Precios y Planes General
+                updatePlan('p1', 'Digitalización Operativa', 'Mapeo y migración de procesos manuales a una base digital sólida.', '$800', '$250');
+                updatePlan('p2', 'Control de Gestión', 'Optimización de flujos y visibilidad de rendimiento en tiempo real.', '$1,500', '$450');
+                updatePlan('p3', 'Blindaje de Marca', 'Cultura de transparencia y evidencia multimedia para protección total.', '$2,800', '$800');
+                updatePlan('p4', 'Crecimiento Escalar', 'Integración multisucursal y arquitectura a la medida para expansión.', 'COTIZACIÓN', '25%');
+                
+                p3Shimmer.classList.add('hidden');
+            }
+        }
+
+        function updatePlan(id, name, desc, price, comm) {
+            document.getElementById(id + '-name').innerText = name;
+            document.getElementById(id + '-desc').innerText = desc;
+            document.getElementById(id + '-price').innerText = price;
+            document.getElementById(id + '-comm').innerText = comm;
+        }
+
+        // Inicializar
+        setMarket('general');
+    </script>
+</body>
+</html>
