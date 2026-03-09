@@ -2,8 +2,7 @@
 
 // ================== AUTH + BACKEND ==================
 const APP_SCRIPT_URLS = [
-    'https://script.google.com/macros/s/AKfycbyRbMCH6FiE9nL_EdCpKVqmTZzt62kExX-YDaG1m_4JlKoh39BFlLAt8qLIweyi_CSN/exec',
-    'https://script.google.com/macros/s/AKfycbxfTsZDlIuSosrVfj8fbIucl64kBqQdmyXhywjy3szq8VjZ4w7g4xkKPXWjI8S7OXk9/exec'
+    'https://script.google.com/macros/s/AKfycbyJG_s8t1lV6TQkKeTN7W6EEWtA9l9TWEHaLmYG09IxPNybAONORYyoDbPp5KKOAQim/exec'
 ];
 let activeBackendUrl = APP_SCRIPT_URLS[0];
 const APP_TOKEN = '446c0599e6fed1bd0408d31e746e727a31829fdedf957972';
@@ -337,6 +336,18 @@ async function callBackend(payload) {
     if (!action) return null;
 
     const urls = [activeBackendUrl].concat(APP_SCRIPT_URLS.filter((url) => url && url !== activeBackendUrl));
+    const normalizedPayload = Object.assign({ token: APP_TOKEN }, payload);
+    const body = new URLSearchParams();
+    Object.keys(normalizedPayload).forEach((key) => {
+        const value = normalizedPayload[key];
+        if (value === null || typeof value === 'undefined') return;
+        if (typeof value === 'object') {
+            body.set(key, JSON.stringify(value));
+            return;
+        }
+        body.set(key, String(value));
+    });
+
     for (let i = 0; i < urls.length; i += 1) {
         const url = urls[i];
         const controller = new AbortController();
@@ -345,12 +356,8 @@ async function callBackend(payload) {
         try {
             const response = await fetch(url, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
                 cache: 'no-store',
-                body: JSON.stringify(Object.assign({ token: APP_TOKEN }, payload)),
+                body: body,
                 signal: controller.signal
             });
             const raw = await response.text();
