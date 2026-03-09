@@ -38,6 +38,29 @@
         .section-head-toggle { cursor: pointer; }
         .quick-panel { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 1rem; padding: 1rem; }
         .mobile-bottom-nav { display: none; }
+        #loginModal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        #loginModal.hidden { display: none; }
+        .login-box {
+            background: white;
+            padding: 1.4rem;
+            border-radius: 1rem;
+            max-width: 380px;
+            width: 92%;
+            box-shadow: 0 14px 28px rgba(0,0,0,0.15);
+        }
+        .login-box h2 { font-weight: 800; font-size: 1.35rem; margin-bottom: 0.25rem; }
+        .login-box input { width: 100%; padding: 0.72rem; border: 1px solid #e2e8f0; border-radius: 0.7rem; margin-bottom: 0.7rem; }
+        .login-box button { background: #4f46e5; color: white; font-weight: 800; padding: 0.7rem; border-radius: 0.7rem; width: 100%; }
+        .login-box button:hover { background: #4338ca; }
+        .login-error { color: #dc2626; font-size: 0.82rem; margin-top: 0.4rem; }
         @media (max-width: 1024px) {
             #sidebar-desktop { display: none; }
             #sidebar-mobile { display: block; position: sticky; top: 80px; z-index: 40; }

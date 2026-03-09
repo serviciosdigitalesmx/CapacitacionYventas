@@ -1,4 +1,69 @@
 
+        // ================== AUTH + BACKEND ==================
+        const APP_SCRIPT_URL = ''; // Ej: https://script.google.com/macros/s/XXXX/exec
+        const APP_TOKEN = '';
+        const FALLBACK_USERS = [
+            { username: 'freelancer1', password: 'pass1' }, { username: 'freelancer2', password: 'pass2' },
+            { username: 'freelancer3', password: 'pass3' }, { username: 'freelancer4', password: 'pass4' },
+            { username: 'freelancer5', password: 'pass5' }, { username: 'freelancer6', password: 'pass6' },
+            { username: 'freelancer7', password: 'pass7' }, { username: 'freelancer8', password: 'pass8' },
+            { username: 'freelancer9', password: 'pass9' }, { username: 'freelancer10', password: 'pass10' },
+            { username: 'freelancer11', password: 'pass11' }, { username: 'freelancer12', password: 'pass12' },
+            { username: 'freelancer13', password: 'pass13' }, { username: 'freelancer14', password: 'pass14' },
+            { username: 'freelancer15', password: 'pass15' }, { username: 'freelancer16', password: 'pass16' },
+            { username: 'freelancer17', password: 'pass17' }, { username: 'freelancer18', password: 'pass18' },
+            { username: 'freelancer19', password: 'pass19' }, { username: 'freelancer20', password: 'pass20' }
+        ];
+        let currentUser = null;
+        let saveTimer = null;
+
+        async function callBackend(payload) {
+            if (!APP_SCRIPT_URL) return null;
+            try {
+                const res = await fetch(APP_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(Object.assign({ token: APP_TOKEN }, payload))
+                });
+                return await res.json();
+            } catch (e) {
+                return null;
+            }
+        }
+
+        async function validateCredentials(username, password) {
+            const remote = await callBackend({ action: 'login', username, password });
+            if (remote && remote.success === true) return true;
+            return FALLBACK_USERS.some(u => u.username === username && u.password === password);
+        }
+
+        async function cargarDatosDesdeBackend(username) {
+            const remote = await callBackend({ action: 'loadState', username });
+            if (remote && remote.success && remote.state) return remote.state;
+            return null;
+        }
+
+        async function guardarDatosEnBackend(username, state) {
+            await callBackend({ action: 'saveState', username, state });
+        }
+
+        function collectUserState() {
+            return {
+                prospectos: prospectos || [],
+                checklist: obtenerDeStorage('checklist', [false, false, false, false, false, false]),
+                evaluacion: obtenerDeStorage('evaluacion', [false, false, false, false, false]),
+                diaActual: obtenerDeStorage('diaActual', 1)
+            };
+        }
+
+        function scheduleBackendSync() {
+            if (!currentUser) return;
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(() => {
+                guardarDatosEnBackend(currentUser, collectUserState());
+            }, 400);
+        }
+
         // ================== FUNCIONES GLOBALES ==================
         function copiarTexto(btn) {
             const parent = btn.closest('[data-script]');
@@ -13,16 +78,19 @@
 
         // ================== PERSISTENCIA GENERAL ==================
         function guardarEnStorage(key, value) {
-            localStorage.setItem(key, JSON.stringify(value));
+            if (!currentUser) return;
+            localStorage.setItem(`${currentUser}_${key}`, JSON.stringify(value));
+            scheduleBackendSync();
         }
 
         function obtenerDeStorage(key, defaultValue) {
-            const item = localStorage.getItem(key);
+            if (!currentUser) return defaultValue;
+            const item = localStorage.getItem(`${currentUser}_${key}`);
             return item ? JSON.parse(item) : defaultValue;
         }
 
         // ================== CRM AVANZADO ==================
-        let prospectos = obtenerDeStorage('prospectos', []);
+        let prospectos = [];
 
         function sanitizar(texto) {
             if (!texto) return '';
@@ -347,7 +415,7 @@
 
         document.getElementById('limpiarCRM').addEventListener('click', () => {
             if (confirm('¿Borrar TODOS los prospectos?')) {
-                localStorage.removeItem('prospectos');
+                localStorage.removeItem(`${currentUser}_prospectos`);
                 prospectos = [];
                 renderCRM();
             }
@@ -360,15 +428,20 @@
             document.getElementById('mini-chk2'),
             document.getElementById('mini-chk3')
         ].filter(Boolean);
-        const savedChecks = obtenerDeStorage('checklist', [false, false, false, false, false, false]);
-        checkboxes.forEach((cb, i) => { cb.checked = savedChecks[i] || false; });
+        let savedChecks = [];
+
+        function cargarChecklist() {
+            savedChecks = obtenerDeStorage('checklist', [false, false, false, false, false, false]);
+            checkboxes.forEach((cb, i) => { cb.checked = savedChecks[i] || false; });
+            syncMiniChecklist();
+        }
 
         function syncMiniChecklist() {
             miniChecks.forEach((mini, i) => {
                 mini.checked = checkboxes[i] ? checkboxes[i].checked : false;
             });
         }
-        syncMiniChecklist();
+        cargarChecklist();
 
         checkboxes.forEach((cb, i) => {
             cb.addEventListener('change', () => {
@@ -391,9 +464,14 @@
 
         // ================== EVALUACIÓN (autoguardado) ==================
         const evalItems = document.querySelectorAll('.eval-item');
-        const savedEval = obtenerDeStorage('evaluacion', [false, false, false, false, false]);
-        evalItems.forEach((cb, i) => { cb.checked = savedEval[i] || false; });
-        actualizarPuntajeEval();
+        let savedEval = [];
+
+        function cargarEvaluacion() {
+            savedEval = obtenerDeStorage('evaluacion', [false, false, false, false, false]);
+            evalItems.forEach((cb, i) => { cb.checked = savedEval[i] || false; });
+            actualizarPuntajeEval();
+        }
+        cargarEvaluacion();
 
         function actualizarPuntajeEval() {
             const checks = Array.from(evalItems).map(cb => cb.checked);
@@ -471,7 +549,7 @@
         }
 
         // ================== PLAN POR DÍAS ==================
-        let diaActual = obtenerDeStorage('diaActual', 1);
+        let diaActual = 1;
         const actividades = [
             "Leer guía + practicar mensaje 5 veces",
             "Ejercicios de voz + grabarse 2 min",
@@ -498,7 +576,12 @@
             document.getElementById('selectorDia').value = diaActual;
         }
 
-        actualizarDiaHeader();
+        function cargarDia() {
+            diaActual = obtenerDeStorage('diaActual', 1);
+            actualizarDiaHeader();
+        }
+
+        cargarDia();
 
         document.getElementById('marcarDiaCompletado').addEventListener('click', () => {
             if (diaActual < 7) {
@@ -520,18 +603,22 @@
         // ================== RESET DE DEMO ==================
         document.getElementById('resetDemo').addEventListener('click', () => {
             if (confirm('¿Resetear checklist, evaluación y día? (Los prospectos del CRM se conservan)')) {
-                localStorage.removeItem('checklist');
-                localStorage.removeItem('evaluacion');
-                localStorage.removeItem('diaActual');
-                location.reload();
+                localStorage.removeItem(`${currentUser}_checklist`);
+                localStorage.removeItem(`${currentUser}_evaluacion`);
+                localStorage.removeItem(`${currentUser}_diaActual`);
+                cargarChecklist();
+                cargarEvaluacion();
+                cargarDia();
+                actualizarProgresoGlobal();
             }
         });
 
         // ================== SIDEBAR MÓVIL + MÓDULOS ==================
         const menuToggle = document.getElementById('menuToggle');
         const mobileMenu = document.getElementById('mobileMenu');
-        const desktopNav = document.querySelector('#sidebar-desktop nav').cloneNode(true);
-        mobileMenu.innerHTML = desktopNav.innerHTML;
+        const desktopNavSource = document.querySelector('#sidebar-desktop nav');
+        const desktopNav = desktopNavSource ? desktopNavSource.cloneNode(true) : null;
+        if (mobileMenu && desktopNav) mobileMenu.innerHTML = desktopNav.innerHTML;
 
         function setupModuleAccordions(container) {
             container.querySelectorAll('.module').forEach(module => {
@@ -543,12 +630,14 @@
             });
         }
 
-        setupModuleAccordions(document.querySelector('#sidebar-desktop nav'));
-        setupModuleAccordions(mobileMenu);
+        if (desktopNavSource) setupModuleAccordions(desktopNavSource);
+        if (mobileMenu) setupModuleAccordions(mobileMenu);
 
-        menuToggle.addEventListener('click', () => {
-            mobileMenu.classList.toggle('open');
-        });
+        if (menuToggle && mobileMenu) {
+            menuToggle.addEventListener('click', () => {
+                mobileMenu.classList.toggle('open');
+            });
+        }
 
         // ================== TABS PRINCIPALES ==================
         const TAB_SECTIONS = {
@@ -710,10 +799,68 @@
         }, { threshold: 0.3, rootMargin: '-100px 0px -100px 0px' });
         sections.forEach(s => observer.observe(s));
 
-        // ================== INICIALIZAR ==================
-        renderCRM();
-        actualizarProgresoGlobal();
-        actualizarKPIsReales();
-        actualizarAlertasSeguimiento();
+        // ================== LOGIN / LOGOUT ==================
+        function setAppVisible(visible) {
+            document.getElementById('mainHeader').style.display = visible ? '' : 'none';
+            document.getElementById('sidebar-mobile').style.display = visible ? '' : 'none';
+            document.getElementById('appShell').style.display = visible ? 'flex' : 'none';
+            document.getElementById('mobileBottomNav').style.display = visible ? '' : 'none';
+            document.getElementById('mainFooter').style.display = visible ? '' : 'none';
+        }
+
+        async function hydrateUserState() {
+            const remoteState = await cargarDatosDesdeBackend(currentUser);
+            if (remoteState) {
+                if (Array.isArray(remoteState.prospectos)) localStorage.setItem(`${currentUser}_prospectos`, JSON.stringify(remoteState.prospectos));
+                if (Array.isArray(remoteState.checklist)) localStorage.setItem(`${currentUser}_checklist`, JSON.stringify(remoteState.checklist));
+                if (Array.isArray(remoteState.evaluacion)) localStorage.setItem(`${currentUser}_evaluacion`, JSON.stringify(remoteState.evaluacion));
+                if (remoteState.diaActual) localStorage.setItem(`${currentUser}_diaActual`, JSON.stringify(remoteState.diaActual));
+            }
+            prospectos = obtenerDeStorage('prospectos', []);
+            cargarChecklist();
+            cargarEvaluacion();
+            cargarDia();
+        }
+
+        async function doLogin() {
+            const username = (document.getElementById('loginUsername').value || '').trim();
+            const password = (document.getElementById('loginPassword').value || '').trim();
+            const loginError = document.getElementById('loginError');
+            const ok = await validateCredentials(username, password);
+            if (!ok) {
+                loginError.classList.remove('hidden');
+                loginError.innerText = 'Usuario o contraseña incorrectos.';
+                return;
+            }
+
+            currentUser = username;
+            loginError.classList.add('hidden');
+            document.getElementById('loggedUserDisplay').innerText = `👤 ${currentUser}`;
+            document.getElementById('loginModal').classList.add('hidden');
+            setAppVisible(true);
+
+            await hydrateUserState();
+            renderCRM();
+            actualizarProgresoGlobal();
+            actualizarKPIsReales();
+            actualizarAlertasSeguimiento();
+            setActiveTab('progreso');
+        }
+
+        document.getElementById('loginBtn').addEventListener('click', doLogin);
+        document.getElementById('loginPassword').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') doLogin();
+        });
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            currentUser = null;
+            setAppVisible(false);
+            document.getElementById('loginUsername').value = '';
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('loggedUserDisplay').innerText = '';
+            document.getElementById('loginModal').classList.remove('hidden');
+        });
+
+        // Estado inicial
+        setAppVisible(false);
     
 
