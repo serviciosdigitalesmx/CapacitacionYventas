@@ -100,7 +100,7 @@
                 </button>
                 <button data-tab-target="protocolos" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800/50 hover:text-white transition-all group">
                     <i data-lucide="book-open" class="w-5 h-5 group-hover:text-cyan-400 transition-colors"></i>
-                    <span class="font-medium">Protocolos</span>
+                    <span class="font-medium">Material de aprendizaje</span>
                 </button>
             </nav>
             <div class="p-4 border-t border-slate-800">
@@ -402,48 +402,45 @@
 
                 <section id="protocolos" class="tab-content hidden animate-fade-in">
                     <div class="mb-8">
-                        <h1 class="text-3xl font-bold text-white mb-2">Biblioteca de Protocolos</h1>
-                        <p class="text-slate-400">Documentación operativa y procedimientos estándar</p>
+                        <h1 class="text-3xl font-bold text-white mb-2">Material de aprendizaje</h1>
+                        <p class="text-slate-400">Manual de prospección por módulos con autoevaluación</p>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="glass-panel rounded-xl border border-slate-700/50 p-6 hover:border-indigo-500/30 transition-all cursor-pointer group">
+
+                    <div class="max-w-6xl">
+                        <div class="overflow-x-auto mb-6">
+                            <div class="flex gap-2 pb-2" id="moduleTabs"></div>
+                        </div>
+
+                        <div id="conceptoCard" class="flashcard p-8 mb-8">
                             <div class="flex items-start gap-4">
-                                <div class="p-3 rounded-lg bg-indigo-500/10 group-hover:bg-indigo-500/20 transition-colors"><i data-lucide="file-text" class="w-6 h-6 text-indigo-400"></i></div>
+                                <div class="w-12 h-12 bg-indigo-100 text-indigo-700 rounded-2xl flex items-center justify-center text-2xl font-bold" id="moduloNumero">1</div>
                                 <div class="flex-1">
-                                    <h3 class="font-semibold text-white mb-1">Onboarding de Clientes</h3>
-                                    <p class="text-sm text-slate-400 mb-3">Procedimiento inicial de incorporación y kickoff de proyectos.</p>
-                                    <span class="text-xs text-emerald-400 font-medium">v2.1 • Actualizado hoy</span>
+                                    <h2 class="text-2xl font-extrabold text-slate-900 mb-2" id="moduloTitulo">Misión del Puesto</h2>
+                                    <p class="text-slate-600 leading-relaxed" id="moduloDescripcion">Cargando...</p>
                                 </div>
                             </div>
                         </div>
-                        <div class="glass-panel rounded-xl border border-slate-700/50 p-6 hover:border-indigo-500/30 transition-all cursor-pointer group">
-                            <div class="flex items-start gap-4">
-                                <div class="p-3 rounded-lg bg-emerald-500/10 group-hover:bg-emerald-500/20 transition-colors"><i data-lucide="phone" class="w-6 h-6 text-emerald-400"></i></div>
-                                <div class="flex-1">
-                                    <h3 class="font-semibold text-white mb-1">Scripts de Ventas</h3>
-                                    <p class="text-sm text-slate-400 mb-3">Guiones de llamada y manejo de objeciones comerciales.</p>
-                                    <span class="text-xs text-emerald-400 font-medium">v1.5 • Actualizado ayer</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="glass-panel rounded-xl border border-slate-700/50 p-6 hover:border-indigo-500/30 transition-all cursor-pointer group">
-                            <div class="flex items-start gap-4">
-                                <div class="p-3 rounded-lg bg-amber-500/10 group-hover:bg-amber-500/20 transition-colors"><i data-lucide="alert-triangle" class="w-6 h-6 text-amber-400"></i></div>
-                                <div class="flex-1">
-                                    <h3 class="font-semibold text-white mb-1">Gestión de Crisis</h3>
-                                    <p class="text-sm text-slate-400 mb-3">Protocolos de escalamiento y resolución de conflictos.</p>
-                                    <span class="text-xs text-emerald-400 font-medium">v1.0 • Estable</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="glass-panel rounded-xl border border-slate-700/50 p-6 hover:border-indigo-500/30 transition-all cursor-pointer group">
-                            <div class="flex items-start gap-4">
-                                <div class="p-3 rounded-lg bg-purple-500/10 group-hover:bg-purple-500/20 transition-colors"><i data-lucide="git-branch" class="w-6 h-6 text-purple-400"></i></div>
-                                <div class="flex-1">
-                                    <h3 class="font-semibold text-white mb-1">Flujo de Producción</h3>
-                                    <p class="text-sm text-slate-400 mb-3">Metodología de desarrollo y entregables por fase.</p>
-                                    <span class="text-xs text-emerald-400 font-medium">v3.0 • Actualizado hoy</span>
-                                </div>
+
+                        <h3 class="text-lg font-bold text-slate-200 mb-4 flex items-center gap-2">
+                            <span class="bg-indigo-500/20 text-indigo-300 p-1 rounded-lg">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                            </span>
+                            Conceptos clave
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10" id="conceptosGrid"></div>
+
+                        <div class="bg-slate-900 rounded-3xl p-6 border border-slate-700">
+                            <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                                <span class="bg-amber-500/20 text-amber-300 p-1 rounded-lg">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                </span>
+                                Autoevaluación
+                            </h3>
+                            <div id="quizContainerAprende">
+                                <p class="text-slate-400" id="preguntaTexto">Selecciona un módulo para ver la pregunta.</p>
+                                <div id="opcionesQuiz" class="mt-4 space-y-2"></div>
+                                <div id="feedbackQuiz" class="mt-4 text-sm"></div>
+                                <button id="reiniciarQuiz" class="mt-4 text-indigo-400 text-sm font-medium hidden">↻ Intentar otra vez</button>
                             </div>
                         </div>
                     </div>

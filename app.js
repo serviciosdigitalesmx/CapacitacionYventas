@@ -176,6 +176,7 @@ const AuthModule = {
             CRMModule.init();
             QuoteModule.init();
             TrainingModule.init();
+            LearningModule.init();
             DashboardModule.init();
             Toast.show('Acceso concedido. Bienvenido al sistema.', 'success');
         }, 300);
@@ -1042,6 +1043,245 @@ const TrainingModule = {
                     Toast.show('❌ Revisa tu enfoque', 'error');
                 }
             });
+        });
+    }
+};
+
+const LearningModule = {
+    initialized: false,
+    activeIndex: 0,
+    modules: [
+        {
+            id: 1,
+            titulo: 'Misión del Puesto',
+            descripcion: 'Tu trabajo no es vender tecnología, sino identificar negocios que están perdiendo clientes por desorganización y abrir conversación para que conozcan nuestra solución.',
+            conceptos: [
+                { titulo: 'Enfoque', texto: 'No vendas tecnología, vende organización y tranquilidad.' },
+                { titulo: 'Problema base', texto: 'Negocios que pierden clientes por desorganización en mensajes y citas.' },
+                { titulo: 'Objetivo', texto: 'Abrir conversación, no cerrar de inmediato.' }
+            ],
+            quiz: {
+                pregunta: '¿Cuál es el verdadero objetivo del puesto?',
+                opciones: ['Vender el software a cualquier precio', 'Identificar negocios desorganizados y conversar', 'Conseguir 10 llamadas por día', 'Demostrar que somos expertos en tecnología'],
+                correcta: 1
+            }
+        },
+        {
+            id: 2,
+            titulo: 'Nuestra Solución',
+            descripcion: 'Ofrecemos un sistema que organiza mensajes, automatiza respuestas y centraliza citas. Ayudamos al dueño a dejar de perder tiempo en tareas repetitivas.',
+            conceptos: [
+                { titulo: 'Automatización', texto: 'Respuestas automáticas a preguntas frecuentes (precios, horarios).' },
+                { titulo: 'Centralización', texto: 'Todos los mensajes de WhatsApp, Instagram y Facebook en un solo lugar.' },
+                { titulo: 'Agenda', texto: 'Gestión de citas sin dobles reservas.' }
+            ],
+            quiz: {
+                pregunta: '¿Qué beneficio principal ofrecemos al dueño?',
+                opciones: ['Reducir la carga cognitiva y ahorrar tiempo', 'Tener más seguidores en redes', 'Vender productos más caros', 'Aparecer en Google Maps'],
+                correcta: 0
+            }
+        },
+        {
+            id: 3,
+            titulo: 'Problemas que resolvemos',
+            descripcion: 'Pérdida de mensajes, desorden de citas, respuestas tardías, falta de seguimiento.',
+            conceptos: [
+                { titulo: 'Mensajes perdidos', texto: 'Clientes que preguntan y nunca reciben respuesta.' },
+                { titulo: 'Doble agenda', texto: 'Citar dos clientes a la misma hora.' },
+                { titulo: 'Saturación', texto: 'Dueño abrumado por notificaciones.' }
+            ],
+            quiz: {
+                pregunta: '¿Cuál de estos NO es un problema que resolvemos?',
+                opciones: ['Pérdida de mensajes', 'Falta de materia prima', 'Desorden de citas', 'Respuestas tardías'],
+                correcta: 1
+            }
+        },
+        {
+            id: 4,
+            titulo: 'Nichos de Mercado',
+            descripcion: 'Negocios que atienden clientes directamente y reciben solicitudes por mensajes. Dueño suele responder personalmente.',
+            conceptos: [
+                { titulo: 'Servicios técnicos', texto: 'Minisplit, electricistas, plomeros, fumigación.' },
+                { titulo: 'Belleza', texto: 'Barberías, salones de uñas, tatuadores.' },
+                { titulo: 'Mascotas', texto: 'Veterinarias, estética canina, paseadores.' },
+                { titulo: 'Comida', texto: 'Dark kitchens, repostería, taquerías.' }
+            ],
+            quiz: {
+                pregunta: '¿Qué tipo de negocio suele ser un buen prospecto?',
+                opciones: ['Una fábrica con 500 empleados', 'Un barbero que agenda por WhatsApp', 'Una tienda departamental', 'Un banco'],
+                correcta: 1
+            }
+        },
+        {
+            id: 5,
+            titulo: 'Fuentes de Prospección',
+            descripcion: 'Lugares donde encontrar prospectos: Facebook, Google Maps, Instagram, WhatsApp Business.',
+            conceptos: [
+                { titulo: 'Facebook', texto: 'Marketplace y grupos de servicios locales.' },
+                { titulo: 'Google Maps', texto: 'Buscar servicios en tu ciudad.' },
+                { titulo: 'Instagram', texto: 'Perfiles de negocios pequeños con poca actividad.' },
+                { titulo: 'WhatsApp', texto: 'Enlaces de WhatsApp compartidos en redes.' }
+            ],
+            quiz: {
+                pregunta: '¿Cuál es una fuente válida de prospección?',
+                opciones: ['Periódico impreso', 'Radio local', 'Grupos de Facebook', 'Valla publicitaria'],
+                correcta: 2
+            }
+        },
+        {
+            id: 6,
+            titulo: 'Guion de Apertura',
+            descripcion: 'Mensaje inicial breve y personalizado: mencionar el negocio, el problema observado y ofrecer ayuda.',
+            conceptos: [
+                { titulo: 'Estructura', texto: 'Saludo + contexto + propuesta de valor + llamado a acción.' },
+                { titulo: 'Ejemplo', texto: 'Hola, soy [nombre] de Servicios Digitales. Veo que atiendes muchos mensajes, ¿te gustaría organizarlos mejor?' },
+                { titulo: 'Personalización', texto: 'Menciona algo específico del negocio para generar conexión.' }
+            ],
+            quiz: {
+                pregunta: '¿Qué debe incluir un buen guion de apertura?',
+                opciones: ['Una lista de precios', 'Un saludo personalizado y mención del problema', 'Un enlace a la página web', 'Una oferta de descuento'],
+                correcta: 1
+            }
+        },
+        {
+            id: 7,
+            titulo: 'Detección de Dolores',
+            descripcion: 'Preguntas para descubrir dolor: cómo gestiona citas, si pierde mensajes y cuánto tiempo invierte en responder.',
+            conceptos: [
+                { titulo: 'Pregunta abierta', texto: '¿Cómo llevas la organización de tus citas?' },
+                { titulo: 'Dolor típico', texto: 'A veces se me duplican las reservas.' },
+                { titulo: 'Escucha activa', texto: 'Repetir lo que dice el cliente para generar confianza.' }
+            ],
+            quiz: {
+                pregunta: 'Si el cliente dice "a veces se me pasan los mensajes", ¿qué dolor detectas?',
+                opciones: ['Falta de clientes', 'Pérdida de comunicación', 'Precios bajos', 'Proveedores lentos'],
+                correcta: 1
+            }
+        },
+        {
+            id: 8,
+            titulo: 'Presentación Corta (Pitch)',
+            descripcion: 'Explicar en 30 segundos: quién eres, qué haces y cómo le beneficia.',
+            conceptos: [
+                { titulo: 'Claridad', texto: 'Evita tecnicismos, usa lenguaje del dueño.' },
+                { titulo: 'Beneficio', texto: 'Céntrate en lo que gana: tiempo, orden, más clientes.' },
+                { titulo: 'Ejemplo rápido', texto: 'Con mi sistema, nunca más se te olvidará una cita.' }
+            ],
+            quiz: {
+                pregunta: '¿Cuál es el foco principal del pitch?',
+                opciones: ['Explicar funciones técnicas', 'Mostrar el logo de la empresa', 'El beneficio para el cliente', 'Compararse con la competencia'],
+                correcta: 2
+            }
+        },
+        {
+            id: 9,
+            titulo: 'Métricas Diarias',
+            descripcion: 'Número de contactos, conversaciones abiertas, reuniones agendadas y ventas cerradas.',
+            conceptos: [
+                { titulo: 'Prospección', texto: 'Cantidad de primeros mensajes enviados.' },
+                { titulo: 'Conversión', texto: 'Porcentaje que pasa a la siguiente etapa.' },
+                { titulo: 'Objetivo diario', texto: 'Al menos 15-20 contactos nuevos.' }
+            ],
+            quiz: {
+                pregunta: 'Si contactas a 20 y conviertes 2 en ventas, ¿cuál es tu tasa de conversión?',
+                opciones: ['5%', '10%', '20%', '15%'],
+                correcta: 1
+            }
+        },
+        {
+            id: 10,
+            titulo: 'Mentalidad de Cierre',
+            descripcion: 'Cada "no" es un dato para mejorar. No tomarlo personal. Persistencia con aprendizaje.',
+            conceptos: [
+                { titulo: 'Resiliencia', texto: 'El rechazo es parte del proceso.' },
+                { titulo: 'Mejora continua', texto: 'Anota objeciones y prepara respuestas.' },
+                { titulo: 'Enfoque', texto: 'El objetivo es ayudar, no forzar.' }
+            ],
+            quiz: {
+                pregunta: '¿Cómo deberías ver un "no"?',
+                opciones: ['Como un fracaso personal', 'Como información para mejorar', 'Como señal de que el producto es malo', 'Como motivo para rendirse'],
+                correcta: 1
+            }
+        }
+    ],
+    init() {
+        const tabs = document.getElementById('moduleTabs');
+        if (!tabs) return;
+        if (!this.initialized) {
+            this.bindEvents();
+            this.initialized = true;
+        }
+        this.renderTabs();
+        this.renderModule(this.activeIndex);
+    },
+    bindEvents() {
+        const retry = document.getElementById('reiniciarQuiz');
+        retry?.addEventListener('click', () => this.renderQuiz(this.modules[this.activeIndex]));
+    },
+    renderTabs() {
+        const tabsContainer = document.getElementById('moduleTabs');
+        if (!tabsContainer) return;
+        tabsContainer.innerHTML = '';
+        this.modules.forEach((mod, index) => {
+            const tab = document.createElement('span');
+            tab.className = `module-tab ${index === this.activeIndex ? 'module-tab-active' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`;
+            tab.textContent = `${mod.id}. ${mod.titulo}`;
+            tab.addEventListener('click', () => {
+                this.activeIndex = index;
+                this.renderTabs();
+                this.renderModule(index);
+            });
+            tabsContainer.appendChild(tab);
+        });
+    },
+    renderModule(idx) {
+        const mod = this.modules[idx];
+        const numero = document.getElementById('moduloNumero');
+        const titulo = document.getElementById('moduloTitulo');
+        const desc = document.getElementById('moduloDescripcion');
+        const grid = document.getElementById('conceptosGrid');
+        if (!mod || !numero || !titulo || !desc || !grid) return;
+
+        numero.textContent = String(mod.id);
+        titulo.textContent = mod.titulo;
+        desc.textContent = mod.descripcion;
+        grid.innerHTML = '';
+        mod.conceptos.forEach((con) => {
+            const card = document.createElement('div');
+            card.className = 'bg-white p-5 rounded-2xl border border-slate-100 shadow-sm';
+            card.innerHTML = `<h4 class="font-bold text-indigo-800 text-base mb-1">${con.titulo}</h4><p class="text-sm text-slate-600">${con.texto}</p>`;
+            grid.appendChild(card);
+        });
+        this.renderQuiz(mod);
+    },
+    renderQuiz(mod) {
+        const pregunta = document.getElementById('preguntaTexto');
+        const opciones = document.getElementById('opcionesQuiz');
+        const feedback = document.getElementById('feedbackQuiz');
+        const retry = document.getElementById('reiniciarQuiz');
+        if (!pregunta || !opciones || !feedback || !retry) return;
+
+        pregunta.textContent = mod.quiz.pregunta;
+        opciones.innerHTML = '';
+        feedback.innerHTML = '';
+        retry.classList.add('hidden');
+
+        mod.quiz.opciones.forEach((op, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'quiz-option w-full text-left p-3 rounded-xl bg-slate-800 text-slate-100 hover:bg-indigo-900 disabled:opacity-60 disabled:pointer-events-none';
+            btn.textContent = `${String.fromCharCode(65 + i)}. ${op}`;
+            btn.dataset.index = String(i);
+            btn.addEventListener('click', (e) => {
+                opciones.querySelectorAll('.quiz-option').forEach((b) => { b.disabled = true; });
+                const selected = Number(e.currentTarget.dataset.index);
+                if (selected === mod.quiz.correcta) {
+                    feedback.innerHTML = '<div class="correct-feedback p-3 rounded-xl">✅ ¡Correcto! Bien entendido.</div>';
+                } else {
+                    feedback.innerHTML = `<div class="wrong-feedback p-3 rounded-xl">❌ Incorrecto. La respuesta correcta es: ${mod.quiz.opciones[mod.quiz.correcta]}</div>`;
+                }
+                retry.classList.remove('hidden');
+            });
+            opciones.appendChild(btn);
         });
     }
 };

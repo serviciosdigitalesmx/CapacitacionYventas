@@ -255,3 +255,52 @@ tbody tr:hover {
     cursor: grab;
     user-select: none;
 }
+
+.flashcard {
+    background: #ffffff;
+    border-radius: 1.5rem;
+    box-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+    border: 1px solid #eef2f6;
+}
+
+.flashcard:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 24px -8px rgba(99, 102, 241, 0.15);
+}
+
+.module-tab {
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 999px;
+    padding: 0.5rem 1.2rem;
+    font-weight: 600;
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+.module-tab-active {
+    background: #4f46e5;
+    color: #ffffff;
+    box-shadow: 0 6px 12px -6px #4f46e5;
+}
+
+.quiz-option {
+    transition: all 0.15s;
+    border: 1px solid #334155;
+}
+
+.quiz-option:hover:not(.disabled) {
+    background: #312e81;
+    border-color: #818cf8;
+}
+
+.correct-feedback {
+    color: #059669;
+    background: #d1fae5;
+}
+
+.wrong-feedback {
+    color: #b91c1c;
+    background: #fee2e2;
+}
