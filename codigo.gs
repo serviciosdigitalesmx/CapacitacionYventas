@@ -26,6 +26,7 @@ const SHEET_EVENTS = 'Eventos';
 const USERS_HEADER = ['username', 'password', 'activo', 'rol', 'updatedAt'];
 const STATE_HEADER = ['username', 'stateJson', 'updatedAt'];
 const EVENTS_HEADER = ['username', 'tipo', 'detalleJson', 'createdAt'];
+const USERS_CACHE_KEY = 'users_map_v2';
 
 const FALLBACK_USERS = [
   ['freelancer1', 'pass1'], ['freelancer2', 'pass2'], ['freelancer3', 'pass3'], ['freelancer4', 'pass4'], ['freelancer5', 'pass5'],
@@ -124,12 +125,7 @@ function loadState_(ss, params) {
   if (!state) {
     return jsonResponse_({
       success: true,
-      state: {
-        prospectos: [],
-        checklist: [false, false, false, false, false, false],
-        evaluacion: [false, false, false, false, false],
-        diaActual: 1
-      }
+      state: normalizeState_({})
     });
   }
 
@@ -175,7 +171,13 @@ function notifyEvent_(ss, params) {
     try { detalle = JSON.parse(detalle); } catch (e) { detalle = { raw: detalle }; }
   }
   const eventsSheet = ss.getSheetByName(SHEET_EVENTS);
-  eventsSheet.appendRow([username, tipo, JSON.stringify(detalle || {}), isoNow_()]);
+  const lock = LockService.getScriptLock();
+  lock.waitLock(5000);
+  try {
+    appendSheetRow_(eventsSheet, [username, tipo, JSON.stringify(detalle || {}), isoNow_()]);
+  } finally {
+    lock.releaseLock();
+  }
   return jsonResponse_({ success: true, message: 'Evento registrado' });
 }
 
@@ -245,22 +247,43 @@ function ensureSheet_(ss, name, headers) {
 function ensureDefaultUsers_(usersSheet) {
   const users = readUsers_(usersSheet);
   const now = isoNow_();
+  const newRows = [];
 
   FALLBACK_USERS.forEach(function(pair) {
     const username = pair[0];
     const password = pair[1];
     if (!users[username]) {
-      usersSheet.appendRow([username, password, true, 'freelancer', now]);
+      newRows.push([username, password, true, 'freelancer', now]);
     }
   });
+
+  if (newRows.length) {
+    usersSheet
+      .getRange(usersSheet.getLastRow() + 1, 1, newRows.length, USERS_HEADER.length)
+      .setValues(newRows);
+    CacheService.getScriptCache().remove(USERS_CACHE_KEY);
+  }
 }
 
 // =========================
 // Data helpers
 // =========================
 function readUsers_(usersSheet) {
+  const cache = CacheService.getScriptCache();
+  const cached = cache.get(USERS_CACHE_KEY);
+  if (cached) {
+    try {
+      return JSON.parse(cached);
+    } catch (e) {
+      cache.remove(USERS_CACHE_KEY);
+    }
+  }
+
   const data = usersSheet.getDataRange().getValues();
-  if (data.length <= 1) return {};
+  if (data.length <= 1) {
+    cache.put(USERS_CACHE_KEY, JSON.stringify({}), 300);
+    return {};
+  }
   const headers = data[0];
   const out = {};
 
@@ -275,6 +298,7 @@ function readUsers_(usersSheet) {
     };
   });
 
+  cache.put(USERS_CACHE_KEY, JSON.stringify(out), 300);
   return out;
 }
 
@@ -284,50 +308,53 @@ function userExistsAndActive_(ss, username) {
 }
 
 function readStateByUsername_(stateSheet, username) {
-  const data = stateSheet.getDataRange().getValues();
-  if (data.length <= 1) return null;
-  const headers = data[0];
+  const headers = stateSheet.getRange(1, 1, 1, stateSheet.getLastColumn()).getValues()[0];
   const idxUsername = headers.indexOf('username');
   const idxState = headers.indexOf('stateJson');
   if (idxUsername === -1 || idxState === -1) return null;
+  const row = findRowByUsername_(stateSheet, idxUsername, username);
+  if (row < 2) return null;
 
-  for (var r = 1; r < data.length; r++) {
-    if (normalizeUsername_(data[r][idxUsername]) === username) {
-      const raw = String(data[r][idxState] || '').trim();
-      if (!raw) return null;
-      try {
-        return JSON.parse(raw);
-      } catch (e) {
-        return null;
-      }
-    }
+  const raw = String(stateSheet.getRange(row, idxState + 1).getValue() || '').trim();
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw);
+  } catch (e) {
+    return null;
   }
-  return null;
 }
 
 function writeStateByUsername_(stateSheet, username, state) {
-  const data = stateSheet.getDataRange().getValues();
-  const headers = data[0];
+  const headers = stateSheet.getRange(1, 1, 1, stateSheet.getLastColumn()).getValues()[0];
   const idxUsername = headers.indexOf('username');
   const idxState = headers.indexOf('stateJson');
   const idxUpdated = headers.indexOf('updatedAt');
   const payload = JSON.stringify(state);
   const now = isoNow_();
+  const lock = LockService.getScriptLock();
 
-  for (var r = 1; r < data.length; r++) {
-    if (normalizeUsername_(data[r][idxUsername]) === username) {
-      stateSheet.getRange(r + 1, idxState + 1).setValue(payload);
-      if (idxUpdated >= 0) stateSheet.getRange(r + 1, idxUpdated + 1).setValue(now);
-      return;
-    }
+  if (payload.length > 45000) {
+    throw new Error('state excede el tamaño seguro para la celda');
   }
 
-  stateSheet.appendRow([username, payload, now]);
+  lock.waitLock(10000);
+  try {
+    const row = findRowByUsername_(stateSheet, idxUsername, username);
+    if (row >= 2) {
+      const values = [[payload, now]];
+      stateSheet.getRange(row, idxState + 1, 1, 2).setValues(values);
+      return;
+    }
+
+    appendSheetRow_(stateSheet, [username, payload, now]);
+  } finally {
+    lock.releaseLock();
+  }
 }
 
 function normalizeState_(state) {
   const out = {
-    prospectos: Array.isArray(state.prospectos) ? state.prospectos : [],
+    prospectos: Array.isArray(state.prospectos) ? state.prospectos.map(normalizeProspect_) : [],
     checklist: Array.isArray(state.checklist) ? state.checklist : [false, false, false, false, false, false],
     evaluacion: Array.isArray(state.evaluacion) ? state.evaluacion : [false, false, false, false, false],
     diaActual: Number(state.diaActual || 1),
@@ -362,6 +389,21 @@ function normalizeState_(state) {
 // =========================
 // Utils
 // =========================
+function appendSheetRow_(sheet, values) {
+  sheet.getRange(sheet.getLastRow() + 1, 1, 1, values.length).setValues([values]);
+}
+
+function findRowByUsername_(sheet, idxUsername, username) {
+  if (sheet.getLastRow() <= 1) return -1;
+  const usernames = sheet.getRange(2, idxUsername + 1, sheet.getLastRow() - 1, 1).getValues();
+  for (var i = 0; i < usernames.length; i++) {
+    if (normalizeUsername_(usernames[i][0]) === username) {
+      return i + 2;
+    }
+  }
+  return -1;
+}
+
 function getParams_(e) {
   const query = (e && e.parameter) ? e.parameter : {};
   let body = {};
@@ -403,6 +445,43 @@ function rowToObj_(headers, row) {
     out[h] = row[i];
   });
   return out;
+}
+
+function limitText_(value, maxLen) {
+  return String(value || '').trim().slice(0, maxLen);
+}
+
+function normalizeDate_(value) {
+  const raw = String(value || '').trim();
+  return /^\d{4}-\d{2}-\d{2}$/.test(raw) ? raw : '';
+}
+
+function normalizeProspect_(raw) {
+  const source = raw && typeof raw === 'object' ? raw : {};
+  return {
+    nombre: limitText_(source.nombre, 120),
+    giro: limitText_(source.giro, 120),
+    contacto: String(source.contacto || '').replace(/\D/g, '').slice(-10),
+    responsable: limitText_(source.responsable || 'Yo', 80),
+    semaforo: ['Verde', 'Amarillo', 'Rojo'].indexOf(source.semaforo) >= 0 ? source.semaforo : 'Verde',
+    etapa: ['Nuevo', 'Contactado', 'Respondió', 'Seguimiento 1', 'Seguimiento 2', 'Demo agendada', 'Cerrado', 'Descartado'].indexOf(source.etapa) >= 0 ? source.etapa : 'Nuevo',
+    canal: limitText_(source.canal, 80),
+    proximoSeguimiento: normalizeDate_(source.proximoSeguimiento),
+    notas: limitText_(source.notas, 1200),
+    problema: limitText_(source.problema, 180),
+    objecion: limitText_(source.objecion, 180),
+    nivelInteres: ['Alto', 'Medio', 'Bajo'].indexOf(source.nivelInteres) >= 0 ? source.nivelInteres : 'Medio',
+    horario: limitText_(source.horario, 80),
+    mensajeEnviado: !!source.mensajeEnviado,
+    respondio: !!source.respondio,
+    demoAgendada: !!source.demoAgendada,
+    cerrado: !!source.cerrado,
+    archivado: !!source.archivado,
+    evidencia: limitText_(source.evidencia, 800),
+    fechaAlta: limitText_(source.fechaAlta, 60),
+    fechaActualizacion: limitText_(source.fechaActualizacion, 60),
+    ultimoContacto: Number(source.ultimoContacto || 0) || 0
+  };
 }
 
 function isoNow_() {

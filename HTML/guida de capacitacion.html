@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Protocolo de Operación · Servicios Digitales MX</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="../CSS/guida de capacitacion.css">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../CSS/guida de capacitacion.css">
 </head>
-<body class="bg-slate-50 text-slate-900 kid-mode">
+<body class="bg-slate-50 text-slate-900 workspace-shell">
     <div id="loginModal">
         <div class="login-box">
-            <h2>🔐 Acceso Freelancer</h2>
-            <p class="text-sm text-slate-500 mb-3">Ingresa tu usuario y contraseña.</p>
+            <h2>Acceso operativo</h2>
+            <p class="text-sm text-slate-500 mb-3">Ingresa tus credenciales para continuar.</p>
             <input type="text" id="loginUsername" placeholder="Usuario" autocomplete="off">
             <input type="password" id="loginPassword" placeholder="Contraseña">
             <button id="loginBtn">Entrar</button>
@@ -32,14 +32,14 @@
                 </div>
                 <div class="flex items-center gap-4">
                     <span class="hidden md:block text-slate-400 text-sm font-medium">Protocolo de Operación · v7</span>
-                    <div class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold uppercase">Modo Claro</div>
+                    <div class="status-pill status-pill--success">Operacion estandar</div>
                     <div class="text-sm font-semibold text-indigo-700" id="loggedUserDisplay"></div>
                     <button id="logoutBtn" class="text-xs bg-slate-200 px-2 py-1 rounded-full">Salir</button>
                 </div>
             </div>
             <!-- Mensaje de bienvenida -->
             <div class="mt-2 bg-indigo-100 p-3 rounded-xl text-indigo-900 text-sm font-medium">
-                🚀 Bien. Vamos por partes: aprende, practica y registra.
+                Opera con criterio: domina fundamentos, ejecuta y documenta cada avance.
             </div>
             <!-- Barra de progreso dinámica -->
             <div class="mt-3 flex items-center gap-3">
@@ -157,11 +157,11 @@
                     </ul>
                 </div>
                 <div class="flex flex-wrap gap-2">
-                    <span class="kid-chip">1. Mira tu meta</span>
-                    <span class="kid-chip">2. Haz tareas cortas</span>
-                    <span class="kid-chip">3. Registra todo</span>
+                    <span class="status-pill">1. Define la meta</span>
+                    <span class="status-pill">2. Ejecuta el bloque</span>
+                    <span class="status-pill">3. Documenta el avance</span>
                 </div>
-                <div class="kid-tip">Tip rápido: abre solo una sección, complétala y luego pasa a la siguiente.</div>
+                <div class="strategy-note">Trabaja una seccion a la vez. Cierra ese bloque y despues avanza al siguiente.</div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <div class="bg-white border border-slate-200 rounded-2xl p-4">
                         <p class="text-xs font-bold uppercase text-slate-500">Micro-cápsula 01</p>
@@ -190,10 +190,10 @@
                         <p class="font-bold">Plan día a día</p>
                         <p class="text-xs text-slate-500 mt-1">Ruta semanal con foco operativo.</p>
                     </a>
-                    <a href="#crm" class="bg-white border border-slate-200 rounded-2xl p-4 hover:border-indigo-400">
+                    <a href="#crm" id="dashboardCrmCard" data-requires-crm class="bg-white border border-slate-200 rounded-2xl p-4 hover:border-indigo-400">
                         <p class="text-xs text-indigo-600 font-bold uppercase">Paso 3</p>
                         <p class="font-bold">CRM avanzado</p>
-                        <p class="text-xs text-slate-500 mt-1">Registrar para medir y cobrar.</p>
+                        <p id="dashboardCrmStatus" class="text-xs text-slate-500 mt-1">Disponible al completar Fundamentos 0/6.</p>
                     </a>
                 </div>
             </section>
@@ -474,8 +474,13 @@
                 <div class="flex items-center gap-4">
                     <div class="step-number">11</div>
                     <h2 class="text-3xl font-extrabold text-slate-900">CRM avanzado</h2>
+                    <span id="crmAccessBadge" class="hidden status-pill"></span>
                 </div>
-                <div class="bg-white p-6 rounded-3xl border border-slate-200">
+                <div id="crmLockedNotice" class="crm-locked-panel hidden">
+                    <p class="crm-locked-panel__eyebrow">Bloqueo por hitos</p>
+                    <p id="crmLockStatus" class="crm-locked-panel__text">Completa Fundamentos para habilitar el CRM.</p>
+                </div>
+                <div id="crmWorkspace" class="bg-white p-6 rounded-3xl border border-slate-200">
                     <p class="mb-4">Registra prospectos con todos los datos necesarios. Se sincronizan en la nube.</p>
                     <!-- Mini estadística por responsable -->
                     <div id="statsResponsable" class="bg-indigo-50 p-2 rounded-xl mb-4 text-sm flex flex-wrap gap-4"></div>
@@ -828,7 +833,22 @@
 
             <!-- CHECKLIST DIARIO CON PERSISTENCIA -->
             <section id="checklist" class="space-y-4 bg-white p-6 rounded-3xl border-2 border-indigo-200">
-                <h2 class="text-2xl font-extrabold text-indigo-800 flex items-center gap-2"><span>📋</span> Checklist diario</h2>
+                <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                    <div>
+                        <h2 class="text-2xl font-extrabold text-indigo-800">Fundamentos operativos</h2>
+                        <p class="text-sm text-slate-500">Debes completar 6 de 6 para desbloquear el CRM.</p>
+                    </div>
+                    <div class="fundamentos-progress">
+                        <div class="fundamentos-progress__head">
+                            <span class="fundamentos-progress__label">Avance</span>
+                            <span id="fundamentosProgressLabel" class="fundamentos-progress__value">0/6</span>
+                        </div>
+                        <div class="progress-bar progress-bar--compact">
+                            <div id="fundamentosProgressFill" class="progress-fill" style="width:0%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="fundamentosStatus" class="fundamentos-status">Completa los 6 fundamentos para desbloquear el CRM.</div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-2" id="checklistContainer">
                     <div class="checklist-item"><input type="checkbox" class="check-dia" id="chk1"> <label for="chk1">Ejercicio de voz (lápiz/respiración)</label></div>
                     <div class="checklist-item"><input type="checkbox" class="check-dia" id="chk2"> <label for="chk2">Nicho elegido</label></div>
@@ -859,23 +879,23 @@
                 <div class="flex gap-3 text-sm overflow-x-auto snap-x pb-2" id="scriptsContainer">
                     <div class="bg-white p-3 rounded-xl font-mono flex justify-between items-center min-w-[22rem] snap-start" data-script="Hola [nombre], te contacto porque vi que ofreces [servicio]. Trabajo con Servicios Digitales MX, ayudamos a negocios a organizar las solicitudes de clientes para no perder oportunidades. ¿Te puedo contar rápido cómo funciona?">
                         <span class="truncate">Primer contacto genérico...</span>
-                        <button class="copy-btn ml-2 bg-indigo-200 text-indigo-800 px-3 py-1 rounded-lg text-xs" onclick="copiarTexto(this)">Copiar</button>
+                        <button class="copy-btn ml-2 bg-indigo-200 text-indigo-800 px-3 py-1 rounded-lg text-xs" data-copy-script>Copiar</button>
                     </div>
                     <div class="bg-white p-3 rounded-xl font-mono flex justify-between items-center min-w-[22rem] snap-start" data-script="Hola, te retomo el mensaje porque justo lo que hacemos ayuda mucho cuando las cotizaciones se están manejando por WhatsApp. ¿Te puedo mostrar un ejemplo rápido?">
                         <span class="truncate">Seguimiento 2 días sin respuesta...</span>
-                        <button class="copy-btn ml-2 bg-indigo-200 text-indigo-800 px-3 py-1 rounded-lg text-xs" onclick="copiarTexto(this)">Copiar</button>
+                        <button class="copy-btn ml-2 bg-indigo-200 text-indigo-800 px-3 py-1 rounded-lg text-xs" data-copy-script>Copiar</button>
                     </div>
                     <div class="bg-white p-3 rounded-xl font-mono flex justify-between items-center min-w-[22rem] snap-start" data-script="Sin problema, lo movemos. ¿Qué día te queda mejor para retomarlo?">
                         <span class="truncate">Reagendar demo...</span>
-                        <button class="copy-btn ml-2 bg-indigo-200 text-indigo-800 px-3 py-1 rounded-lg text-xs" onclick="copiarTexto(this)">Copiar</button>
+                        <button class="copy-btn ml-2 bg-indigo-200 text-indigo-800 px-3 py-1 rounded-lg text-xs" data-copy-script>Copiar</button>
                     </div>
                     <div class="bg-white p-3 rounded-xl font-mono flex justify-between items-center min-w-[22rem] snap-start" data-script="Hola, solo te doy seguimiento a la demo de ayer. ¿Qué te pareció la idea?">
                         <span class="truncate">Post-demo...</span>
-                        <button class="copy-btn ml-2 bg-indigo-200 text-indigo-800 px-3 py-1 rounded-lg text-xs" onclick="copiarTexto(this)">Copiar</button>
+                        <button class="copy-btn ml-2 bg-indigo-200 text-indigo-800 px-3 py-1 rounded-lg text-xs" data-copy-script>Copiar</button>
                     </div>
                     <div class="bg-white p-3 rounded-xl font-mono flex justify-between items-center min-w-[22rem] snap-start" data-script="Si te hace sentido, el siguiente paso sería ver qué flujo encaja mejor con tu negocio. ¿Coordinamos una reunión breve?">
                         <span class="truncate">Cierre suave...</span>
-                        <button class="copy-btn ml-2 bg-indigo-200 text-indigo-800 px-3 py-1 rounded-lg text-xs" onclick="copiarTexto(this)">Copiar</button>
+                        <button class="copy-btn ml-2 bg-indigo-200 text-indigo-800 px-3 py-1 rounded-lg text-xs" data-copy-script>Copiar</button>
                     </div>
                 </div>
             </section>
@@ -886,15 +906,15 @@
                 <div class="space-y-3 text-sm">
                     <div class="bg-slate-50 p-3 rounded-xl font-mono flex justify-between items-start gap-3" data-script="Equipo, actualizamos la estructura de la guía. Ahora está dividida en 4 módulos lógicos para que su entrenamiento sea más rápido y ordenado. Revisen el nuevo orden en el menú principal.">
                         <span class="leading-relaxed">"Equipo, actualizamos la estructura de la guía. Ahora está dividida en 4 módulos lógicos para que su entrenamiento sea más rápido y ordenado. Revisen el nuevo orden en el menú principal."</span>
-                        <button class="copy-btn bg-indigo-200 text-indigo-800 px-3 py-1 rounded-lg text-xs whitespace-nowrap" onclick="copiarTexto(this)">Copiar</button>
+                        <button class="copy-btn bg-indigo-200 text-indigo-800 px-3 py-1 rounded-lg text-xs whitespace-nowrap" data-copy-script>Copiar</button>
                     </div>
                     <div class="bg-slate-50 p-3 rounded-xl font-mono flex justify-between items-start gap-3" data-script="Hola a todos. Notamos que la guía tenía demasiada información junta, así que la reorganizamos por etapas: desde lo básico hasta cómo escalar sus comisiones. Es mucho más intuitivo ahora, denle una vuelta.">
                         <span class="leading-relaxed">"Hola a todos. Notamos que la guía tenía demasiada información junta, así que la reorganizamos por etapas: desde lo básico hasta cómo escalar sus comisiones. Es mucho más intuitivo ahora, denle una vuelta."</span>
-                        <button class="copy-btn bg-indigo-200 text-indigo-800 px-3 py-1 rounded-lg text-xs whitespace-nowrap" onclick="copiarTexto(this)">Copiar</button>
+                        <button class="copy-btn bg-indigo-200 text-indigo-800 px-3 py-1 rounded-lg text-xs whitespace-nowrap" data-copy-script>Copiar</button>
                     </div>
                     <div class="bg-slate-50 p-3 rounded-xl font-mono flex justify-between items-start gap-3" data-script="Jesús, optimicé la arquitectura de información del Bootcamp. Reduje la fricción cognitiva agrupando las 22 secciones en 4 pilares estratégicos. Esto facilitará el onboarding de nuevos freelancers y mejorará la retención del proceso operativo. Ya está listo para implementarse.">
                         <span class="leading-relaxed">"Jesús, optimicé la arquitectura de información del Bootcamp. Reduje la fricción cognitiva agrupando las 22 secciones en 4 pilares estratégicos. Esto facilitará el onboarding de nuevos freelancers y mejorará la retención del proceso operativo. Ya está listo para implementarse."</span>
-                        <button class="copy-btn bg-indigo-200 text-indigo-800 px-3 py-1 rounded-lg text-xs whitespace-nowrap" onclick="copiarTexto(this)">Copiar</button>
+                        <button class="copy-btn bg-indigo-200 text-indigo-800 px-3 py-1 rounded-lg text-xs whitespace-nowrap" data-copy-script>Copiar</button>
                     </div>
                 </div>
             </section>
@@ -908,6 +928,27 @@
                     <div><span class="font-black text-2xl text-indigo-600" id="kpi3">0</span><br><span class="text-xs">respuestas</span></div>
                     <div><span class="font-black text-2xl text-indigo-600" id="kpi4">0</span><br><span class="text-xs">demos</span></div>
                     <div><span class="font-black text-2xl text-indigo-600" id="kpi5">0</span><br><span class="text-xs">cierres</span></div>
+                </div>
+                <div class="conversion-panel">
+                    <div class="conversion-panel__main">
+                        <div class="conversion-panel__meta">
+                            <p class="conversion-panel__eyebrow">Tasa de conversion</p>
+                            <div class="conversion-panel__headline">
+                                <span id="conversionRateValue">0%</span>
+                                <span id="conversionRateTrend" class="conversion-panel__trend">Sin cierres</span>
+                            </div>
+                            <p id="conversionRateCaption" class="conversion-panel__caption">Registra prospectos y cierres para construir tu referencia operativa.</p>
+                        </div>
+                        <div class="conversion-gauge">
+                            <div class="conversion-gauge__track">
+                                <div id="conversionRateFill" class="conversion-gauge__fill" style="width:0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="conversion-panel__side">
+                        <p class="conversion-panel__eyebrow">Relacion cierres / prospectos</p>
+                        <p id="conversionRateRatio" class="conversion-panel__ratio">0/0</p>
+                    </div>
                 </div>
                 <button id="actualizarKPIs" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm">Actualizar desde CRM</button>
             </section>
@@ -955,7 +996,7 @@
             </div>
             <div class="quick-panel">
                 <p class="text-sm font-semibold text-slate-800 mb-2">Acción principal</p>
-                <a href="#crm" class="block w-full text-center bg-indigo-600 text-white font-bold py-2 rounded-xl hover:bg-indigo-700">➕ Nuevo prospecto</a>
+                <a href="#crm" id="quickActionCrm" data-requires-crm class="block w-full text-center bg-indigo-600 text-white font-bold py-2 rounded-xl hover:bg-indigo-700">Nuevo prospecto</a>
                 <div class="mt-3">
                     <p class="text-xs text-slate-500 mb-1">Progreso del día</p>
                     <div class="progress-bar"><div id="miniProgress" class="progress-fill" style="width:0%"></div></div>
@@ -987,6 +1028,6 @@
         </div>
     </div>
 
-        <script src="../JS/guida de capacitacion.js"></script>
+    <script src="../JS/guida de capacitacion.js"></script>
 </body>
 </html>

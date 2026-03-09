@@ -1,985 +1,1632 @@
+'use strict';
 
-        // ================== AUTH + BACKEND ==================
-        const APP_SCRIPT_URLS = [
-            'https://script.google.com/macros/s/AKfycbyRbMCH6FiE9nL_EdCpKVqmTZzt62kExX-YDaG1m_4JlKoh39BFlLAt8qLIweyi_CSN/exec',
-            'https://script.google.com/macros/s/AKfycbxfTsZDlIuSosrVfj8fbIucl64kBqQdmyXhywjy3szq8VjZ4w7g4xkKPXWjI8S7OXk9/exec'
-        ];
-        let activeBackendUrl = APP_SCRIPT_URLS[0];
-        const APP_TOKEN = '446c0599e6fed1bd0408d31e746e727a31829fdedf957972';
-        let currentUser = null;
-        let saveTimer = null;
-        let userState = null;
+// ================== AUTH + BACKEND ==================
+const APP_SCRIPT_URLS = [
+    'https://script.google.com/macros/s/AKfycbyRbMCH6FiE9nL_EdCpKVqmTZzt62kExX-YDaG1m_4JlKoh39BFlLAt8qLIweyi_CSN/exec',
+    'https://script.google.com/macros/s/AKfycbxfTsZDlIuSosrVfj8fbIucl64kBqQdmyXhywjy3szq8VjZ4w7g4xkKPXWjI8S7OXk9/exec'
+];
+let activeBackendUrl = APP_SCRIPT_URLS[0];
+const APP_TOKEN = '446c0599e6fed1bd0408d31e746e727a31829fdedf957972';
+const BACKEND_TIMEOUT_MS = 10000;
+const STATE_SYNC_DEBOUNCE_MS = 900;
+const LOCAL_CACHE_VERSION = 2;
+const LOCAL_CACHE_PREFIX = 'capacitacionyventas:user:';
+const ALLOWED_SEMAFOROS = ['Verde', 'Amarillo', 'Rojo'];
+const ALLOWED_ETAPAS = ['Nuevo', 'Contactado', 'Respondió', 'Seguimiento 1', 'Seguimiento 2', 'Demo agendada', 'Cerrado', 'Descartado'];
+const ALLOWED_INTERES = ['Alto', 'Medio', 'Bajo'];
 
-        function defaultState() {
-            return {
-                prospectos: [],
-                checklist: [false, false, false, false, false, false],
-                evaluacion: [false, false, false, false, false],
-                diaActual: 1,
-                onboardingStartedAt: '',
-                survivalPaused: false,
-                certificacion: { aprobada: false, puntaje: 0 },
-                checklistNotificado: false
-            };
+const $ = (id) => document.getElementById(id);
+const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+
+const dom = {
+    loginModal: $('loginModal'),
+    loginUsername: $('loginUsername'),
+    loginPassword: $('loginPassword'),
+    loginBtn: $('loginBtn'),
+    loginError: $('loginError'),
+    mainHeader: $('mainHeader'),
+    sidebarMobile: $('sidebar-mobile'),
+    appShell: $('appShell'),
+    mobileBottomNav: $('mobileBottomNav'),
+    mainFooter: $('mainFooter'),
+    loggedUserDisplay: $('loggedUserDisplay'),
+    logoutBtn: $('logoutBtn'),
+    progresoGlobal: $('progresoGlobal'),
+    porcentajeProgreso: $('porcentajeProgreso'),
+    leyendaProgreso: $('leyendaProgreso'),
+    miniProgress: $('miniProgress'),
+    diaActual: $('diaActual'),
+    actividadDia: $('actividadDia'),
+    objetivoDia: $('objetivoDia'),
+    selectorDia: $('selectorDia'),
+    marcarDiaCompletado: $('marcarDiaCompletado'),
+    alertasSeguimiento: $('alertasSeguimiento'),
+    survivalAlert: $('survivalAlert'),
+    pauseOverlay: $('pauseOverlay'),
+    statsResponsable: $('statsResponsable'),
+    filtroResponsable: $('filtroResponsable'),
+    buscarCRM: $('buscarCRM'),
+    filtroEtapa: $('filtroEtapa'),
+    filtroSemaforo: $('filtroSemaforo'),
+    filtroCanal: $('filtroCanal'),
+    crmLista: $('crmLista'),
+    crmForm: $('crmForm'),
+    crmNombre: $('crmNombre'),
+    crmGiro: $('crmGiro'),
+    crmContacto: $('crmContacto'),
+    crmResponsable: $('crmResponsable'),
+    crmSemaforo: $('crmSemaforo'),
+    crmEtapa: $('crmEtapa'),
+    crmCanal: $('crmCanal'),
+    crmProximoSeguimiento: $('crmProximoSeguimiento'),
+    crmNotas: $('crmNotas'),
+    crmProblema: $('crmProblema'),
+    crmObjecion: $('crmObjecion'),
+    crmNivelInteres: $('crmNivelInteres'),
+    crmHorario: $('crmHorario'),
+    crmMensajeEnviado: $('crmMensajeEnviado'),
+    crmRespondio: $('crmRespondio'),
+    crmDemoAgendada: $('crmDemoAgendada'),
+    crmCerrado: $('crmCerrado'),
+    crmEvidencia: $('crmEvidencia'),
+    crmIndex: $('crmIndex'),
+    btnSubmitCRM: $('btnSubmitCRM'),
+    modoEdicion: $('modoEdicion'),
+    editandoTexto: $('editandoTexto'),
+    cancelarEdicion: $('cancelarEdicion'),
+    crmLockedNotice: $('crmLockedNotice'),
+    crmLockStatus: $('crmLockStatus'),
+    crmWorkspace: $('crmWorkspace'),
+    crmAccessBadge: $('crmAccessBadge'),
+    dashboardCrmCard: $('dashboardCrmCard'),
+    dashboardCrmStatus: $('dashboardCrmStatus'),
+    quickActionCrm: $('quickActionCrm'),
+    fundamentosStatus: $('fundamentosStatus'),
+    fundamentosProgressLabel: $('fundamentosProgressLabel'),
+    fundamentosProgressFill: $('fundamentosProgressFill'),
+    puntajeEval: $('puntajeEval'),
+    estadoEval: $('estadoEval'),
+    actualizarKPIs: $('actualizarKPIs'),
+    kpi1: $('kpi1'),
+    kpi2: $('kpi2'),
+    kpi3: $('kpi3'),
+    kpi4: $('kpi4'),
+    kpi5: $('kpi5'),
+    conversionRateValue: $('conversionRateValue'),
+    conversionRateFill: $('conversionRateFill'),
+    conversionRateCaption: $('conversionRateCaption'),
+    conversionRateRatio: $('conversionRateRatio'),
+    conversionRateTrend: $('conversionRateTrend'),
+    tuRanking: $('tuRanking'),
+    menuToggle: $('menuToggle'),
+    mobileMenu: $('mobileMenu'),
+    quizContainer: $('quizContainer'),
+    quizResultado: $('quizResultado'),
+    btnEvaluarQuiz: $('btnEvaluarQuiz'),
+    btnGenerarGuion: $('btnGenerarGuion'),
+    btnCopiarGuionGenerado: $('btnCopiarGuionGenerado'),
+    scriptTipo: $('scriptTipo'),
+    scriptNegocio: $('scriptNegocio'),
+    scriptGenerado: $('scriptGenerado'),
+    calcVentas: $('calcVentas'),
+    calcComisionProm: $('calcComisionProm'),
+    calcVentasVal: $('calcVentasVal'),
+    calcResultado: $('calcResultado')
+};
+
+const checkboxes = $$('.check-dia');
+const evalItems = $$('.eval-item');
+const miniChecks = ['mini-chk1', 'mini-chk2', 'mini-chk3'].map($).filter(Boolean);
+const tabButtons = $$('[data-tab-target]');
+const sections = $$('.active-section');
+const sidebarLinks = $$('.sidebar-link');
+const rankingCells = dom.tuRanking ? dom.tuRanking.querySelectorAll('td') : [];
+
+let currentUser = null;
+let userState = defaultState();
+let prospectos = [];
+let diaActual = 1;
+let syncTimer = null;
+let syncInFlight = false;
+let pendingSyncState = null;
+let pendingSyncSnapshot = '';
+let lastSyncedSnapshot = '';
+let activeTabName = 'progreso';
+let unlockedModules = { 1: true, 2: true, 3: true, 4: false };
+let prospectInsights = buildProspectInsights([]);
+let crmRenderHandle = 0;
+
+function defaultState() {
+    return {
+        prospectos: [],
+        checklist: [false, false, false, false, false, false],
+        evaluacion: [false, false, false, false, false],
+        diaActual: 1,
+        onboardingStartedAt: '',
+        survivalPaused: false,
+        certificacion: { aprobada: false, puntaje: 0 },
+        checklistNotificado: false
+    };
+}
+
+function normalizeUsername(value) {
+    return String(value || '').trim().toLowerCase();
+}
+
+function clampNumber(value, min, max, fallback) {
+    const num = Number(value);
+    if (!Number.isFinite(num)) return fallback;
+    return Math.min(Math.max(num, min), max);
+}
+
+function limitText(value, maxLen) {
+    return String(value || '').trim().slice(0, maxLen);
+}
+
+function normalizeDateInput(value) {
+    const raw = String(value || '').trim();
+    return /^\d{4}-\d{2}-\d{2}$/.test(raw) ? raw : '';
+}
+
+function normalizeBooleanArray(list, length) {
+    const source = Array.isArray(list) ? list.slice(0, length) : [];
+    while (source.length < length) source.push(false);
+    return source.map(Boolean);
+}
+
+function normalizeProspect(raw) {
+    const source = raw && typeof raw === 'object' ? raw : {};
+    const contacto = String(source.contacto || '').replace(/\D/g, '').slice(-10);
+    let etapa = ALLOWED_ETAPAS.includes(source.etapa) ? source.etapa : 'Nuevo';
+    let semaforo = ALLOWED_SEMAFOROS.includes(source.semaforo) ? source.semaforo : 'Verde';
+    const prospecto = {
+        nombre: limitText(source.nombre, 120),
+        giro: limitText(source.giro, 120),
+        contacto: contacto,
+        responsable: limitText(source.responsable || 'Yo', 80),
+        semaforo: semaforo,
+        etapa: etapa,
+        canal: limitText(source.canal, 80),
+        proximoSeguimiento: normalizeDateInput(source.proximoSeguimiento),
+        notas: limitText(source.notas, 1200),
+        problema: limitText(source.problema, 180),
+        objecion: limitText(source.objecion, 180),
+        nivelInteres: ALLOWED_INTERES.includes(source.nivelInteres) ? source.nivelInteres : 'Medio',
+        horario: limitText(source.horario, 80),
+        mensajeEnviado: !!source.mensajeEnviado,
+        respondio: !!source.respondio,
+        demoAgendada: !!source.demoAgendada,
+        cerrado: !!source.cerrado,
+        archivado: !!source.archivado,
+        evidencia: limitText(source.evidencia, 800),
+        fechaAlta: limitText(source.fechaAlta, 60),
+        fechaActualizacion: limitText(source.fechaActualizacion, 60),
+        ultimoContacto: clampNumber(source.ultimoContacto, 0, Number.MAX_SAFE_INTEGER, 0)
+    };
+
+    if (prospecto.cerrado) {
+        prospecto.etapa = 'Cerrado';
+        prospecto.demoAgendada = true;
+        prospecto.respondio = true;
+        prospecto.mensajeEnviado = true;
+        prospecto.semaforo = 'Verde';
+    } else if (prospecto.archivado) {
+        prospecto.etapa = 'Descartado';
+    } else if (prospecto.demoAgendada) {
+        prospecto.etapa = 'Demo agendada';
+        prospecto.respondio = true;
+        prospecto.mensajeEnviado = true;
+        prospecto.semaforo = prospecto.semaforo === 'Rojo' ? 'Amarillo' : prospecto.semaforo;
+    } else if (prospecto.respondio && prospecto.etapa === 'Nuevo') {
+        prospecto.etapa = 'Respondió';
+        prospecto.mensajeEnviado = true;
+    } else if (prospecto.mensajeEnviado && prospecto.etapa === 'Nuevo') {
+        prospecto.etapa = 'Contactado';
+    }
+
+    return prospecto;
+}
+
+function normalizeClientState(rawState) {
+    const base = rawState && typeof rawState === 'object' ? rawState : {};
+    const normalized = {
+        prospectos: Array.isArray(base.prospectos) ? base.prospectos.map(normalizeProspect) : [],
+        checklist: normalizeBooleanArray(base.checklist, 6),
+        evaluacion: normalizeBooleanArray(base.evaluacion, 5),
+        diaActual: clampNumber(base.diaActual || 1, 1, 7, 1),
+        onboardingStartedAt: limitText(base.onboardingStartedAt, 60),
+        survivalPaused: !!base.survivalPaused,
+        certificacion: {
+            aprobada: !!(base.certificacion && base.certificacion.aprobada),
+            puntaje: clampNumber(base.certificacion && base.certificacion.puntaje, 0, 10, 0)
+        },
+        checklistNotificado: !!base.checklistNotificado
+    };
+
+    if (normalized.checklist.every(Boolean)) {
+        normalized.checklistNotificado = true;
+    }
+
+    return normalized;
+}
+
+function cloneValue(value) {
+    if (typeof structuredClone === 'function') {
+        try {
+            return structuredClone(value);
+        } catch (error) {
+            // fallback below
         }
+    }
+    return JSON.parse(JSON.stringify(value));
+}
 
-        async function callBackend(payload) {
-            if (!APP_SCRIPT_URLS.length) return null;
-            const urls = [activeBackendUrl].concat(APP_SCRIPT_URLS.filter((u) => u !== activeBackendUrl));
-            for (let i = 0; i < urls.length; i++) {
-                const url = urls[i];
-                try {
-                    const res = await fetch(url, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(Object.assign({ token: APP_TOKEN }, payload))
-                    });
-                    const data = await res.json();
-                    activeBackendUrl = url;
-                    return data;
-                } catch (e) {
-                    // intentar siguiente backend
-                }
-            }
-            return null;
-        }
+function serializeState(state) {
+    return JSON.stringify(normalizeClientState(state));
+}
 
-        async function validateCredentials(username, password) {
-            const remote = await callBackend({ action: 'login', username, password });
-            return !!(remote && remote.success === true);
-        }
+function getLocalCacheKey(username) {
+    return `${LOCAL_CACHE_PREFIX}${normalizeUsername(username)}`;
+}
 
-        async function cargarDatosDesdeBackend(username) {
-            const remote = await callBackend({ action: 'loadState', username });
-            if (remote && remote.success && remote.state) return remote.state;
-            return null;
-        }
+function safeJsonParse(raw) {
+    if (!raw || typeof raw !== 'string') return null;
+    try {
+        return JSON.parse(raw);
+    } catch (error) {
+        return null;
+    }
+}
 
-        async function guardarDatosEnBackend(username, state) {
-            await callBackend({ action: 'saveState', username, state });
-        }
-
-        async function notifyEvent(tipo, detalle) {
-            if (!currentUser) return;
-            await callBackend({
-                action: 'notifyEvent',
-                username: currentUser,
-                tipo: tipo,
-                detalle: detalle || {}
-            });
-        }
-
-        function collectUserState() {
-            return {
-                prospectos: prospectos || [],
-                checklist: obtenerDeStorage('checklist', defaultState().checklist),
-                evaluacion: obtenerDeStorage('evaluacion', defaultState().evaluacion),
-                diaActual: obtenerDeStorage('diaActual', defaultState().diaActual),
-                onboardingStartedAt: obtenerDeStorage('onboardingStartedAt', ''),
-                survivalPaused: !!obtenerDeStorage('survivalPaused', false),
-                certificacion: obtenerDeStorage('certificacion', defaultState().certificacion),
-                checklistNotificado: !!obtenerDeStorage('checklistNotificado', false)
-            };
-        }
-
-        function scheduleBackendSync() {
-            if (!currentUser) return;
-            clearTimeout(saveTimer);
-            saveTimer = setTimeout(() => {
-                guardarDatosEnBackend(currentUser, collectUserState());
-            }, 400);
-        }
-
-        // ================== FUNCIONES GLOBALES ==================
-        function copiarTexto(btn) {
-            const parent = btn.closest('[data-script]');
-            if (parent) {
-                const texto = parent.getAttribute('data-script');
-                navigator.clipboard.writeText(texto).then(() => {
-                    btn.innerText = 'Copiado!';
-                    setTimeout(() => btn.innerText = 'Copiar', 1500);
-                }).catch(() => alert('Error al copiar, selecciona manual.'));
-            }
-        }
-
-        // ================== PERSISTENCIA GENERAL ==================
-        function guardarEnStorage(key, value) {
-            if (!currentUser) return;
-            if (!userState) userState = defaultState();
-            userState[key] = value;
-            scheduleBackendSync();
-        }
-
-        function obtenerDeStorage(key, defaultValue) {
-            if (!userState) return defaultValue;
-            return (typeof userState[key] === 'undefined') ? defaultValue : userState[key];
-        }
-
-        // ================== CRM AVANZADO ==================
-        let prospectos = [];
-
-        function sanitizar(texto) {
-            if (!texto) return '';
-            return texto.replace(/[&<>"]/g, function(m) {
-                if (m === '&') return '&amp;';
-                if (m === '<') return '&lt;';
-                if (m === '>') return '&gt;';
-                if (m === '"') return '&quot;';
-                return m;
-            });
-        }
-
-        function actualizarStatsResponsable() {
-            const stats = {};
-            prospectos.forEach(p => {
-                const resp = p.responsable || 'Sin asignar';
-                stats[resp] = (stats[resp] || 0) + 1;
-            });
-            const div = document.getElementById('statsResponsable');
-            div.innerHTML = '';
-            for (let [resp, count] of Object.entries(stats)) {
-                const span = document.createElement('span');
-                span.className = 'bg-white px-3 py-1 rounded-full shadow-sm';
-                span.textContent = `${resp}: ${count}`;
-                div.appendChild(span);
-            }
-        }
-
-        function actualizarFiltrosResponsable() {
-            const select = document.getElementById('filtroResponsable');
-            const responsables = [...new Set(prospectos.map(p => p.responsable || 'Sin asignar'))];
-            select.innerHTML = '<option value="">Todos los responsables</option>';
-            responsables.forEach(r => {
-                const opt = document.createElement('option');
-                opt.value = r;
-                opt.textContent = r;
-                select.appendChild(opt);
-            });
-        }
-
-        function ordenarProspectos(lista) {
-            const hoy = new Date().toISOString().split('T')[0];
-            return lista.sort((a, b) => {
-                if (a.etapa === 'Demo agendada' && b.etapa !== 'Demo agendada') return -1;
-                if (a.etapa !== 'Demo agendada' && b.etapa === 'Demo agendada') return 1;
-                const aVencido = a.proximoSeguimiento && a.proximoSeguimiento < hoy;
-                const bVencido = b.proximoSeguimiento && b.proximoSeguimiento < hoy;
-                if (aVencido && !bVencido) return -1;
-                if (!aVencido && bVencido) return 1;
-                const aHoy = a.proximoSeguimiento === hoy;
-                const bHoy = b.proximoSeguimiento === hoy;
-                if (aHoy && !bHoy) return -1;
-                if (!aHoy && bHoy) return 1;
-                if (a.semaforo === 'Verde' && b.semaforo !== 'Verde') return -1;
-                if (a.semaforo !== 'Verde' && b.semaforo === 'Verde') return 1;
-                return (b.ultimoContacto || 0) - (a.ultimoContacto || 0);
-            });
-        }
-
-        function renderCRM() {
-            const lista = document.getElementById('crmLista');
-            const busqueda = document.getElementById('buscarCRM').value.toLowerCase();
-            const filtroEtapa = document.getElementById('filtroEtapa').value;
-            const filtroSemaforo = document.getElementById('filtroSemaforo').value;
-            const filtroResponsable = document.getElementById('filtroResponsable').value;
-            const filtroCanal = document.getElementById('filtroCanal').value.toLowerCase();
-
-            let filtrados = prospectos.filter(p => {
-                return (p.nombre.toLowerCase().includes(busqueda) || p.giro.toLowerCase().includes(busqueda)) &&
-                       (filtroEtapa === '' || p.etapa === filtroEtapa) &&
-                       (filtroSemaforo === '' || p.semaforo === filtroSemaforo) &&
-                       (filtroResponsable === '' || (p.responsable || 'Sin asignar') === filtroResponsable) &&
-                       (filtroCanal === '' || (p.canal || '').toLowerCase().includes(filtroCanal)) &&
-                       !p.archivado;
-            });
-
-            filtrados = ordenarProspectos(filtrados);
-            const hoy = new Date().toISOString().split('T')[0];
-
-            if (filtrados.length === 0) {
-                lista.innerHTML = '<div class="p-4 text-center text-slate-400">Aún no hay prospectos registrados. ¡Agrega uno arriba!</div>';
-            } else {
-                lista.innerHTML = '';
-                filtrados.forEach((p, idx) => {
-                    const indexReal = prospectos.indexOf(p);
-                    const badge = p.proximoSeguimiento === hoy ? '<span class="badge-hoy ml-1">Hoy</span>' :
-                                 (p.proximoSeguimiento && p.proximoSeguimiento < hoy ? '<span class="badge-vencido ml-1">Vencido</span>' : '');
-                    const nombre = sanitizar(p.nombre);
-                    const giro = sanitizar(p.giro);
-                    const contacto = sanitizar(p.contacto);
-                    const responsable = sanitizar(p.responsable || '');
-                    const canal = sanitizar(p.canal || '');
-                    const proximo = sanitizar(p.proximoSeguimiento || '');
-                    const problema = sanitizar(p.problema || '');
-                    const objecion = sanitizar(p.objecion || '');
-                    const nivelInteres = sanitizar(p.nivelInteres || '');
-                    const horario = sanitizar(p.horario || '');
-                    const evidencia = sanitizar(p.evidencia || '');
-                    const notas = sanitizar(p.notas || '');
-                    const fechaAlta = sanitizar(p.fechaAlta || '');
-                    const fechaAct = sanitizar(p.fechaActualizacion || '');
-                    const mensajeIcon = p.mensajeEnviado ? '📤' : '⏳';
-                    const respondioIcon = p.respondio ? '💬' : '🔇';
-                    const demoIcon = p.demoAgendada ? '📅' : '';
-                    const cerradoIcon = p.cerrado ? '✅' : '';
-
-                    const div = document.createElement('div');
-                    div.className = 'p-3 border rounded flex flex-wrap justify-between items-center gap-2';
-                    div.innerHTML = `
-                        <div class="flex-1">
-                            <div><strong>${nombre}</strong> (${giro}) - ${contacto} - ${p.semaforo} - ${p.etapa} ${mensajeIcon} ${respondioIcon} ${demoIcon} ${cerradoIcon} ${badge}</div>
-                            <div class="text-xs text-slate-500">Resp: ${responsable} | Canal: ${canal} | Próx seg: ${proximo}</div>
-                            <div class="text-xs text-slate-500">Problema: ${problema} | Objeción: ${objecion} | Interés: ${nivelInteres} | Horario: ${horario}</div>
-                            <div class="text-xs text-slate-500">Notas: ${notas}</div>
-                            <div class="text-xs text-slate-500">Evidencia: ${evidencia}</div>
-                            <div class="text-xs text-slate-400">Creado: ${fechaAlta} | Últ. act: ${fechaAct}</div>
-                        </div>
-                        <div class="flex gap-2">
-                            <button class="bg-slate-700 text-white px-3 py-1 rounded text-xs" onclick="archivarProspecto(${indexReal})">Archivar</button>
-                        </div>
-                    `;
-                    lista.appendChild(div);
-                });
-            }
-            actualizarRankingPropio();
-            actualizarKPIsReales();
-            actualizarProgresoGlobal();
-            actualizarAlertasSeguimiento();
-            actualizarStatsResponsable();
-            actualizarFiltrosResponsable();
-            applyModuleLocks();
-            checkSurvivalMode();
-        }
-
-        // Coherencia etapa-checkbox
-        document.getElementById('crmCerrado').addEventListener('change', function(e) {
-            if (this.checked) document.getElementById('crmEtapa').value = 'Cerrado';
-        });
-        document.getElementById('crmDemoAgendada').addEventListener('change', function(e) {
-            if (this.checked) document.getElementById('crmEtapa').value = 'Demo agendada';
-        });
-        document.getElementById('crmRespondio').addEventListener('change', function(e) {
-            if (this.checked && document.getElementById('crmEtapa').value === 'Nuevo') {
-                document.getElementById('crmEtapa').value = 'Respondió';
-            }
-        });
-        document.getElementById('crmMensajeEnviado').addEventListener('change', function(e) {
-            if (this.checked && document.getElementById('crmEtapa').value === 'Nuevo') {
-                document.getElementById('crmEtapa').value = 'Contactado';
-            }
-        });
-
-        window.editarProspecto = function(index) {
-            const p = prospectos[index];
-            document.getElementById('crmNombre').value = p.nombre || '';
-            document.getElementById('crmGiro').value = p.giro || '';
-            document.getElementById('crmContacto').value = p.contacto || '';
-            document.getElementById('crmResponsable').value = p.responsable || 'Yo';
-            document.getElementById('crmSemaforo').value = p.semaforo || 'Verde';
-            document.getElementById('crmEtapa').value = p.etapa || 'Nuevo';
-            document.getElementById('crmCanal').value = p.canal || '';
-            document.getElementById('crmProximoSeguimiento').value = p.proximoSeguimiento || '';
-            document.getElementById('crmNotas').value = p.notas || '';
-            document.getElementById('crmProblema').value = p.problema || '';
-            document.getElementById('crmObjecion').value = p.objecion || '';
-            document.getElementById('crmNivelInteres').value = p.nivelInteres || 'Medio';
-            document.getElementById('crmHorario').value = p.horario || '';
-            document.getElementById('crmMensajeEnviado').checked = p.mensajeEnviado || false;
-            document.getElementById('crmRespondio').checked = p.respondio || false;
-            document.getElementById('crmDemoAgendada').checked = p.demoAgendada || false;
-            document.getElementById('crmCerrado').checked = p.cerrado || false;
-            document.getElementById('crmEvidencia').value = p.evidencia || '';
-            document.getElementById('crmIndex').value = index;
-            document.getElementById('btnSubmitCRM').innerText = 'Actualizar prospecto';
-            document.getElementById('modoEdicion').classList.remove('hidden');
-            document.getElementById('editandoTexto').innerText = `Editando: ${p.nombre}`;
+function readLocalStateCache(username) {
+    if (!username || !window.localStorage) return null;
+    try {
+        const parsed = safeJsonParse(window.localStorage.getItem(getLocalCacheKey(username)));
+        if (!parsed || typeof parsed !== 'object') return null;
+        return {
+            version: Number(parsed.version || 0),
+            updatedAt: Number(parsed.updatedAt || 0),
+            dirty: !!parsed.dirty,
+            state: normalizeClientState(parsed.state)
         };
+    } catch (error) {
+        return null;
+    }
+}
 
-        window.archivarProspecto = function(index) {
-            if (!prospectos[index]) return;
-            prospectos[index].archivado = true;
-            prospectos[index].etapa = 'Descartado';
-            prospectos[index].fechaActualizacion = new Date().toLocaleString();
-            guardarEnStorage('prospectos', prospectos);
-            renderCRM();
+function persistLocalState(username, state, dirty) {
+    if (!username || !window.localStorage) return;
+    try {
+        window.localStorage.setItem(getLocalCacheKey(username), JSON.stringify({
+            version: LOCAL_CACHE_VERSION,
+            updatedAt: Date.now(),
+            dirty: !!dirty,
+            state: normalizeClientState(state)
+        }));
+    } catch (error) {
+        console.warn('No se pudo escribir en localStorage:', error);
+    }
+}
+
+function clearLocalState(username) {
+    if (!username || !window.localStorage) return;
+    try {
+        window.localStorage.removeItem(getLocalCacheKey(username));
+    } catch (error) {
+        console.warn('No se pudo limpiar la cache local:', error);
+    }
+}
+
+function applyStateToRuntime(state, options) {
+    const normalized = normalizeClientState(state);
+    userState = normalized;
+    prospectos = normalized.prospectos.slice();
+    diaActual = normalized.diaActual;
+    prospectInsights = buildProspectInsights(prospectos);
+
+    if (options && options.persistLocal && currentUser) {
+        persistLocalState(currentUser, normalized, !!options.dirty);
+    }
+}
+
+async function callBackend(payload) {
+    if (!Array.isArray(APP_SCRIPT_URLS) || APP_SCRIPT_URLS.length === 0) return null;
+    if (!payload || typeof payload !== 'object') return null;
+
+    const action = String(payload.action || '').trim();
+    if (!action) return null;
+
+    const urls = [activeBackendUrl].concat(APP_SCRIPT_URLS.filter((url) => url && url !== activeBackendUrl));
+    for (let i = 0; i < urls.length; i += 1) {
+        const url = urls[i];
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), BACKEND_TIMEOUT_MS);
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                cache: 'no-store',
+                body: JSON.stringify(Object.assign({ token: APP_TOKEN }, payload)),
+                signal: controller.signal
+            });
+            const raw = await response.text();
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            const data = safeJsonParse(raw);
+            if (!data || typeof data !== 'object') {
+                throw new Error('Respuesta no JSON del backend');
+            }
+
+            activeBackendUrl = url;
+            return data;
+        } catch (error) {
+            console.warn(`Backend fallido en ${url}:`, error);
+        } finally {
+            clearTimeout(timeoutId);
+        }
+    }
+
+    return null;
+}
+
+async function validateCredentials(username, password) {
+    const cleanUsername = normalizeUsername(username);
+    const cleanPassword = String(password || '').trim();
+    if (!cleanUsername || !cleanPassword) return false;
+
+    const remote = await callBackend({
+        action: 'login',
+        username: cleanUsername,
+        password: cleanPassword
+    });
+
+    return !!(remote && remote.success === true);
+}
+
+async function cargarDatosDesdeBackend(username) {
+    const cleanUsername = normalizeUsername(username);
+    if (!cleanUsername) return null;
+
+    const remote = await callBackend({
+        action: 'loadState',
+        username: cleanUsername
+    });
+
+    if (remote && remote.success && remote.state && typeof remote.state === 'object') {
+        return normalizeClientState(remote.state);
+    }
+
+    return null;
+}
+
+async function guardarDatosEnBackend(username, state) {
+    const cleanUsername = normalizeUsername(username);
+    if (!cleanUsername) return false;
+
+    const remote = await callBackend({
+        action: 'saveState',
+        username: cleanUsername,
+        state: normalizeClientState(state)
+    });
+
+    return !!(remote && remote.success === true);
+}
+
+function notifyEvent(tipo, detalle) {
+    if (!currentUser || !tipo) return;
+    void callBackend({
+        action: 'notifyEvent',
+        username: currentUser,
+        tipo: String(tipo).trim(),
+        detalle: detalle && typeof detalle === 'object' ? detalle : {}
+    });
+}
+
+function collectUserState() {
+    const base = userState || defaultState();
+    return normalizeClientState({
+        prospectos: prospectos,
+        checklist: base.checklist,
+        evaluacion: base.evaluacion,
+        diaActual: diaActual,
+        onboardingStartedAt: base.onboardingStartedAt,
+        survivalPaused: base.survivalPaused,
+        certificacion: base.certificacion,
+        checklistNotificado: base.checklistNotificado
+    });
+}
+
+async function flushBackendSync() {
+    if (!currentUser || syncInFlight || !pendingSyncState || !pendingSyncSnapshot) return;
+
+    const snapshot = pendingSyncSnapshot;
+    const state = normalizeClientState(pendingSyncState);
+    syncInFlight = true;
+
+    try {
+        const ok = await guardarDatosEnBackend(currentUser, state);
+        if (!ok) return;
+
+        if (pendingSyncSnapshot === snapshot) {
+            pendingSyncSnapshot = '';
+            pendingSyncState = null;
+        }
+        lastSyncedSnapshot = snapshot;
+        persistLocalState(currentUser, state, false);
+    } finally {
+        syncInFlight = false;
+        if (pendingSyncSnapshot && pendingSyncSnapshot !== lastSyncedSnapshot) {
+            clearTimeout(syncTimer);
+            syncTimer = setTimeout(() => {
+                void flushBackendSync();
+            }, 250);
+        }
+    }
+}
+
+function scheduleBackendSync() {
+    if (!currentUser) return;
+
+    const snapshotState = collectUserState();
+    const snapshot = serializeState(snapshotState);
+    persistLocalState(currentUser, snapshotState, true);
+
+    if (snapshot === lastSyncedSnapshot || snapshot === pendingSyncSnapshot) return;
+
+    pendingSyncState = snapshotState;
+    pendingSyncSnapshot = snapshot;
+
+    clearTimeout(syncTimer);
+    syncTimer = setTimeout(() => {
+        void flushBackendSync();
+    }, STATE_SYNC_DEBOUNCE_MS);
+}
+
+function guardarEnStorage(key, value) {
+    const nextState = cloneValue(userState || defaultState());
+    nextState[key] = value;
+    applyStateToRuntime(nextState, { persistLocal: !!currentUser, dirty: !!currentUser });
+    if (currentUser) scheduleBackendSync();
+}
+
+function obtenerDeStorage(key, defaultValue) {
+    if (!userState || typeof userState[key] === 'undefined') {
+        return cloneValue(defaultValue);
+    }
+    return cloneValue(userState[key]);
+}
+
+function sanitizar(texto) {
+    if (!texto) return '';
+    return String(texto).replace(/[&<>"]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        if (m === '"') return '&quot;';
+        return m;
+    });
+}
+
+function buildProspectInsights(lista) {
+    const today = new Date().toISOString().split('T')[0];
+    const statsResponsable = {};
+    let active = 0;
+    let mensajes = 0;
+    let respuestas = 0;
+    let demos = 0;
+    let cerrados = 0;
+    let vencidos = 0;
+    let seguimientosHoy = 0;
+    let demosHoy = 0;
+
+    lista.forEach((prospecto) => {
+        const p = normalizeProspect(prospecto);
+        if (!p.archivado) {
+            active += 1;
+            const responsable = p.responsable || 'Sin asignar';
+            statsResponsable[responsable] = (statsResponsable[responsable] || 0) + 1;
+        }
+        if (p.mensajeEnviado) mensajes += 1;
+        if (p.respondio) respuestas += 1;
+        if (p.demoAgendada) demos += 1;
+        if (p.cerrado) cerrados += 1;
+        if (p.proximoSeguimiento === today) {
+            seguimientosHoy += 1;
+            if (p.etapa === 'Demo agendada') demosHoy += 1;
+        }
+        if (p.proximoSeguimiento && p.proximoSeguimiento < today && p.etapa !== 'Cerrado' && p.etapa !== 'Descartado') {
+            vencidos += 1;
+        }
+    });
+
+    return {
+        total: lista.length,
+        active: active,
+        mensajes: mensajes,
+        respuestas: respuestas,
+        demos: demos,
+        cerrados: cerrados,
+        vencidos: vencidos,
+        seguimientosHoy: seguimientosHoy,
+        demosHoy: demosHoy,
+        conversionRate: lista.length ? (cerrados / lista.length) * 100 : 0,
+        statsResponsable: statsResponsable,
+        responsables: Object.keys(statsResponsable).sort((a, b) => a.localeCompare(b, 'es'))
+    };
+}
+
+function getChecklistStats() {
+    const estados = obtenerDeStorage('checklist', defaultState().checklist);
+    const total = estados.length || 6;
+    const completados = estados.filter(Boolean).length;
+    return {
+        estados: estados,
+        total: total,
+        completados: completados,
+        porcentaje: total ? Math.round((completados / total) * 100) : 0,
+        completo: total > 0 && completados === total
+    };
+}
+
+function getSectionAccessState(sectionId) {
+    if (sectionId === 'crm') {
+        const checklistStats = getChecklistStats();
+        const locked = !checklistStats.completo;
+        return {
+            locked: locked,
+            reason: locked ? `Completa Fundamentos ${checklistStats.completados}/${checklistStats.total} para habilitar el CRM.` : '',
+            checklistStats: checklistStats
         };
+    }
 
-        document.getElementById('crmForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const nombre = document.getElementById('crmNombre').value.trim();
-            const giro = document.getElementById('crmGiro').value.trim();
-            const contacto = document.getElementById('crmContacto').value.trim();
-            const responsable = document.getElementById('crmResponsable').value.trim();
-            const semaforo = document.getElementById('crmSemaforo').value;
-            const etapa = document.getElementById('crmEtapa').value;
-            const canal = document.getElementById('crmCanal').value;
-            const proximoSeguimiento = document.getElementById('crmProximoSeguimiento').value;
-            const notas = document.getElementById('crmNotas').value;
-            const problema = document.getElementById('crmProblema').value;
-            const objecion = document.getElementById('crmObjecion').value;
-            const nivelInteres = document.getElementById('crmNivelInteres').value;
-            const horario = document.getElementById('crmHorario').value;
-            const mensajeEnviado = document.getElementById('crmMensajeEnviado').checked;
-            const respondio = document.getElementById('crmRespondio').checked;
-            const demoAgendada = document.getElementById('crmDemoAgendada').checked;
-            const cerrado = document.getElementById('crmCerrado').checked;
-            const evidencia = document.getElementById('crmEvidencia').value;
-            const index = parseInt(document.getElementById('crmIndex').value);
+    return { locked: false, reason: '', checklistStats: getChecklistStats() };
+}
 
-            // Validaciones
-            if (!nombre || !giro || !contacto) {
-                alert('Nombre, giro y contacto son obligatorios.');
+function updateCrmAccessUi() {
+    const access = getSectionAccessState('crm');
+    const statusText = access.locked
+        ? `CRM bloqueado. Fundamentos completados: ${access.checklistStats.completados}/${access.checklistStats.total}.`
+        : `CRM habilitado. Fundamentos completados: ${access.checklistStats.completados}/${access.checklistStats.total}.`;
+
+    if (dom.crmLockedNotice) {
+        dom.crmLockedNotice.classList.toggle('hidden', !access.locked);
+    }
+    if (dom.crmLockStatus) {
+        dom.crmLockStatus.innerText = statusText;
+    }
+    if (dom.crmWorkspace) {
+        dom.crmWorkspace.classList.toggle('hidden', access.locked);
+    }
+    if (dom.crmAccessBadge) {
+        dom.crmAccessBadge.classList.remove('hidden');
+        dom.crmAccessBadge.classList.toggle('status-pill--locked', access.locked);
+        dom.crmAccessBadge.classList.toggle('status-pill--success', !access.locked);
+        dom.crmAccessBadge.textContent = access.locked ? 'CRM bloqueado' : 'CRM habilitado';
+    }
+    if (dom.dashboardCrmCard) {
+        dom.dashboardCrmCard.classList.toggle('is-disabled', access.locked);
+        dom.dashboardCrmCard.setAttribute('aria-disabled', access.locked ? 'true' : 'false');
+    }
+    if (dom.dashboardCrmStatus) {
+        dom.dashboardCrmStatus.innerText = access.locked
+            ? `Disponible al completar Fundamentos ${access.checklistStats.completados}/${access.checklistStats.total}.`
+            : 'Disponible para registrar y dar seguimiento.';
+    }
+    if (dom.quickActionCrm) {
+        dom.quickActionCrm.classList.toggle('is-disabled', access.locked);
+        dom.quickActionCrm.setAttribute('aria-disabled', access.locked ? 'true' : 'false');
+        dom.quickActionCrm.setAttribute('title', access.locked ? access.reason : 'Abrir CRM');
+    }
+    if (dom.fundamentosStatus) {
+        dom.fundamentosStatus.classList.toggle('is-ready', !access.locked);
+        dom.fundamentosStatus.innerText = access.locked
+            ? `Completa los 6 fundamentos para desbloquear el CRM.`
+            : 'Fundamentos completos. El CRM ya está habilitado.';
+    }
+    if (dom.fundamentosProgressLabel) {
+        dom.fundamentosProgressLabel.innerText = `${access.checklistStats.completados}/${access.checklistStats.total}`;
+    }
+    if (dom.fundamentosProgressFill) {
+        dom.fundamentosProgressFill.style.width = `${access.checklistStats.porcentaje}%`;
+    }
+}
+
+function actualizarStatsResponsable() {
+    if (!dom.statsResponsable) return;
+
+    const fragment = document.createDocumentFragment();
+    dom.statsResponsable.replaceChildren();
+
+    if (!prospectInsights.responsables.length) {
+        const span = document.createElement('span');
+        span.className = 'metric-badge';
+        span.textContent = 'Sin actividad registrada';
+        fragment.appendChild(span);
+    } else {
+        prospectInsights.responsables.forEach((responsable) => {
+            const span = document.createElement('span');
+            span.className = 'metric-badge';
+            span.textContent = `${responsable}: ${prospectInsights.statsResponsable[responsable]}`;
+            fragment.appendChild(span);
+        });
+    }
+
+    dom.statsResponsable.appendChild(fragment);
+}
+
+function actualizarFiltrosResponsable() {
+    if (!dom.filtroResponsable) return;
+
+    const currentValue = dom.filtroResponsable.value;
+    dom.filtroResponsable.innerHTML = '<option value="">Todos los responsables</option>';
+    prospectInsights.responsables.forEach((responsable) => {
+        const option = document.createElement('option');
+        option.value = responsable;
+        option.textContent = responsable;
+        dom.filtroResponsable.appendChild(option);
+    });
+
+    if (prospectInsights.responsables.includes(currentValue)) {
+        dom.filtroResponsable.value = currentValue;
+    }
+}
+
+function ordenarProspectos(lista) {
+    const hoy = new Date().toISOString().split('T')[0];
+    return lista.sort((a, b) => {
+        if (a.prospecto.etapa === 'Demo agendada' && b.prospecto.etapa !== 'Demo agendada') return -1;
+        if (a.prospecto.etapa !== 'Demo agendada' && b.prospecto.etapa === 'Demo agendada') return 1;
+
+        const aVencido = a.prospecto.proximoSeguimiento && a.prospecto.proximoSeguimiento < hoy;
+        const bVencido = b.prospecto.proximoSeguimiento && b.prospecto.proximoSeguimiento < hoy;
+        if (aVencido && !bVencido) return -1;
+        if (!aVencido && bVencido) return 1;
+
+        const aHoy = a.prospecto.proximoSeguimiento === hoy;
+        const bHoy = b.prospecto.proximoSeguimiento === hoy;
+        if (aHoy && !bHoy) return -1;
+        if (!aHoy && bHoy) return 1;
+
+        if (a.prospecto.semaforo === 'Verde' && b.prospecto.semaforo !== 'Verde') return -1;
+        if (a.prospecto.semaforo !== 'Verde' && b.prospecto.semaforo === 'Verde') return 1;
+
+        return (b.prospecto.ultimoContacto || 0) - (a.prospecto.ultimoContacto || 0);
+    });
+}
+
+function renderCRM() {
+    if (!dom.crmLista) return;
+
+    crmRenderHandle = 0;
+    updateCrmAccessUi();
+    prospectInsights = buildProspectInsights(prospectos);
+
+    const busqueda = limitText((dom.buscarCRM && dom.buscarCRM.value) || '', 120).toLowerCase();
+    const filtroEtapa = (dom.filtroEtapa && dom.filtroEtapa.value) || '';
+    const filtroSemaforo = (dom.filtroSemaforo && dom.filtroSemaforo.value) || '';
+    const filtroResponsable = (dom.filtroResponsable && dom.filtroResponsable.value) || '';
+    const filtroCanal = limitText((dom.filtroCanal && dom.filtroCanal.value) || '', 80).toLowerCase();
+
+    const filtrados = ordenarProspectos(prospectos.reduce((acumulado, prospecto, index) => {
+        const p = normalizeProspect(prospecto);
+        const matchBusqueda = !busqueda
+            || p.nombre.toLowerCase().includes(busqueda)
+            || p.giro.toLowerCase().includes(busqueda)
+            || p.contacto.includes(busqueda);
+        const matchEtapa = !filtroEtapa || p.etapa === filtroEtapa;
+        const matchSemaforo = !filtroSemaforo || p.semaforo === filtroSemaforo;
+        const matchResponsable = !filtroResponsable || (p.responsable || 'Sin asignar') === filtroResponsable;
+        const matchCanal = !filtroCanal || (p.canal || '').toLowerCase().includes(filtroCanal);
+
+        if (!p.archivado && matchBusqueda && matchEtapa && matchSemaforo && matchResponsable && matchCanal) {
+            acumulado.push({ prospecto: p, index: index });
+        }
+        return acumulado;
+    }, []));
+
+    if (!filtrados.length) {
+        dom.crmLista.innerHTML = '<div class="empty-state">Aun no hay prospectos registrados con esos filtros.</div>';
+    } else {
+        const hoy = new Date().toISOString().split('T')[0];
+        const fragment = document.createDocumentFragment();
+
+        filtrados.forEach(({ prospecto, index }) => {
+            const badge = prospecto.proximoSeguimiento === hoy
+                ? '<span class="badge-hoy">Hoy</span>'
+                : (prospecto.proximoSeguimiento && prospecto.proximoSeguimiento < hoy ? '<span class="badge-vencido">Vencido</span>' : '');
+
+            const div = document.createElement('div');
+            div.className = 'crm-card';
+            div.innerHTML = `
+                <div class="crm-card__content">
+                    <div class="crm-card__title">
+                        <strong>${sanitizar(prospecto.nombre)}</strong>
+                        <span>${sanitizar(prospecto.giro)}</span>
+                        <span class="crm-card__meta">${sanitizar(prospecto.contacto)}</span>
+                        <span class="crm-card__meta">${sanitizar(prospecto.semaforo)} / ${sanitizar(prospecto.etapa)}</span>
+                        ${badge}
+                    </div>
+                    <div class="crm-card__line">Responsable: ${sanitizar(prospecto.responsable || 'Sin asignar')} | Canal: ${sanitizar(prospecto.canal || 'N/D')} | Proximo seguimiento: ${sanitizar(prospecto.proximoSeguimiento || 'Pendiente')}</div>
+                    <div class="crm-card__line">Problema: ${sanitizar(prospecto.problema || 'Sin definir')} | Objecion: ${sanitizar(prospecto.objecion || 'Sin definir')} | Interes: ${sanitizar(prospecto.nivelInteres || 'Medio')}</div>
+                    <div class="crm-card__line">Notas: ${sanitizar(prospecto.notas || 'Sin notas')}</div>
+                    <div class="crm-card__line">Evidencia: ${sanitizar(prospecto.evidencia || 'Sin evidencia')}</div>
+                    <div class="crm-card__footer">Alta: ${sanitizar(prospecto.fechaAlta || 'N/D')} | Actualizacion: ${sanitizar(prospecto.fechaActualizacion || 'N/D')}</div>
+                </div>
+                <div class="crm-card__actions">
+                    <button type="button" class="crm-action-btn" data-crm-action="edit" data-prospect-index="${index}">Editar</button>
+                    <button type="button" class="crm-action-btn crm-action-btn--ghost" data-crm-action="archive" data-prospect-index="${index}">Archivar</button>
+                </div>
+            `;
+            fragment.appendChild(div);
+        });
+
+        dom.crmLista.replaceChildren(fragment);
+    }
+
+    actualizarRankingPropio();
+    actualizarKPIsReales();
+    actualizarProgresoGlobal();
+    actualizarAlertasSeguimiento();
+    actualizarStatsResponsable();
+    actualizarFiltrosResponsable();
+    applyModuleLocks();
+    checkSurvivalMode();
+}
+
+function scheduleRenderCRM() {
+    if (crmRenderHandle) return;
+    crmRenderHandle = window.requestAnimationFrame(renderCRM);
+}
+
+function resetCrmForm() {
+    if (dom.crmForm) dom.crmForm.reset();
+    if (dom.crmIndex) dom.crmIndex.value = '-1';
+    if (dom.btnSubmitCRM) dom.btnSubmitCRM.innerText = 'Guardar prospecto';
+    if (dom.modoEdicion) dom.modoEdicion.classList.add('hidden');
+    if (dom.editandoTexto) dom.editandoTexto.innerText = '';
+}
+
+function editarProspecto(index) {
+    const prospecto = normalizeProspect(prospectos[index]);
+    if (!prospecto || !dom.crmIndex) return;
+
+    dom.crmNombre.value = prospecto.nombre || '';
+    dom.crmGiro.value = prospecto.giro || '';
+    dom.crmContacto.value = prospecto.contacto || '';
+    dom.crmResponsable.value = prospecto.responsable || 'Yo';
+    dom.crmSemaforo.value = prospecto.semaforo || 'Verde';
+    dom.crmEtapa.value = prospecto.etapa || 'Nuevo';
+    dom.crmCanal.value = prospecto.canal || '';
+    dom.crmProximoSeguimiento.value = prospecto.proximoSeguimiento || '';
+    dom.crmNotas.value = prospecto.notas || '';
+    dom.crmProblema.value = prospecto.problema || '';
+    dom.crmObjecion.value = prospecto.objecion || '';
+    dom.crmNivelInteres.value = prospecto.nivelInteres || 'Medio';
+    dom.crmHorario.value = prospecto.horario || '';
+    dom.crmMensajeEnviado.checked = prospecto.mensajeEnviado || false;
+    dom.crmRespondio.checked = prospecto.respondio || false;
+    dom.crmDemoAgendada.checked = prospecto.demoAgendada || false;
+    dom.crmCerrado.checked = prospecto.cerrado || false;
+    dom.crmEvidencia.value = prospecto.evidencia || '';
+    dom.crmIndex.value = String(index);
+    dom.btnSubmitCRM.innerText = 'Actualizar prospecto';
+    dom.modoEdicion.classList.remove('hidden');
+    dom.editandoTexto.innerText = `Editando: ${prospecto.nombre}`;
+}
+
+function archivarProspecto(index) {
+    if (!prospectos[index]) return;
+    const nextProspectos = prospectos.slice();
+    const prospecto = normalizeProspect(nextProspectos[index]);
+    prospecto.archivado = true;
+    prospecto.etapa = 'Descartado';
+    prospecto.fechaActualizacion = new Date().toLocaleString('es-MX');
+    nextProspectos[index] = prospecto;
+    guardarEnStorage('prospectos', nextProspectos);
+    scheduleRenderCRM();
+}
+
+function readCrmFormData() {
+    return {
+        nombre: limitText(dom.crmNombre.value, 120),
+        giro: limitText(dom.crmGiro.value, 120),
+        contacto: String(dom.crmContacto.value || '').replace(/\D/g, '').slice(-10),
+        responsable: limitText(dom.crmResponsable.value || 'Yo', 80),
+        semaforo: dom.crmSemaforo.value,
+        etapa: dom.crmEtapa.value,
+        canal: limitText(dom.crmCanal.value, 80),
+        proximoSeguimiento: normalizeDateInput(dom.crmProximoSeguimiento.value),
+        notas: limitText(dom.crmNotas.value, 1200),
+        problema: limitText(dom.crmProblema.value, 180),
+        objecion: limitText(dom.crmObjecion.value, 180),
+        nivelInteres: dom.crmNivelInteres.value,
+        horario: limitText(dom.crmHorario.value, 80),
+        mensajeEnviado: !!dom.crmMensajeEnviado.checked,
+        respondio: !!dom.crmRespondio.checked,
+        demoAgendada: !!dom.crmDemoAgendada.checked,
+        cerrado: !!dom.crmCerrado.checked,
+        evidencia: limitText(dom.crmEvidencia.value, 800)
+    };
+}
+
+function onCrmStageAssist() {
+    if (dom.crmCerrado.checked) {
+        dom.crmEtapa.value = 'Cerrado';
+    } else if (dom.crmDemoAgendada.checked) {
+        dom.crmEtapa.value = 'Demo agendada';
+    } else if (dom.crmRespondio.checked && dom.crmEtapa.value === 'Nuevo') {
+        dom.crmEtapa.value = 'Respondió';
+    } else if (dom.crmMensajeEnviado.checked && dom.crmEtapa.value === 'Nuevo') {
+        dom.crmEtapa.value = 'Contactado';
+    }
+}
+
+function guardarProspectoDesdeFormulario(event) {
+    event.preventDefault();
+
+    const access = getSectionAccessState('crm');
+    if (access.locked) {
+        alert(access.reason);
+        return;
+    }
+
+    const formData = readCrmFormData();
+    const index = Number(dom.crmIndex.value || -1);
+
+    if (!formData.nombre || !formData.giro || !formData.contacto) {
+        alert('Nombre, giro y WhatsApp son obligatorios.');
+        return;
+    }
+    if (!/^\d{10}$/.test(formData.contacto)) {
+        alert('WhatsApp debe contener 10 digitos.');
+        return;
+    }
+
+    const cert = obtenerDeStorage('certificacion', defaultState().certificacion);
+    if (formData.cerrado && !(cert && cert.aprobada)) {
+        alert('Debes aprobar la certificacion antes de registrar cierres.');
+        return;
+    }
+
+    const duplicado = prospectos.find((prospecto, prospectIndex) => {
+        return normalizeProspect(prospecto).contacto === formData.contacto && prospectIndex !== index;
+    });
+    if (duplicado) {
+        alert('Ya existe un prospecto con ese WhatsApp.');
+        return;
+    }
+
+    const ahora = new Date().toLocaleString('es-MX');
+    const nuevoProspecto = normalizeProspect(Object.assign({}, formData, {
+        fechaAlta: index === -1 ? ahora : normalizeProspect(prospectos[index]).fechaAlta || ahora,
+        fechaActualizacion: ahora,
+        ultimoContacto: Date.now()
+    }));
+
+    const nextProspectos = prospectos.slice();
+    if (index === -1) {
+        nextProspectos.push(nuevoProspecto);
+        notifyEvent('crm_created', { contacto: nuevoProspecto.contacto });
+    } else {
+        nextProspectos[index] = nuevoProspecto;
+        notifyEvent('crm_updated', { contacto: nuevoProspecto.contacto });
+    }
+
+    guardarEnStorage('prospectos', nextProspectos);
+    resetCrmForm();
+    scheduleRenderCRM();
+}
+
+// ================== CHECKLIST DIARIO ==================
+function cargarChecklist() {
+    const savedChecks = normalizeBooleanArray(obtenerDeStorage('checklist', defaultState().checklist), checkboxes.length || 6);
+    checkboxes.forEach((checkbox, index) => {
+        checkbox.checked = !!savedChecks[index];
+    });
+    syncMiniChecklist();
+    updateCrmAccessUi();
+}
+
+function syncMiniChecklist() {
+    miniChecks.forEach((mini, index) => {
+        mini.checked = checkboxes[index] ? checkboxes[index].checked : false;
+    });
+}
+
+function onChecklistChange(index, checked) {
+    const estados = checkboxes.map((checkbox) => checkbox.checked);
+    guardarEnStorage('checklist', estados);
+    syncMiniChecklist();
+    actualizarProgresoGlobal();
+    applyModuleLocks();
+    updateCrmAccessUi();
+
+    if (checked) {
+        notifyEvent('checklist_item_done', { item: index + 1 });
+    }
+    if (estados.every(Boolean) && !obtenerDeStorage('checklistNotificado', false)) {
+        guardarEnStorage('checklistNotificado', true);
+        notifyEvent('checklist_completo', { total: estados.length });
+    }
+}
+
+// ================== EVALUACION ==================
+function cargarEvaluacion() {
+    const savedEval = normalizeBooleanArray(obtenerDeStorage('evaluacion', defaultState().evaluacion), evalItems.length || 5);
+    evalItems.forEach((checkbox, index) => {
+        checkbox.checked = !!savedEval[index];
+    });
+    actualizarPuntajeEval();
+}
+
+function actualizarPuntajeEval() {
+    const checks = evalItems.map((checkbox) => checkbox.checked);
+    const puntaje = checks.filter(Boolean).length;
+
+    if (dom.puntajeEval) dom.puntajeEval.innerText = String(puntaje);
+    if (dom.estadoEval) {
+        dom.estadoEval.innerText = puntaje === 5 ? 'Aprobado' : puntaje >= 3 ? 'En proceso' : 'No aprobado';
+    }
+}
+
+// ================== PROGRESO ==================
+function actualizarProgresoGlobal() {
+    const checklistPct = checkboxes.length ? (checkboxes.filter((checkbox) => checkbox.checked).length / checkboxes.length) * 30 : 0;
+    const evalPct = evalItems.length ? (evalItems.filter((checkbox) => checkbox.checked).length / evalItems.length) * 30 : 0;
+    const prospectosPct = Math.min(prospectInsights.total / 10, 1) * 40;
+    const total = Math.round(checklistPct + evalPct + prospectosPct);
+
+    if (dom.progresoGlobal) dom.progresoGlobal.style.width = `${total}%`;
+    if (dom.porcentajeProgreso) dom.porcentajeProgreso.innerText = `${total}%`;
+    if (dom.leyendaProgreso) {
+        dom.leyendaProgreso.innerText = '30% Fundamentos · 30% Evaluacion · 40% CRM (10+ prospectos)';
+    }
+    if (dom.miniProgress) dom.miniProgress.style.width = `${total}%`;
+}
+
+function actualizarRankingPropio() {
+    if (!rankingCells || rankingCells.length < 5) return;
+    rankingCells[1].innerText = String(prospectInsights.total);
+    rankingCells[2].innerText = String(prospectInsights.respuestas);
+    rankingCells[3].innerText = String(prospectInsights.demos);
+    rankingCells[4].innerText = String(prospectInsights.cerrados);
+}
+
+function actualizarDashboardConversion() {
+    const rate = Number(prospectInsights.conversionRate.toFixed(1));
+    const tone = rate >= 20 ? 'Solido' : rate >= 10 ? 'Saludable' : rate > 0 ? 'Por desarrollar' : 'Sin cierres';
+
+    if (dom.conversionRateValue) dom.conversionRateValue.innerText = `${rate}%`;
+    if (dom.conversionRateFill) dom.conversionRateFill.style.width = `${Math.min(rate, 100)}%`;
+    if (dom.conversionRateCaption) {
+        dom.conversionRateCaption.innerText = prospectInsights.total
+            ? `${prospectInsights.cerrados} cierres sobre ${prospectInsights.total} prospectos registrados.`
+            : 'Registra prospectos y cierres para construir tu referencia operativa.';
+    }
+    if (dom.conversionRateRatio) {
+        dom.conversionRateRatio.innerText = `${prospectInsights.cerrados}/${prospectInsights.total || 0}`;
+    }
+    if (dom.conversionRateTrend) {
+        dom.conversionRateTrend.innerText = tone;
+    }
+}
+
+function actualizarKPIsReales() {
+    if (dom.kpi1) dom.kpi1.innerText = String(prospectInsights.total);
+    if (dom.kpi2) dom.kpi2.innerText = String(prospectInsights.mensajes);
+    if (dom.kpi3) dom.kpi3.innerText = String(prospectInsights.respuestas);
+    if (dom.kpi4) dom.kpi4.innerText = String(prospectInsights.demos);
+    if (dom.kpi5) dom.kpi5.innerText = String(prospectInsights.cerrados);
+    actualizarDashboardConversion();
+}
+
+function actualizarAlertasSeguimiento() {
+    if (!dom.alertasSeguimiento) return;
+
+    if (prospectInsights.vencidos > 0 || prospectInsights.seguimientosHoy > 0) {
+        dom.alertasSeguimiento.classList.remove('hidden');
+        dom.alertasSeguimiento.innerText = `Seguimientos hoy: ${prospectInsights.seguimientosHoy} | Demos hoy: ${prospectInsights.demosHoy} | Vencidos: ${prospectInsights.vencidos}.`;
+    } else {
+        dom.alertasSeguimiento.classList.add('hidden');
+        dom.alertasSeguimiento.innerText = '';
+    }
+}
+
+// ================== PLAN POR DIAS ==================
+const actividades = [
+    'Leer guia y practicar mensaje 5 veces',
+    'Ejercicios de voz y grabarse 2 minutos',
+    'Buscar 30 prospectos',
+    'Enviar 20 mensajes',
+    'Seguimiento y roleplay',
+    'Revisar KPIs y afinar',
+    'Evaluacion con el equipo'
+];
+
+const objetivos = [
+    'Meta: leer y practicar',
+    'Meta: voz clara',
+    'Meta: 30 prospectos',
+    'Meta: 20 mensajes',
+    'Meta: seguimiento',
+    'Meta: revisar numeros',
+    'Meta: evaluacion'
+];
+
+function actualizarDiaHeader() {
+    if (dom.diaActual) dom.diaActual.innerText = String(diaActual);
+    if (dom.actividadDia) dom.actividadDia.innerText = actividades[diaActual - 1];
+    if (dom.objetivoDia) dom.objetivoDia.innerText = objetivos[diaActual - 1];
+    if (dom.selectorDia) dom.selectorDia.value = String(diaActual);
+}
+
+function cargarDia() {
+    diaActual = clampNumber(obtenerDeStorage('diaActual', 1), 1, 7, 1);
+    actualizarDiaHeader();
+}
+
+// ================== GENERADOR DE GUIONES ==================
+const SCRIPT_TEMPLATES = {
+    comercio: 'Hola {negocio}, vi su negocio y les contacto porque ayudamos a comercios a ordenar mensajes y cotizaciones en un solo flujo. Te puedo mostrar un ejemplo de 5 minutos?',
+    servicios: 'Hola {negocio}, trabajamos con negocios de servicios para que reciban datos completos del cliente antes de cotizar y asi responder mas rapido. Te explico como?',
+    marca_personal: 'Hola {negocio}, ayudamos a marcas personales a convertir mensajes en citas ordenadas sin perder oportunidades. Te comparto una idea breve?'
+};
+
+function generarGuion() {
+    const tipo = (dom.scriptTipo && dom.scriptTipo.value) || 'comercio';
+    const negocio = limitText((dom.scriptNegocio && dom.scriptNegocio.value) || 'tu negocio', 120) || 'tu negocio';
+    const base = SCRIPT_TEMPLATES[tipo] || SCRIPT_TEMPLATES.comercio;
+    if (dom.scriptGenerado) {
+        dom.scriptGenerado.value = base.replace('{negocio}', negocio);
+    }
+}
+
+async function copiarGuionGenerado() {
+    const value = (dom.scriptGenerado && dom.scriptGenerado.value) || '';
+    if (!value) return;
+
+    try {
+        await navigator.clipboard.writeText(value);
+        dom.btnCopiarGuionGenerado.innerText = 'Copiado';
+        setTimeout(() => {
+            if (dom.btnCopiarGuionGenerado) dom.btnCopiarGuionGenerado.innerText = 'Copiar guion';
+        }, 1200);
+    } catch (error) {
+        alert('No se pudo copiar el guion en este navegador.');
+    }
+}
+
+async function handleCopyScript(button) {
+    const container = button.closest('[data-script]');
+    const text = container ? container.getAttribute('data-script') : '';
+    if (!text) return;
+
+    try {
+        await navigator.clipboard.writeText(text);
+        const originalText = button.innerText;
+        button.innerText = 'Copiado';
+        setTimeout(() => {
+            button.innerText = originalText;
+        }, 1200);
+    } catch (error) {
+        alert('No se pudo copiar el texto.');
+    }
+}
+
+// ================== CALCULADORA ==================
+function actualizarCalculadora() {
+    const ventas = clampNumber(dom.calcVentas && dom.calcVentas.value, 0, 30, 0);
+    const comisionProm = clampNumber(dom.calcComisionProm && dom.calcComisionProm.value, 0, 100000, 0);
+    const total = ventas * comisionProm;
+
+    if (dom.calcVentasVal) dom.calcVentasVal.innerText = String(ventas);
+    if (dom.calcResultado) dom.calcResultado.innerText = `$${total.toLocaleString('es-MX')} MXN`;
+}
+
+// ================== CERTIFICACION ==================
+const QUIZ_QUESTIONS = [
+    { q: 'Que haces primero con un prospecto nuevo?', a: 'registrar', o: ['mandar precio directo', 'registrar', 'cerrar venta'] },
+    { q: 'Si te dicen "esta caro", que haces?', a: 'valor', o: ['discutir', 'valor', 'colgar'] },
+    { q: 'Cuando cuenta la comision de cierre?', a: 'liquida', o: ['al agendar', 'liquida', 'al primer mensaje'] },
+    { q: 'Cuantos prospectos minimo en 48h para no pausa?', a: 'cinco', o: ['uno', 'cinco', 'diez'] },
+    { q: 'Que no debes hacer?', a: 'prometer', o: ['prometer', 'seguir proceso', 'registrar crm'] },
+    { q: 'Semaforo rojo significa:', a: 'descartar', o: ['cerrar', 'descartar', 'bono'] },
+    { q: 'El follow-up ideal es:', a: 'persistente', o: ['solo 1 mensaje', 'persistente', 'nunca'] },
+    { q: 'Si no esta certificado:', a: 'no_cierre', o: ['puede cerrar', 'no_cierre', 'puede cobrar cierre'] },
+    { q: 'Dato clave en CRM:', a: 'contacto', o: ['solo nombre', 'contacto', 'solo giro'] },
+    { q: 'Meta del dia 1:', a: 'primer_prospecto', o: ['cerrar 3 ventas', 'primer_prospecto', 'ignorar checklist'] }
+];
+
+function renderQuiz() {
+    if (!dom.quizContainer) return;
+    dom.quizContainer.replaceChildren();
+
+    QUIZ_QUESTIONS.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = 'quiz-card';
+        card.innerHTML = `
+            <p class="text-sm font-semibold">${index + 1}. ${item.q}</p>
+            <select class="quiz-select p-2 border rounded-xl mt-2 w-full" data-quiz-index="${index}">
+                <option value="">Selecciona...</option>
+                ${item.o.map((opt) => `<option value="${opt}">${opt.replace('_', ' ')}</option>`).join('')}
+            </select>
+        `;
+        dom.quizContainer.appendChild(card);
+    });
+}
+
+function evaluarQuiz() {
+    const answers = $$('.quiz-select').map((select) => select.value);
+    let ok = 0;
+    QUIZ_QUESTIONS.forEach((question, index) => {
+        if (answers[index] === question.a) ok += 1;
+    });
+    guardarEnStorage('certificacion', { aprobada: ok >= 8, puntaje: ok });
+    syncCertResult();
+    applyModuleLocks();
+}
+
+function syncCertResult() {
+    if (!dom.quizResultado) return;
+    const cert = obtenerDeStorage('certificacion', defaultState().certificacion);
+    dom.quizResultado.innerText = cert.aprobada ? `Aprobado (${cert.puntaje}/10)` : `No aprobado (${cert.puntaje}/10)`;
+}
+
+// ================== KPI SUPERVIVENCIA ==================
+function checkSurvivalMode() {
+    const started = obtenerDeStorage('onboardingStartedAt', '');
+    const startTs = started ? Date.parse(started) : Date.now();
+    const shouldPause = (Date.now() - startTs) > (48 * 60 * 60 * 1000) && prospectInsights.active < 5;
+    const currentPauseState = !!obtenerDeStorage('survivalPaused', false);
+
+    if (currentPauseState !== shouldPause) {
+        guardarEnStorage('survivalPaused', shouldPause);
+    }
+
+    if (dom.survivalAlert) {
+        dom.survivalAlert.classList.toggle('hidden', !shouldPause);
+        dom.survivalAlert.innerText = shouldPause
+            ? 'KPI de supervivencia: en las primeras 48 horas debias registrar 5 prospectos activos.'
+            : '';
+    }
+    if (dom.pauseOverlay) {
+        dom.pauseOverlay.classList.toggle('hidden', !shouldPause);
+    }
+
+    return shouldPause;
+}
+
+// ================== SIDEBAR MOVIL + MODULOS ==================
+const desktopNavSource = document.querySelector('#sidebar-desktop nav');
+const desktopNav = desktopNavSource ? desktopNavSource.cloneNode(true) : null;
+if (dom.mobileMenu && desktopNav) dom.mobileMenu.innerHTML = desktopNav.innerHTML;
+
+function setupModuleAccordions(container) {
+    if (!container) return;
+    $$('.module', container).forEach((module) => {
+        const toggle = module.querySelector('.module-toggle');
+        if (!toggle) return;
+        toggle.addEventListener('click', () => {
+            const mod = Number(toggle.dataset.module || 0);
+            if (mod && !unlockedModules[mod]) {
+                alert('Ese modulo sigue bloqueado por hitos de operacion.');
                 return;
             }
-            if (!/^\d{10}$/.test(contacto)) {
-                alert('WhatsApp debe tener 10 dígitos.');
-                return;
-            }
-            const cert = obtenerDeStorage('certificacion', defaultState().certificacion);
-            if (cerrado && !(cert && cert.aprobada)) {
-                alert('Debes aprobar la certificación (8/10) antes de marcar cierres.');
-                return;
-            }
-            const existe = prospectos.find((p, i) => p.contacto === contacto && i !== index);
-            if (existe) {
-                alert('Ya existe un prospecto con ese WhatsApp.');
-                return;
-            }
-
-            const ahora = new Date().toLocaleString();
-            const timestamp = Date.now();
-            const nuevoProspecto = {
-                nombre, giro, contacto, responsable, semaforo, etapa, canal, proximoSeguimiento, notas,
-                problema, objecion, nivelInteres, horario,
-                mensajeEnviado, respondio, demoAgendada, cerrado,
-                evidencia,
-                fechaAlta: index === -1 ? ahora : prospectos[index].fechaAlta || ahora,
-                fechaActualizacion: ahora,
-                ultimoContacto: timestamp
-            };
-
-            if (index === -1) {
-                prospectos.push(nuevoProspecto);
-            } else {
-                prospectos[index] = nuevoProspecto;
-            }
-
-            guardarEnStorage('prospectos', prospectos);
-            renderCRM();
-            e.target.reset();
-            document.getElementById('crmIndex').value = '-1';
-            document.getElementById('btnSubmitCRM').innerText = 'Guardar prospecto';
-            document.getElementById('modoEdicion').classList.add('hidden');
+            module.classList.toggle('is-open');
         });
+    });
+}
 
-        document.getElementById('cancelarEdicion').addEventListener('click', () => {
-            document.getElementById('crmForm').reset();
-            document.getElementById('crmIndex').value = '-1';
-            document.getElementById('btnSubmitCRM').innerText = 'Guardar prospecto';
-            document.getElementById('modoEdicion').classList.add('hidden');
+setupModuleAccordions(desktopNavSource);
+setupModuleAccordions(dom.mobileMenu);
+
+// ================== TABS PRINCIPALES ==================
+const SECTION_TO_MODULE = {
+    rol: 1, psicologia: 1, herramientas: 1, 'frases-prohibidas': 1,
+    ruta: 2, calificacion: 2, 'guiones-giro': 2, 'generador-guiones': 2, objeciones: 2, 'battle-cards': 2, seguimiento: 2,
+    'inicio-rapido': 3, 'plan-dias': 3, crm: 3, kpis: 3, handoff: 3, checklist: 3, 'mi-semana': 3, certificacion: 3,
+    comisiones: 4, 'calculadora-comision': 4, ranking: 4, crecimiento: 4, evaluacion: 4, 'post-demo': 4, 'comunicado-equipo': 4
+};
+
+const TAB_SECTIONS = {
+    entrenamiento: ['ruta', 'calificacion', 'seguimiento', 'objeciones', 'battle-cards', 'guiones-giro', 'generador-guiones', 'kpis', 'disciplina', 'casos', 'rol', 'plan-dias'],
+    operacion: ['crm', 'comisiones', 'calculadora-comision', 'ranking', 'evaluacion', 'certificacion', 'psicologia', 'errores', 'frases-prohibidas', 'roleplay', 'crecimiento', 'post-demo', 'handoff', 'herramientas', 'inicio-rapido', 'preguntas-frecuentes', 'scripts', 'comunicado-equipo'],
+    progreso: ['dashboard-inicio', 'checklist', 'mi-semana']
+};
+
+const allTabSectionIds = Array.from(new Set(Object.values(TAB_SECTIONS).flat()));
+
+function computeUnlockedModules() {
+    const cert = obtenerDeStorage('certificacion', defaultState().certificacion);
+    const certOk = !!(cert && cert.aprobada);
+    unlockedModules = {
+        1: true,
+        2: true,
+        3: true,
+        4: prospectInsights.active >= 5 && prospectInsights.demos >= 1 && certOk
+    };
+}
+
+function applyModuleLocks() {
+    computeUnlockedModules();
+
+    $$('.module-toggle[data-module]').forEach((button) => {
+        const mod = Number(button.dataset.module);
+        const unlocked = !!unlockedModules[mod];
+        button.classList.toggle('is-locked', !unlocked);
+
+        let chip = button.querySelector('.lock-chip');
+        if (!unlocked && !chip) {
+            chip = document.createElement('span');
+            chip.className = 'lock-chip';
+            button.appendChild(chip);
+        }
+        if (chip) {
+            chip.textContent = mod === 4 ? 'hito pendiente' : 'bloqueado';
+            if (unlocked) chip.remove();
+        }
+    });
+
+    sidebarLinks.forEach((link) => {
+        const sectionId = (link.getAttribute('href') || '').replace('#', '');
+        const access = getSectionAccessState(sectionId);
+        const mod = SECTION_TO_MODULE[sectionId];
+        const moduleLocked = mod ? !unlockedModules[mod] : false;
+        const locked = access.locked || moduleLocked;
+        const reason = access.reason || (moduleLocked ? 'Cumple los hitos de resultados para abrir este bloque.' : '');
+
+        link.classList.toggle('is-locked', locked);
+        if (locked) {
+            link.setAttribute('title', reason);
+        } else {
+            link.removeAttribute('title');
+        }
+    });
+
+    setActiveTab(activeTabName);
+}
+
+function prepareSectionAccordions() {
+    allTabSectionIds.forEach((id) => {
+        const section = $(id);
+        if (!section || section.dataset.prepared === '1') return;
+        if (section.children.length < 2) {
+            section.dataset.prepared = '1';
+            return;
+        }
+
+        const head = section.firstElementChild;
+        const body = document.createElement('div');
+        body.className = 'section-body';
+
+        while (section.children.length > 1) {
+            body.appendChild(section.children[1]);
+        }
+
+        section.appendChild(body);
+        head.classList.add('section-head-toggle');
+        head.addEventListener('click', () => section.classList.toggle('section-collapsed'));
+        section.dataset.prepared = '1';
+    });
+}
+
+function expandFirstVisible(tabName) {
+    let opened = false;
+    (TAB_SECTIONS[tabName] || []).forEach((id) => {
+        const section = $(id);
+        if (!section || section.classList.contains('tab-hidden')) return;
+        if (!opened) {
+            section.classList.remove('section-collapsed');
+            opened = true;
+        } else {
+            section.classList.add('section-collapsed');
+        }
+    });
+}
+
+function setActiveTab(tabName) {
+    activeTabName = tabName;
+
+    allTabSectionIds.forEach((id) => {
+        const section = $(id);
+        if (!section) return;
+
+        const inTab = (TAB_SECTIONS[tabName] || []).includes(id);
+        const access = getSectionAccessState(id);
+        const mod = SECTION_TO_MODULE[id];
+        const moduleLocked = mod ? !unlockedModules[mod] : false;
+        section.classList.toggle('tab-hidden', !(inTab && !access.locked && !moduleLocked));
+    });
+
+    tabButtons.forEach((button) => {
+        button.classList.toggle('is-active', button.dataset.tabTarget === tabName);
+    });
+
+    expandFirstVisible(tabName);
+}
+
+function tabForSection(id) {
+    return Object.keys(TAB_SECTIONS).find((tab) => TAB_SECTIONS[tab].includes(id));
+}
+
+function decorateSectionTitles() {
+    // Se omite decoracion adicional para mantener una interfaz mas sobria.
+}
+
+$$('a[href^="#"]').forEach((link) => {
+    link.addEventListener('click', (event) => {
+        const targetId = (link.getAttribute('href') || '').replace('#', '');
+        const access = getSectionAccessState(targetId);
+        const mod = SECTION_TO_MODULE[targetId];
+        const moduleLocked = mod ? !unlockedModules[mod] : false;
+
+        if (access.locked || moduleLocked) {
+            event.preventDefault();
+            alert(access.reason || 'Ese bloque sigue bloqueado por hitos.');
+            return;
+        }
+
+        const tab = tabForSection(targetId);
+        if (tab) setActiveTab(tab);
+    });
+});
+
+// ================== INTERSECTION OBSERVER ==================
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const id = entry.target.getAttribute('id');
+        sidebarLinks.forEach((link) => {
+            link.classList.toggle('active', link.getAttribute('href') === `#${id}`);
         });
+    });
+}, { threshold: 0.3, rootMargin: '-100px 0px -100px 0px' });
 
-        document.getElementById('buscarCRM').addEventListener('input', renderCRM);
-        document.getElementById('filtroEtapa').addEventListener('change', renderCRM);
-        document.getElementById('filtroSemaforo').addEventListener('change', renderCRM);
-        document.getElementById('filtroResponsable').addEventListener('change', renderCRM);
-        document.getElementById('filtroCanal').addEventListener('input', renderCRM);
+sections.forEach((section) => observer.observe(section));
 
-        // ================== CHECKLIST DIARIO (autoguardado) ==================
-        const checkboxes = document.querySelectorAll('.check-dia');
-        const miniChecks = [
-            document.getElementById('mini-chk1'),
-            document.getElementById('mini-chk2'),
-            document.getElementById('mini-chk3')
-        ].filter(Boolean);
-        let savedChecks = [];
+// ================== LOGIN / LOGOUT ==================
+function setAppVisible(visible) {
+    if (dom.mainHeader) dom.mainHeader.style.display = visible ? '' : 'none';
+    if (dom.sidebarMobile) dom.sidebarMobile.style.display = visible ? '' : 'none';
+    if (dom.appShell) dom.appShell.style.display = visible ? 'flex' : 'none';
+    if (dom.mobileBottomNav) dom.mobileBottomNav.style.display = visible ? '' : 'none';
+    if (dom.mainFooter) dom.mainFooter.style.display = visible ? '' : 'none';
+}
 
-        function cargarChecklist() {
-            savedChecks = obtenerDeStorage('checklist', [false, false, false, false, false, false]);
-            checkboxes.forEach((cb, i) => { cb.checked = savedChecks[i] || false; });
-            syncMiniChecklist();
+async function hydrateUserState() {
+    const localCache = readLocalStateCache(currentUser);
+    const remoteState = await cargarDatosDesdeBackend(currentUser);
+
+    let nextState = defaultState();
+    let dirty = false;
+
+    if (remoteState && localCache && localCache.dirty) {
+        nextState = localCache.state;
+        dirty = true;
+    } else if (remoteState) {
+        nextState = remoteState;
+        dirty = false;
+    } else if (localCache) {
+        nextState = localCache.state;
+        dirty = !!localCache.dirty;
+    }
+
+    applyStateToRuntime(nextState, { persistLocal: !!currentUser, dirty: dirty });
+    lastSyncedSnapshot = remoteState ? serializeState(remoteState) : '';
+    pendingSyncSnapshot = '';
+    pendingSyncState = null;
+
+    if (!userState.onboardingStartedAt) {
+        userState.onboardingStartedAt = new Date().toISOString();
+        scheduleBackendSync();
+    } else if (dirty) {
+        scheduleBackendSync();
+    }
+
+    cargarChecklist();
+    cargarEvaluacion();
+    cargarDia();
+    syncCertResult();
+}
+
+async function doLogin() {
+    const username = normalizeUsername(dom.loginUsername && dom.loginUsername.value);
+    const password = String((dom.loginPassword && dom.loginPassword.value) || '').trim();
+    if (!dom.loginError || !dom.loginBtn) return;
+
+    dom.loginError.classList.add('hidden');
+    dom.loginError.innerText = '';
+    dom.loginBtn.disabled = true;
+    dom.loginBtn.innerText = 'Validando...';
+
+    try {
+        const ok = await validateCredentials(username, password);
+        if (!ok) {
+            dom.loginError.classList.remove('hidden');
+            dom.loginError.innerText = 'No se pudo iniciar sesion. Revisa credenciales o conectividad.';
+            return;
         }
 
-        function syncMiniChecklist() {
-            miniChecks.forEach((mini, i) => {
-                mini.checked = checkboxes[i] ? checkboxes[i].checked : false;
-            });
-        }
-        cargarChecklist();
+        currentUser = username;
+        if (dom.loggedUserDisplay) dom.loggedUserDisplay.innerText = currentUser;
+        if (dom.loginModal) dom.loginModal.classList.add('hidden');
+        setAppVisible(true);
 
-        checkboxes.forEach((cb, i) => {
-            cb.addEventListener('change', () => {
-                const estados = Array.from(checkboxes).map(c => c.checked);
-                guardarEnStorage('checklist', estados);
-                syncMiniChecklist();
-                actualizarProgresoGlobal();
-                applyModuleLocks();
-                if (estados[i]) {
-                    notifyEvent('checklist_item_done', { item: i + 1 });
-                }
-                if (estados.every(Boolean) && !obtenerDeStorage('checklistNotificado', false)) {
-                    guardarEnStorage('checklistNotificado', true);
-                    notifyEvent('checklist_completo', { total: estados.length });
-                }
-            });
-        });
+        await hydrateUserState();
+        scheduleRenderCRM();
+        actualizarProgresoGlobal();
+        actualizarKPIsReales();
+        actualizarAlertasSeguimiento();
+        applyModuleLocks();
+        checkSurvivalMode();
+        setActiveTab('progreso');
+    } finally {
+        dom.loginBtn.disabled = false;
+        dom.loginBtn.innerText = 'Entrar';
+    }
+}
 
-        miniChecks.forEach((mini, i) => {
-            mini.addEventListener('change', () => {
-                if (!checkboxes[i]) return;
-                checkboxes[i].checked = mini.checked;
-                const estados = Array.from(checkboxes).map(c => c.checked);
-                guardarEnStorage('checklist', estados);
-                actualizarProgresoGlobal();
-                applyModuleLocks();
-            });
-        });
+function doLogout() {
+    const previousUser = currentUser;
+    currentUser = null;
+    userState = defaultState();
+    prospectos = [];
+    diaActual = 1;
+    syncInFlight = false;
+    pendingSyncState = null;
+    pendingSyncSnapshot = '';
+    lastSyncedSnapshot = '';
+    clearTimeout(syncTimer);
 
-        // ================== EVALUACIÓN (autoguardado) ==================
-        const evalItems = document.querySelectorAll('.eval-item');
-        let savedEval = [];
+    setAppVisible(false);
+    if (dom.loginUsername) dom.loginUsername.value = previousUser || '';
+    if (dom.loginPassword) dom.loginPassword.value = '';
+    if (dom.loggedUserDisplay) dom.loggedUserDisplay.innerText = '';
+    if (dom.loginModal) dom.loginModal.classList.remove('hidden');
+    if (dom.loginError) {
+        dom.loginError.classList.add('hidden');
+        dom.loginError.innerText = '';
+    }
 
-        function cargarEvaluacion() {
-            savedEval = obtenerDeStorage('evaluacion', [false, false, false, false, false]);
-            evalItems.forEach((cb, i) => { cb.checked = savedEval[i] || false; });
-            actualizarPuntajeEval();
-        }
-        cargarEvaluacion();
+    resetCrmForm();
+}
 
-        function actualizarPuntajeEval() {
-            const checks = Array.from(evalItems).map(cb => cb.checked);
-            const puntaje = checks.filter(Boolean).length;
-            document.getElementById('puntajeEval').innerText = puntaje;
-            const estado = puntaje === 5 ? '✅ Aprobado' : puntaje >= 3 ? '⚠️ En proceso' : '❌ No aprobado';
-            document.getElementById('estadoEval').innerText = estado;
-        }
+// ================== INIT DE EVENTOS ==================
+if (dom.crmCerrado) dom.crmCerrado.addEventListener('change', onCrmStageAssist);
+if (dom.crmDemoAgendada) dom.crmDemoAgendada.addEventListener('change', onCrmStageAssist);
+if (dom.crmRespondio) dom.crmRespondio.addEventListener('change', onCrmStageAssist);
+if (dom.crmMensajeEnviado) dom.crmMensajeEnviado.addEventListener('change', onCrmStageAssist);
 
-        evalItems.forEach(cb => {
-            cb.addEventListener('change', () => {
-                const estados = Array.from(evalItems).map(c => c.checked);
-                guardarEnStorage('evaluacion', estados);
-                actualizarPuntajeEval();
-                actualizarProgresoGlobal();
-                applyModuleLocks();
-            });
-        });
+if (dom.crmForm) dom.crmForm.addEventListener('submit', guardarProspectoDesdeFormulario);
+if (dom.cancelarEdicion) dom.cancelarEdicion.addEventListener('click', resetCrmForm);
 
-        // ================== PROGRESO GLOBAL ==================
-        function actualizarProgresoGlobal() {
-            const checklistPct = Array.from(checkboxes).filter(cb => cb.checked).length / checkboxes.length * 30;
-            const evalPct = Array.from(evalItems).filter(cb => cb.checked).length / evalItems.length * 30;
-            const prospectosPct = Math.min(prospectos.length / 10, 1) * 40; // máx 40% con 10+
-            const total = Math.round(checklistPct + evalPct + prospectosPct);
-            document.getElementById('progresoGlobal').style.width = total + '%';
-            document.getElementById('porcentajeProgreso').innerText = total + '%';
-            document.getElementById('leyendaProgreso').innerText = `30% checklist · 30% evaluación · 40% CRM (10+ pros)`;
-            const miniProgress = document.getElementById('miniProgress');
-            if (miniProgress) miniProgress.style.width = total + '%';
-        }
+[dom.buscarCRM, dom.filtroEtapa, dom.filtroSemaforo, dom.filtroResponsable, dom.filtroCanal].forEach((node) => {
+    if (!node) return;
+    node.addEventListener(node.tagName === 'SELECT' ? 'change' : 'input', scheduleRenderCRM);
+});
 
-        // ================== RANKING PROPIO ==================
-        function actualizarRankingPropio() {
-            const totalProspectos = prospectos.length;
-            const conversaciones = prospectos.filter(p => p.respondio).length;
-            const demos = prospectos.filter(p => p.demoAgendada).length;
-            const ventas = prospectos.filter(p => p.cerrado).length;
-            document.querySelector('#tuRanking td:nth-child(2)').innerText = totalProspectos;
-            document.querySelector('#tuRanking td:nth-child(3)').innerText = conversaciones;
-            document.querySelector('#tuRanking td:nth-child(4)').innerText = demos;
-            document.querySelector('#tuRanking td:nth-child(5)').innerText = ventas;
-        }
+checkboxes.forEach((checkbox, index) => {
+    checkbox.addEventListener('change', () => onChecklistChange(index, checkbox.checked));
+});
 
-        // ================== KPIs REALES ==================
-        function actualizarKPIsReales() {
-            const total = prospectos.length;
-            const mensajes = prospectos.filter(p => p.mensajeEnviado).length;
-            const respuestas = prospectos.filter(p => p.respondio).length;
-            const demos = prospectos.filter(p => p.demoAgendada).length;
-            const cerrados = prospectos.filter(p => p.cerrado).length;
-            document.getElementById('kpi1').innerText = total;
-            document.getElementById('kpi2').innerText = mensajes;
-            document.getElementById('kpi3').innerText = respuestas;
-            document.getElementById('kpi4').innerText = demos;
-            document.getElementById('kpi5').innerText = cerrados;
-        }
+miniChecks.forEach((mini, index) => {
+    mini.addEventListener('change', () => {
+        if (!checkboxes[index]) return;
+        checkboxes[index].checked = mini.checked;
+        onChecklistChange(index, mini.checked);
+    });
+});
 
-        document.getElementById('actualizarKPIs').addEventListener('click', () => {
-            actualizarKPIsReales();
-        });
+evalItems.forEach((checkbox) => {
+    checkbox.addEventListener('change', () => {
+        const estados = evalItems.map((item) => item.checked);
+        guardarEnStorage('evaluacion', estados);
+        actualizarPuntajeEval();
+        actualizarProgresoGlobal();
+        applyModuleLocks();
+    });
+});
 
-        // ================== ALERTAS DE SEGUIMIENTO ==================
-        function actualizarAlertasSeguimiento() {
-            const hoy = new Date().toISOString().split('T')[0];
-            const vencidos = prospectos.filter(p => p.proximoSeguimiento && p.proximoSeguimiento < hoy && p.etapa !== 'Cerrado' && p.etapa !== 'Descartado').length;
-            const hoyMismo = prospectos.filter(p => p.proximoSeguimiento === hoy).length;
-            const demosHoy = prospectos.filter(p => p.etapa === 'Demo agendada' && p.proximoSeguimiento === hoy).length;
-            const alertaDiv = document.getElementById('alertasSeguimiento');
-            if (vencidos > 0 || hoyMismo > 0) {
-                alertaDiv.classList.remove('hidden');
-                alertaDiv.innerHTML = `🔔 Tienes ${hoyMismo} seguimiento(s) para hoy (${demosHoy} demas) y ${vencidos} vencido(s). ¡Revisa el CRM!`;
-            } else {
-                alertaDiv.classList.add('hidden');
-            }
-        }
-
-        // ================== PLAN POR DÍAS ==================
-        let diaActual = 1;
-        const actividades = [
-            "Leer guía + practicar mensaje 5 veces",
-            "Ejercicios de voz + grabarse 2 min",
-            "Buscar 30 prospectos",
-            "Enviar 20 mensajes",
-            "Seguimiento + roleplay",
-            "Revisar KPIs y afinar",
-            "Evaluación con el equipo"
-        ];
-        const objetivos = [
-            "Meta: leer y practicar",
-            "Meta: voz clara",
-            "Meta: 30 prospectos",
-            "Meta: 20 mensajes",
-            "Meta: seguimiento",
-            "Meta: revisar números",
-            "Meta: evaluación"
-        ];
-
-        function actualizarDiaHeader() {
-            document.getElementById('diaActual').innerText = diaActual;
-            document.getElementById('actividadDia').innerText = actividades[diaActual-1];
-            document.getElementById('objetivoDia').innerText = objetivos[diaActual-1];
-            document.getElementById('selectorDia').value = diaActual;
-        }
-
-        function cargarDia() {
-            diaActual = obtenerDeStorage('diaActual', 1);
-            actualizarDiaHeader();
-        }
-
-        cargarDia();
-
-        document.getElementById('marcarDiaCompletado').addEventListener('click', () => {
-            if (diaActual < 7) {
-                diaActual++;
-                guardarEnStorage('diaActual', diaActual);
-                actualizarDiaHeader();
-                alert('¡Día marcado! Sigue con el siguiente.');
-            } else {
-                alert('¡Felicidades, completaste los 7 días!');
-            }
-        });
-
-        document.getElementById('selectorDia').addEventListener('change', (e) => {
-            diaActual = parseInt(e.target.value);
+if (dom.actualizarKPIs) dom.actualizarKPIs.addEventListener('click', actualizarKPIsReales);
+if (dom.marcarDiaCompletado) {
+    dom.marcarDiaCompletado.addEventListener('click', () => {
+        if (diaActual < 7) {
+            diaActual += 1;
             guardarEnStorage('diaActual', diaActual);
             actualizarDiaHeader();
-        });
-
-        // ================== GENERADOR DE GUIONES ==================
-        const SCRIPT_TEMPLATES = {
-            comercio: 'Hola {negocio}, vi su negocio y les contacto porque ayudamos a comercios a ordenar mensajes y cotizaciones en un solo flujo. ¿Te puedo mostrar un ejemplo de 5 minutos?',
-            servicios: 'Hola {negocio}, trabajamos con negocios de servicios para que reciban datos completos del cliente antes de cotizar y así responder más rápido. ¿Te explico cómo?',
-            marca_personal: 'Hola {negocio}, ayudamos a marcas personales a convertir mensajes en citas ordenadas sin perder oportunidades. ¿Te comparto una idea breve?'
-        };
-
-        function generarGuion() {
-            const tipo = (document.getElementById('scriptTipo') || {}).value || 'comercio';
-            const negocio = ((document.getElementById('scriptNegocio') || {}).value || 'tu negocio').trim();
-            const base = SCRIPT_TEMPLATES[tipo] || SCRIPT_TEMPLATES.comercio;
-            const salida = base.replace('{negocio}', negocio || 'tu negocio');
-            const box = document.getElementById('scriptGenerado');
-            if (box) box.value = salida;
+            alert('Dia actualizado. Sigue con el siguiente bloque.');
+        } else {
+            alert('Completaste los 7 dias del plan.');
         }
+    });
+}
+if (dom.selectorDia) {
+    dom.selectorDia.addEventListener('change', (event) => {
+        diaActual = clampNumber(event.target.value, 1, 7, 1);
+        guardarEnStorage('diaActual', diaActual);
+        actualizarDiaHeader();
+    });
+}
 
-        const btnGenerar = document.getElementById('btnGenerarGuion');
-        if (btnGenerar) btnGenerar.addEventListener('click', generarGuion);
-        const btnCopiarGenerado = document.getElementById('btnCopiarGuionGenerado');
-        if (btnCopiarGenerado) {
-            btnCopiarGenerado.addEventListener('click', async () => {
-                const box = document.getElementById('scriptGenerado');
-                const value = box ? box.value : '';
-                if (!value) return;
-                await navigator.clipboard.writeText(value);
-                btnCopiarGenerado.innerText = 'Copiado';
-                setTimeout(() => { btnCopiarGenerado.innerText = 'Copiar guion'; }, 1200);
-            });
+if (dom.btnGenerarGuion) dom.btnGenerarGuion.addEventListener('click', generarGuion);
+if (dom.btnCopiarGuionGenerado) dom.btnCopiarGuionGenerado.addEventListener('click', () => { void copiarGuionGenerado(); });
+
+if (dom.calcVentas) dom.calcVentas.addEventListener('input', actualizarCalculadora);
+if (dom.calcComisionProm) dom.calcComisionProm.addEventListener('input', actualizarCalculadora);
+
+if (dom.btnEvaluarQuiz) dom.btnEvaluarQuiz.addEventListener('click', evaluarQuiz);
+
+if (dom.menuToggle && dom.mobileMenu) {
+    dom.menuToggle.addEventListener('click', () => {
+        dom.mobileMenu.classList.toggle('open');
+    });
+}
+
+tabButtons.forEach((button) => {
+    button.addEventListener('click', () => setActiveTab(button.dataset.tabTarget));
+});
+
+document.addEventListener('click', (event) => {
+    const copyButton = event.target.closest('[data-copy-script]');
+    if (copyButton) {
+        event.preventDefault();
+        void handleCopyScript(copyButton);
+        return;
+    }
+
+    const crmAction = event.target.closest('[data-crm-action]');
+    if (crmAction) {
+        event.preventDefault();
+        const index = Number(crmAction.getAttribute('data-prospect-index'));
+        if (crmAction.getAttribute('data-crm-action') === 'edit') {
+            editarProspecto(index);
+        } else if (crmAction.getAttribute('data-crm-action') === 'archive') {
+            archivarProspecto(index);
         }
+        return;
+    }
 
-        // ================== CALCULADORA COMISIONES ==================
-        function actualizarCalculadora() {
-            const ventas = Number((document.getElementById('calcVentas') || {}).value || 0);
-            const comisionProm = Number((document.getElementById('calcComisionProm') || {}).value || 0);
-            const total = ventas * comisionProm;
-            const val = document.getElementById('calcVentasVal');
-            const res = document.getElementById('calcResultado');
-            if (val) val.innerText = String(ventas);
-            if (res) res.innerText = `$${total.toLocaleString('es-MX')} MXN`;
+    const lockedCrmTrigger = event.target.closest('[data-requires-crm]');
+    if (lockedCrmTrigger) {
+        const access = getSectionAccessState('crm');
+        if (access.locked) {
+            event.preventDefault();
+            alert(access.reason);
         }
+    }
+});
 
-        const calcVentas = document.getElementById('calcVentas');
-        const calcComisionProm = document.getElementById('calcComisionProm');
-        if (calcVentas) calcVentas.addEventListener('input', actualizarCalculadora);
-        if (calcComisionProm) calcComisionProm.addEventListener('input', actualizarCalculadora);
-        actualizarCalculadora();
+if (dom.loginBtn) dom.loginBtn.addEventListener('click', doLogin);
+if (dom.loginPassword) {
+    dom.loginPassword.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') doLogin();
+    });
+}
+if (dom.logoutBtn) dom.logoutBtn.addEventListener('click', doLogout);
 
-        // ================== CERTIFICACION (10 PREGUNTAS) ==================
-        const QUIZ_QUESTIONS = [
-            { q: '¿Qué haces primero con un prospecto nuevo?', a: 'registrar', o: ['mandar precio directo', 'registrar', 'cerrar venta'] },
-            { q: 'Si te dicen "está caro", ¿qué haces?', a: 'valor', o: ['discutir', 'valor', 'colgar'] },
-            { q: '¿Cuándo cuenta la comisión de cierre?', a: 'liquida', o: ['al agendar', 'liquida', 'al primer mensaje'] },
-            { q: '¿Cuántos prospectos mínimo en 48h para no pausa?', a: 'cinco', o: ['uno', 'cinco', 'diez'] },
-            { q: '¿Qué no debes hacer?', a: 'prometer', o: ['prometer', 'seguir proceso', 'registrar crm'] },
-            { q: 'Semáforo rojo significa:', a: 'descartar', o: ['cerrar', 'descartar', 'bono'] },
-            { q: 'El follow-up ideal es:', a: 'persistente', o: ['solo 1 mensaje', 'persistente', 'nunca'] },
-            { q: 'Si no está certificado:', a: 'no_cierre', o: ['puede cerrar', 'no_cierre', 'puede cobrar cierre'] },
-            { q: 'Dato clave en CRM:', a: 'contacto', o: ['solo nombre', 'contacto', 'solo giro'] },
-            { q: 'Meta del día 1:', a: 'primer_prospecto', o: ['cerrar 3 ventas', 'primer_prospecto', 'ignorar checklist'] }
-        ];
+// Limpieza defensiva: elimina cualquier boton viejo "Entendido, ir a ..."
+$$('a,button').forEach((element) => {
+    const text = (element.textContent || '').trim();
+    if (text.startsWith('Entendido, ir a')) {
+        element.remove();
+    }
+});
 
-        function renderQuiz() {
-            const wrap = document.getElementById('quizContainer');
-            if (!wrap) return;
-            wrap.innerHTML = '';
-            QUIZ_QUESTIONS.forEach((item, idx) => {
-                const card = document.createElement('div');
-                card.className = 'bg-slate-50 border border-slate-200 rounded-xl p-3';
-                card.innerHTML = `
-                    <p class="text-sm font-semibold">${idx + 1}. ${item.q}</p>
-                    <select class="quiz-select p-2 border rounded-xl mt-2 w-full" data-quiz-index="${idx}">
-                        <option value="">Selecciona...</option>
-                        ${item.o.map((opt) => `<option value="${opt}">${opt.replace('_', ' ')}</option>`).join('')}
-                    </select>
-                `;
-                wrap.appendChild(card);
-            });
-        }
-
-        function evaluarQuiz() {
-            const answers = Array.from(document.querySelectorAll('.quiz-select')).map((s) => s.value);
-            let ok = 0;
-            QUIZ_QUESTIONS.forEach((q, i) => { if (answers[i] === q.a) ok += 1; });
-            const aprobada = ok >= 8;
-            guardarEnStorage('certificacion', { aprobada: aprobada, puntaje: ok });
-            syncCertResult();
-            applyModuleLocks();
-        }
-
-        function syncCertResult() {
-            const cert = obtenerDeStorage('certificacion', defaultState().certificacion);
-            const out = document.getElementById('quizResultado');
-            if (!out) return;
-            out.innerText = cert.aprobada ? `Aprobado (${cert.puntaje}/10)` : `No aprobado (${cert.puntaje}/10)`;
-        }
-
-        renderQuiz();
-        const btnEvaluarQuiz = document.getElementById('btnEvaluarQuiz');
-        if (btnEvaluarQuiz) btnEvaluarQuiz.addEventListener('click', evaluarQuiz);
-
-        // ================== KPI SUPERVIVENCIA (48H) ==================
-        function checkSurvivalMode() {
-            const started = obtenerDeStorage('onboardingStartedAt', '');
-            const startTs = started ? Date.parse(started) : Date.now();
-            const now = Date.now();
-            const activeProspects = prospectos.filter((p) => !p.archivado).length;
-            const shouldPause = (now - startTs) > (48 * 60 * 60 * 1000) && activeProspects < 5;
-            guardarEnStorage('survivalPaused', shouldPause);
-            const alertDiv = document.getElementById('survivalAlert');
-            if (alertDiv) {
-                alertDiv.classList.toggle('hidden', !shouldPause);
-                alertDiv.innerText = shouldPause
-                    ? 'KPI de supervivencia: acceso pausado. En 48h debías registrar 5 prospectos.'
-                    : '';
-            }
-            const overlay = document.getElementById('pauseOverlay');
-            if (overlay) overlay.classList.toggle('hidden', !shouldPause);
-            return shouldPause;
-        }
-
-        // ================== SIDEBAR MÓVIL + MÓDULOS ==================
-        const menuToggle = document.getElementById('menuToggle');
-        const mobileMenu = document.getElementById('mobileMenu');
-        const desktopNavSource = document.querySelector('#sidebar-desktop nav');
-        const desktopNav = desktopNavSource ? desktopNavSource.cloneNode(true) : null;
-        if (mobileMenu && desktopNav) mobileMenu.innerHTML = desktopNav.innerHTML;
-
-        function setupModuleAccordions(container) {
-            container.querySelectorAll('.module').forEach(module => {
-                const toggle = module.querySelector('.module-toggle');
-                if (!toggle) return;
-                toggle.addEventListener('click', () => {
-                    const mod = Number(toggle.dataset.module || 0);
-                    if (mod && !unlockedModules[mod]) {
-                        alert('Completa los pasos del módulo anterior para desbloquear.');
-                        return;
-                    }
-                    module.classList.toggle('is-open');
-                });
-            });
-        }
-
-        if (desktopNavSource) setupModuleAccordions(desktopNavSource);
-        if (mobileMenu) setupModuleAccordions(mobileMenu);
-
-        if (menuToggle && mobileMenu) {
-            menuToggle.addEventListener('click', () => {
-                mobileMenu.classList.toggle('open');
-            });
-        }
-
-        // ================== TABS PRINCIPALES ==================
-        const SECTION_TO_MODULE = {
-            rol: 1, psicologia: 1, herramientas: 1, 'frases-prohibidas': 1,
-            ruta: 2, calificacion: 2, 'guiones-giro': 2, 'generador-guiones': 2, objeciones: 2, 'battle-cards': 2, seguimiento: 2,
-            'inicio-rapido': 3, 'plan-dias': 3, crm: 3, kpis: 3, handoff: 3, checklist: 3, 'mi-semana': 3, certificacion: 3,
-            comisiones: 4, 'calculadora-comision': 4, ranking: 4, crecimiento: 4, evaluacion: 4, 'post-demo': 4, 'comunicado-equipo': 4
-        };
-        const TAB_SECTIONS = {
-            entrenamiento: ['ruta', 'calificacion', 'seguimiento', 'objeciones', 'battle-cards', 'guiones-giro', 'generador-guiones', 'kpis', 'disciplina', 'casos', 'rol', 'plan-dias'],
-            operacion: ['crm', 'comisiones', 'calculadora-comision', 'ranking', 'evaluacion', 'certificacion', 'psicologia', 'errores', 'frases-prohibidas', 'roleplay', 'crecimiento', 'post-demo', 'handoff', 'herramientas', 'inicio-rapido', 'preguntas-frecuentes', 'scripts', 'comunicado-equipo'],
-            progreso: ['dashboard-inicio', 'checklist', 'mi-semana']
-        };
-        const tabButtons = document.querySelectorAll('[data-tab-target]');
-        const allTabSectionIds = Array.from(new Set(Object.values(TAB_SECTIONS).flat()));
-        let unlockedModules = { 1: true, 2: false, 3: false, 4: false };
-
-        function computeUnlockedModules() {
-            const checksDone = (obtenerDeStorage('checklist', defaultState().checklist) || []).filter(Boolean).length;
-            const evalBase = (obtenerDeStorage('evaluacion', defaultState().evaluacion) || [])[0] === true;
-            const activeProspects = prospectos.filter((p) => !p.archivado).length;
-            const demos = prospectos.filter((p) => p.demoAgendada).length;
-            const cert = obtenerDeStorage('certificacion', defaultState().certificacion);
-            const certOk = !!(cert && cert.aprobada);
-
-            unlockedModules = {
-                1: true,
-                2: checksDone >= 2 && evalBase,
-                3: activeProspects >= 1,
-                4: activeProspects >= 5 && demos >= 1 && certOk
-            };
-        }
-
-        function applyModuleLocks() {
-            computeUnlockedModules();
-            document.querySelectorAll('.module-toggle[data-module]').forEach((btn) => {
-                const mod = Number(btn.dataset.module);
-                const unlocked = !!unlockedModules[mod];
-                btn.classList.toggle('is-locked', !unlocked);
-                if (!unlocked && !btn.querySelector('.lock-chip')) {
-                    const chip = document.createElement('span');
-                    chip.className = 'lock-chip';
-                    chip.textContent = 'bloqueado';
-                    btn.appendChild(chip);
-                }
-                if (unlocked) {
-                    const chip = btn.querySelector('.lock-chip');
-                    if (chip) chip.remove();
-                }
-            });
-
-            document.querySelectorAll('.sidebar-link').forEach((link) => {
-                const href = (link.getAttribute('href') || '').replace('#', '');
-                const mod = SECTION_TO_MODULE[href];
-                if (!mod) return;
-                const unlocked = !!unlockedModules[mod];
-                link.classList.toggle('is-locked', !unlocked);
-                if (!unlocked) {
-                    link.setAttribute('title', 'Completa pasos previos para desbloquear');
-                } else {
-                    link.removeAttribute('title');
-                }
-            });
-        }
-
-        function prepareSectionAccordions() {
-            allTabSectionIds.forEach((id) => {
-                const section = document.getElementById(id);
-                if (!section || section.dataset.prepared === '1') return;
-                if (section.children.length < 2) {
-                    section.dataset.prepared = '1';
-                    return;
-                }
-                const head = section.firstElementChild;
-                const body = document.createElement('div');
-                body.className = 'section-body';
-                while (section.children.length > 1) {
-                    body.appendChild(section.children[1]);
-                }
-                section.appendChild(body);
-                head.classList.add('section-head-toggle');
-                head.addEventListener('click', () => section.classList.toggle('section-collapsed'));
-                section.dataset.prepared = '1';
-            });
-        }
-
-        function expandFirstVisible(tabName) {
-            const ids = TAB_SECTIONS[tabName] || [];
-            let firstOpen = false;
-            ids.forEach((id) => {
-                const section = document.getElementById(id);
-                if (!section) return;
-                if (!firstOpen) {
-                    section.classList.remove('section-collapsed');
-                    firstOpen = true;
-                } else {
-                    section.classList.add('section-collapsed');
-                }
-            });
-        }
-
-        function setActiveTab(tabName) {
-            allTabSectionIds.forEach((id) => {
-                const section = document.getElementById(id);
-                if (!section) return;
-                const inTab = (TAB_SECTIONS[tabName] || []).includes(id);
-                const mod = SECTION_TO_MODULE[id];
-                const locked = mod ? !unlockedModules[mod] : false;
-                section.classList.toggle('tab-hidden', !(inTab && !locked));
-            });
-            tabButtons.forEach((btn) => {
-                btn.classList.toggle('is-active', btn.dataset.tabTarget === tabName);
-            });
-            expandFirstVisible(tabName);
-        }
-
-        tabButtons.forEach((btn) => {
-            btn.addEventListener('click', () => setActiveTab(btn.dataset.tabTarget));
-        });
-
-        function tabForSection(id) {
-            return Object.keys(TAB_SECTIONS).find((tab) => TAB_SECTIONS[tab].includes(id));
-        }
-
-        // Etiquetas simples + iconos para escaneo rápido
-        function decorateSectionTitles() {
-            const titleIcons = {
-                ruta: '🧭', calificacion: '🚦', seguimiento: '🔁', objeciones: '🗣️',
-                'guiones-giro': '📝', 'generador-guiones': '🧩', 'battle-cards': '🛡️', kpis: '📊', disciplina: '⚖️', casos: '📂',
-                rol: '🎯', 'plan-dias': '📅', crm: '🗃️', comisiones: '💰',
-                'calculadora-comision': '🧮', ranking: '🏆', evaluacion: '✅', certificacion: '🎓', psicologia: '🧠', errores: '❌',
-                'frases-prohibidas': '🚫', roleplay: '🎭', crecimiento: '📈',
-                'post-demo': '📞', handoff: '🤝', herramientas: '🛠️',
-                'inicio-rapido': '⚡', checklist: '📋', 'preguntas-frecuentes': '❓',
-                scripts: '📜', 'comunicado-equipo': '📣', 'mi-semana': '⭐'
-            };
-            Object.keys(titleIcons).forEach((id) => {
-                const section = document.getElementById(id);
-                if (!section) return;
-                const h2 = section.querySelector('h2');
-                if (!h2 || h2.dataset.iconified === '1') return;
-                h2.textContent = `${titleIcons[id]} ${h2.textContent}`;
-                h2.dataset.iconified = '1';
-            });
-        }
-
-        document.querySelectorAll('a[href^="#"]').forEach((link) => {
-            link.addEventListener('click', (e) => {
-                const targetId = (link.getAttribute('href') || '').replace('#', '');
-                const mod = SECTION_TO_MODULE[targetId];
-                if (mod && !unlockedModules[mod]) {
-                    e.preventDefault();
-                    alert('Este módulo está bloqueado. Completa los pasos previos.');
-                    return;
-                }
-                const tab = tabForSection(targetId);
-                if (tab) setActiveTab(tab);
-            });
-        });
-
-        prepareSectionAccordions();
-        decorateSectionTitles();
-        applyModuleLocks();
-        setActiveTab('progreso');
-
-        // ================== INTERSECTION OBSERVER (desktop y móvil) ==================
-        const sections = document.querySelectorAll('.active-section');
-        const sidebarLinks = document.querySelectorAll('.sidebar-link');
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const id = entry.target.getAttribute('id');
-                    sidebarLinks.forEach(link => {
-                        link.classList.remove('active');
-                        if (link.getAttribute('href') === `#${id}`) {
-                            link.classList.add('active');
-                        }
-                    });
-                }
-            });
-        }, { threshold: 0.3, rootMargin: '-100px 0px -100px 0px' });
-        sections.forEach(s => observer.observe(s));
-
-        // ================== LOGIN / LOGOUT ==================
-        function setAppVisible(visible) {
-            document.getElementById('mainHeader').style.display = visible ? '' : 'none';
-            document.getElementById('sidebar-mobile').style.display = visible ? '' : 'none';
-            document.getElementById('appShell').style.display = visible ? 'flex' : 'none';
-            document.getElementById('mobileBottomNav').style.display = visible ? '' : 'none';
-            document.getElementById('mainFooter').style.display = visible ? '' : 'none';
-        }
-
-        async function hydrateUserState() {
-            const remoteState = await cargarDatosDesdeBackend(currentUser);
-            userState = Object.assign(defaultState(), remoteState || {});
-            if (!userState.onboardingStartedAt) {
-                userState.onboardingStartedAt = new Date().toISOString();
-                scheduleBackendSync();
-            }
-            prospectos = Array.isArray(userState.prospectos) ? userState.prospectos : [];
-            cargarChecklist();
-            cargarEvaluacion();
-            cargarDia();
-            syncCertResult();
-        }
-
-        async function doLogin() {
-            const username = (document.getElementById('loginUsername').value || '').trim();
-            const password = (document.getElementById('loginPassword').value || '').trim();
-            const loginError = document.getElementById('loginError');
-            const ok = await validateCredentials(username, password);
-            if (!ok) {
-                loginError.classList.remove('hidden');
-                loginError.innerText = 'No se pudo iniciar sesión. Revisa usuario/contraseña o backend.';
-                return;
-            }
-
-            currentUser = username;
-            loginError.classList.add('hidden');
-            document.getElementById('loggedUserDisplay').innerText = `👤 ${currentUser}`;
-            document.getElementById('loginModal').classList.add('hidden');
-            setAppVisible(true);
-
-            await hydrateUserState();
-            renderCRM();
-            actualizarProgresoGlobal();
-            actualizarKPIsReales();
-            actualizarAlertasSeguimiento();
-            applyModuleLocks();
-            checkSurvivalMode();
-            setActiveTab('progreso');
-        }
-
-        document.getElementById('loginBtn').addEventListener('click', doLogin);
-        document.getElementById('loginPassword').addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') doLogin();
-        });
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            currentUser = null;
-            userState = null;
-            setAppVisible(false);
-            document.getElementById('loginUsername').value = '';
-            document.getElementById('loginPassword').value = '';
-            document.getElementById('loggedUserDisplay').innerText = '';
-            document.getElementById('loginModal').classList.remove('hidden');
-        });
-
-        // Limpieza defensiva: elimina cualquier botón viejo "Entendido, ir a ..."
-        document.querySelectorAll('a,button').forEach((el) => {
-            const txt = (el.textContent || '').trim();
-            if (txt.startsWith('Entendido, ir a')) {
-                el.remove();
-            }
-        });
-
-        // Estado inicial
-        setAppVisible(false);
-    
+// ================== ESTADO INICIAL ==================
+renderQuiz();
+prepareSectionAccordions();
+decorateSectionTitles();
+actualizarCalculadora();
+cargarChecklist();
+cargarEvaluacion();
+cargarDia();
+updateCrmAccessUi();
+applyModuleLocks();
+setActiveTab('progreso');
+setAppVisible(false);

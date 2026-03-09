@@ -5,84 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Protocolo de Operación · Servicios Digitales MX</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
-        body.kid-mode { background: linear-gradient(180deg, #f8fbff 0%, #eef3ff 100%); }
-        body.kid-mode .active-section { margin-bottom: 1.6rem; }
-        body.kid-mode h2 { letter-spacing: -0.01em; }
-        body.kid-mode .section-body { margin-top: 0.45rem; }
-        .step-number { background: #6366f1; color: white; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: bold; font-size: 14px; flex-shrink: 0; }
-        .sidebar-link { transition: all 0.2s; }
-        .sidebar-link:hover, .sidebar-link.active { background: #f1f5f9; border-left: 4px solid #6366f1; font-weight: 600; color: #1e293b; }
-        .glass-header { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); }
-        .checklist-item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-        .checklist-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: #6366f1; }
-        .semaforo-verde { background-color: #dcfce7; border-left: 6px solid #22c55e; }
-        .semaforo-amarillo { background-color: #fef9c3; border-left: 6px solid #eab308; }
-        .semaforo-rojo { background-color: #fee2e2; border-left: 6px solid #ef4444; }
-        .progress-bar { height: 8px; background-color: #e2e8f0; border-radius: 999px; overflow: hidden; }
-        .progress-fill { height: 100%; background-color: #6366f1; width: 0%; border-radius: 999px; transition: width 0.3s; }
-        .copy-btn { cursor: pointer; transition: all 0.2s; }
-        .copy-btn:active { transform: scale(0.95); }
-        .handoff-card { background: #f8fafc; border: 1px dashed #94a3b8; }
-        .active-section { scroll-margin-top: 100px; }
-        #sidebar-mobile { display: none; }
-        .badge-vencido { background-color: #fee2e2; color: #b91c1c; font-size: 0.6rem; padding: 2px 6px; border-radius: 999px; }
-        .badge-hoy { background-color: #fef3c7; color: #92400e; font-size: 0.6rem; padding: 2px 6px; border-radius: 999px; }
-        .module-toggle { width: 100%; display: flex; justify-content: space-between; align-items: center; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 0.65rem 0.8rem; font-size: 0.82rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; color: #334155; }
-        .module-content { display: none; padding: 0.35rem 0 0.7rem 0.35rem; border-left: 2px solid #c7d2fe; margin: 0.4rem 0 0.2rem 0.45rem; }
-        .module.is-open .module-content { display: block; }
-        .module.is-open .module-arrow { transform: rotate(180deg); }
-        .module-arrow { transition: transform 0.2s; }
-        .quick-link-btn { display: inline-flex; margin-top: 1rem; background: #e2e8f0; color: #1e293b; font-size: 0.78rem; font-weight: 700; padding: 0.55rem 0.85rem; border-radius: 0.65rem; text-decoration: none; }
-        .quick-link-btn:hover { background: #cbd5e1; }
-        .kid-tip { background: #ecfeff; border: 1px solid #a5f3fc; border-radius: 1rem; padding: 0.7rem 0.9rem; font-size: 0.84rem; color: #0f766e; }
-        .kid-chip { display: inline-flex; align-items: center; gap: 0.35rem; border-radius: 999px; background: #ffffff; border: 1px solid #dbeafe; padding: 0.35rem 0.6rem; font-size: 0.72rem; font-weight: 700; color: #1e3a8a; }
-        .tab-btn { padding: 0.55rem 0.9rem; border-radius: 9999px; border: 1px solid #e2e8f0; background: #ffffff; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #475569; }
-        .tab-btn.is-active { background: #4f46e5; color: #ffffff; border-color: #4f46e5; }
-        .tab-hidden { display: none !important; }
-        .section-collapsed .section-body { display: none; }
-        .section-head-toggle { cursor: pointer; }
-        .quick-panel { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 1rem; padding: 1rem; }
-        .mobile-bottom-nav { display: none; }
-        #loginModal {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.55);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-        }
-        #loginModal.hidden { display: none; }
-        .login-box {
-            background: white;
-            padding: 1.4rem;
-            border-radius: 1rem;
-            max-width: 380px;
-            width: 92%;
-            box-shadow: 0 14px 28px rgba(0,0,0,0.15);
-        }
-        .login-box h2 { font-weight: 800; font-size: 1.35rem; margin-bottom: 0.25rem; }
-        .login-box input { width: 100%; padding: 0.72rem; border: 1px solid #e2e8f0; border-radius: 0.7rem; margin-bottom: 0.7rem; }
-        .login-box button { background: #4f46e5; color: white; font-weight: 800; padding: 0.7rem; border-radius: 0.7rem; width: 100%; }
-        .login-box button:hover { background: #4338ca; }
-        .login-error { color: #dc2626; font-size: 0.82rem; margin-top: 0.4rem; }
-        @media (max-width: 1024px) {
-            #sidebar-desktop { display: none; }
-            #sidebar-mobile { display: block; position: sticky; top: 80px; z-index: 40; }
-            .sidebar-mobile-menu { display: none; }
-            .sidebar-mobile-menu.open { display: block; background: white; border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 0.5rem; }
-            .mobile-bottom-nav { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; background: #ffffff; border-top: 1px solid #e2e8f0; padding: 0.4rem 0.35rem calc(env(safe-area-inset-bottom) + 0.4rem) 0.35rem; gap: 0.35rem; }
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="CSS/guida de capacitacion.css">
 </head>
-<body class="bg-slate-50 text-slate-900 kid-mode">
+<body class="bg-slate-50 text-slate-900 workspace-shell">
     <div id="loginModal">
         <div class="login-box">
-            <h2>🔐 Acceso Freelancer</h2>
-            <p class="text-sm text-slate-500 mb-3">Ingresa tu usuario y contraseña.</p>
+            <h2>Acceso operativo</h2>
+            <p class="text-sm text-slate-500 mb-3">Ingresa tus credenciales para continuar.</p>
             <input type="text" id="loginUsername" placeholder="Usuario" autocomplete="off">
             <input type="password" id="loginPassword" placeholder="Contraseña">
             <button id="loginBtn">Entrar</button>
@@ -102,14 +32,14 @@
                 </div>
                 <div class="flex items-center gap-4">
                     <span class="hidden md:block text-slate-400 text-sm font-medium">Protocolo de Operación · v7</span>
-                    <div class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold uppercase">Modo Claro</div>
+                    <div class="status-pill status-pill--success">Operacion estandar</div>
                     <div class="text-sm font-semibold text-indigo-700" id="loggedUserDisplay"></div>
                     <button id="logoutBtn" class="text-xs bg-slate-200 px-2 py-1 rounded-full">Salir</button>
                 </div>
             </div>
             <!-- Mensaje de bienvenida -->
             <div class="mt-2 bg-indigo-100 p-3 rounded-xl text-indigo-900 text-sm font-medium">
-                🚀 Bien. Vamos por partes: aprende, practica y registra.
+                Opera con criterio: domina fundamentos, ejecuta y documenta cada avance.
             </div>
             <!-- Barra de progreso dinámica -->
             <div class="mt-3 flex items-center gap-3">
@@ -134,6 +64,7 @@
             </div>
             <!-- Alertas de seguimiento -->
             <div id="alertasSeguimiento" class="mt-2 text-sm text-orange-700 bg-orange-50 p-2 rounded-xl hidden"></div>
+            <div id="survivalAlert" class="mt-2 text-sm text-red-700 bg-red-50 p-2 rounded-xl hidden"></div>
         </div>
     </header>
 
@@ -156,7 +87,7 @@
                 <a href="#dashboard-inicio" class="sidebar-link block px-4 py-2 rounded-r-xl text-sm font-medium">⚡ Dashboard de inicio</a>
 
                 <div class="module is-open">
-                    <button class="module-toggle" type="button">Módulo 1: Lo básico <span class="module-arrow">▾</span></button>
+                    <button class="module-toggle" type="button" data-module="1">Módulo 1: Lo básico <span class="module-arrow">▾</span></button>
                     <div class="module-content space-y-1">
                         <a href="#rol" class="sidebar-link block px-3 py-2 rounded-r-xl text-sm font-medium">1. Rol exacto</a>
                         <a href="#psicologia" class="sidebar-link block px-3 py-2 rounded-r-xl text-sm font-medium">2. Psicología</a>
@@ -166,7 +97,7 @@
                 </div>
 
                 <div class="module">
-                    <button class="module-toggle" type="button">Módulo 2: Cómo hacerlo <span class="module-arrow">▾</span></button>
+                    <button class="module-toggle" type="button" data-module="2">Módulo 2: Cómo hacerlo <span class="module-arrow">▾</span></button>
                     <div class="module-content space-y-1">
                         <a href="#ruta" class="sidebar-link block px-3 py-2 rounded-r-xl text-sm font-medium">1. Ruta operativa</a>
                         <a href="#calificacion" class="sidebar-link block px-3 py-2 rounded-r-xl text-sm font-medium">2. Calificación</a>
@@ -177,7 +108,7 @@
                 </div>
 
                 <div class="module">
-                    <button class="module-toggle" type="button">Módulo 3: Trabajo diario <span class="module-arrow">▾</span></button>
+                    <button class="module-toggle" type="button" data-module="3">Módulo 3: Trabajo diario <span class="module-arrow">▾</span></button>
                     <div class="module-content space-y-1">
                         <a href="#inicio-rapido" class="sidebar-link block px-3 py-2 rounded-r-xl text-sm font-medium">Inicio rápido</a>
                         <a href="#plan-dias" class="sidebar-link block px-3 py-2 rounded-r-xl text-sm font-medium">1. Plan día a día</a>
@@ -188,7 +119,7 @@
                 </div>
 
                 <div class="module">
-                    <button class="module-toggle" type="button">Módulo 4: Resultados <span class="module-arrow">▾</span></button>
+                    <button class="module-toggle" type="button" data-module="4">Módulo 4: Resultados <span class="module-arrow">▾</span></button>
                     <div class="module-content space-y-1">
                         <a href="#comisiones" class="sidebar-link block px-3 py-2 rounded-r-xl text-sm font-medium">1. Comisiones</a>
                         <a href="#ranking" class="sidebar-link block px-3 py-2 rounded-r-xl text-sm font-medium">2. Ranking semanal</a>
@@ -216,12 +147,38 @@
                     <h2 class="text-3xl font-extrabold text-slate-900">Protocolo de Operación: Servicios Digitales MX</h2>
                 </div>
                 <p class="text-slate-700">Empieza por este panel: define tu día, abre herramientas y arranca ejecución en CRM.</p>
-                <div class="flex flex-wrap gap-2">
-                    <span class="kid-chip">1. Mira tu meta</span>
-                    <span class="kid-chip">2. Haz tareas cortas</span>
-                    <span class="kid-chip">3. Registra todo</span>
+                <div class="bg-white border border-indigo-200 rounded-2xl p-4">
+                    <p class="text-xs font-bold uppercase tracking-wider text-indigo-600">Misión inicial (día 1)</p>
+                    <p class="font-bold text-slate-800 mt-1">Entender el servicio y registrar tu primer prospecto de prueba.</p>
+                    <ul class="list-disc pl-5 text-sm text-slate-700 mt-2">
+                        <li>Completa 2 checks del checklist.</li>
+                        <li>Registra 1 prospecto en CRM.</li>
+                        <li>Pasa a Módulo 2 automáticamente.</li>
+                    </ul>
                 </div>
-                <div class="kid-tip">Tip rápido: abre solo una sección, complétala y luego pasa a la siguiente.</div>
+                <div class="flex flex-wrap gap-2">
+                    <span class="status-pill">1. Define la meta</span>
+                    <span class="status-pill">2. Ejecuta el bloque</span>
+                    <span class="status-pill">3. Documenta el avance</span>
+                </div>
+                <div class="strategy-note">Trabaja una seccion a la vez. Cierra ese bloque y despues avanza al siguiente.</div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div class="bg-white border border-slate-200 rounded-2xl p-4">
+                        <p class="text-xs font-bold uppercase text-slate-500">Micro-cápsula 01</p>
+                        <p class="font-semibold">Cómo abrir conversación en 60s</p>
+                        <p class="text-xs text-slate-500 mt-1">Lee el script, practica 2 veces, envía 1 mensaje real.</p>
+                    </div>
+                    <div class="bg-white border border-slate-200 rounded-2xl p-4">
+                        <p class="text-xs font-bold uppercase text-slate-500">Micro-cápsula 02</p>
+                        <p class="font-semibold">Cómo detectar dolor rápido</p>
+                        <p class="text-xs text-slate-500 mt-1">Haz 3 preguntas y clasifica verde/amarillo/rojo.</p>
+                    </div>
+                    <div class="bg-white border border-slate-200 rounded-2xl p-4">
+                        <p class="text-xs font-bold uppercase text-slate-500">Micro-cápsula 03</p>
+                        <p class="font-semibold">Cómo pedir demo sin presión</p>
+                        <p class="text-xs text-slate-500 mt-1">Usa cierre suave y agenda siguiente paso.</p>
+                    </div>
+                </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <a href="#inicio-rapido" class="bg-white border border-slate-200 rounded-2xl p-4 hover:border-indigo-400">
                         <p class="text-xs text-indigo-600 font-bold uppercase">Paso 1</p>
@@ -233,10 +190,10 @@
                         <p class="font-bold">Plan día a día</p>
                         <p class="text-xs text-slate-500 mt-1">Ruta semanal con foco operativo.</p>
                     </a>
-                    <a href="#crm" class="bg-white border border-slate-200 rounded-2xl p-4 hover:border-indigo-400">
+                    <a href="#crm" id="dashboardCrmCard" data-requires-crm class="bg-white border border-slate-200 rounded-2xl p-4 hover:border-indigo-400">
                         <p class="text-xs text-indigo-600 font-bold uppercase">Paso 3</p>
                         <p class="font-bold">CRM avanzado</p>
-                        <p class="text-xs text-slate-500 mt-1">Registrar para medir y cobrar.</p>
+                        <p id="dashboardCrmStatus" class="text-xs text-slate-500 mt-1">Disponible al completar Fundamentos 0/6.</p>
                     </a>
                 </div>
             </section>
@@ -355,6 +312,20 @@
                 </div>
             </section>
 
+            <section id="battle-cards" class="active-section space-y-4">
+                <div class="flex items-center gap-4">
+                    <div class="step-number">B</div>
+                    <h2 class="text-3xl font-extrabold text-slate-900">Battle Cards (objeciones México)</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="bg-white p-4 rounded-xl border border-slate-200"><span class="font-bold">“Está caro.”</span><br>“Te entiendo. Justo por eso lo vemos como inversión: recuperas tiempo y cierras más rápido.”</div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200"><span class="font-bold">“Lo veo después.”</span><br>“Va. ¿Te parece si lo dejamos agendado de una vez para no perder el hilo?”</div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200"><span class="font-bold">“Ya tengo a alguien.”</span><br>“Perfecto, ¿te está funcionando al 100? Si no, te muestro una opción rápida.”</div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200"><span class="font-bold">“No tengo tiempo.”</span><br>“Son 5 minutos y te digo si sí te conviene o no.”</div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200"><span class="font-bold">“Mándame precio.”</span><br>“Te lo doy exacto cuando vea tu caso en 5 minutos. Así no te doy humo.”</div>
+                </div>
+            </section>
+
             <!-- ========== 5. GUIONES POR GIRO ========= -->
             <section id="guiones-giro" class="active-section space-y-4">
                 <div class="flex items-center gap-4">
@@ -366,6 +337,26 @@
                     <div class="bg-white p-5 rounded-2xl border-l-4 border-green-400"><span class="font-bold text-green-700">Veterinaria</span><br>"Hola, soy de Servicios Digitales MX. Ayudamos a veterinarias a recibir la información de la mascota (síntomas, edad) antes de la consulta para agilizar la atención. ¿Te interesaría conocer cómo?"</div>
                     <div class="bg-white p-5 rounded-2xl border-l-4 border-red-400"><span class="font-bold text-red-700">Taquería / Comida</span><br>"Qué tal, veo que tomas pedidos por WhatsApp. Te comparto una herramienta que usan negocios como el tuyo para que el cliente seleccione su pedido en un menú digital y tú recibas todo ordenado. ¿Te puedo explicar?"</div>
                     <div class="bg-white p-5 rounded-2xl border-l-4 border-purple-400"><span class="font-bold text-purple-700">Técnico (minisplit, etc.)</span><br>"Hola, ¿cómo estás? Te contacto porque muchos técnicos pierden tiempo preguntando la falla, marca, dirección por mensaje. Nosotros creamos un sistema donde el cliente llena una ficha con foto y datos, y tú cotizas más rápido. ¿Te sirve?"</div>
+                </div>
+            </section>
+
+            <section id="generador-guiones" class="active-section space-y-4">
+                <div class="flex items-center gap-4">
+                    <div class="step-number">G</div>
+                    <h2 class="text-3xl font-extrabold text-slate-900">Generador de guiones</h2>
+                </div>
+                <div class="bg-white p-6 rounded-3xl border border-slate-200 space-y-3">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                        <select id="scriptTipo" class="p-2 border rounded-xl">
+                            <option value="comercio">Comercio</option>
+                            <option value="servicios">Servicios</option>
+                            <option value="marca_personal">Marca personal</option>
+                        </select>
+                        <input id="scriptNegocio" class="p-2 border rounded-xl" placeholder="Nombre del negocio">
+                        <button id="btnGenerarGuion" class="bg-indigo-600 text-white px-4 py-2 rounded-xl">Generar guion</button>
+                    </div>
+                    <textarea id="scriptGenerado" class="w-full p-3 border rounded-xl min-h-[110px]" placeholder="Aquí saldrá el mensaje listo para WhatsApp..."></textarea>
+                    <button id="btnCopiarGuionGenerado" class="bg-slate-800 text-white px-4 py-2 rounded-xl text-sm">Copiar guion</button>
                 </div>
             </section>
 
@@ -483,8 +474,13 @@
                 <div class="flex items-center gap-4">
                     <div class="step-number">11</div>
                     <h2 class="text-3xl font-extrabold text-slate-900">CRM avanzado</h2>
+                    <span id="crmAccessBadge" class="hidden status-pill"></span>
                 </div>
-                <div class="bg-white p-6 rounded-3xl border border-slate-200">
+                <div id="crmLockedNotice" class="crm-locked-panel hidden">
+                    <p class="crm-locked-panel__eyebrow">Bloqueo por hitos</p>
+                    <p id="crmLockStatus" class="crm-locked-panel__text">Completa Fundamentos para habilitar el CRM.</p>
+                </div>
+                <div id="crmWorkspace" class="bg-white p-6 rounded-3xl border border-slate-200">
                     <p class="mb-4">Registra prospectos con todos los datos necesarios. Se sincronizan en la nube.</p>
                     <!-- Mini estadística por responsable -->
                     <div id="statsResponsable" class="bg-indigo-50 p-2 rounded-xl mb-4 text-sm flex flex-wrap gap-4"></div>
@@ -609,6 +605,21 @@
                 </div>
             </section>
 
+            <section id="calculadora-comision" class="active-section space-y-4">
+                <div class="flex items-center gap-4">
+                    <div class="step-number">C</div>
+                    <h2 class="text-3xl font-extrabold text-slate-900">Calculadora de comisiones</h2>
+                </div>
+                <div class="bg-white p-6 rounded-3xl border border-slate-200 space-y-3">
+                    <label class="text-sm font-semibold">¿Cuántas ventas planeas cerrar este mes?</label>
+                    <input id="calcVentas" type="range" min="0" max="30" value="5" class="w-full">
+                    <div class="text-sm">Ventas planeadas: <span id="calcVentasVal" class="font-bold">5</span></div>
+                    <label class="text-sm font-semibold">Comisión promedio por cierre (MXN)</label>
+                    <input id="calcComisionProm" type="number" value="500" class="p-2 border rounded-xl w-full md:w-64">
+                    <div class="bg-indigo-50 p-3 rounded-xl text-indigo-900">Proyección: <span id="calcResultado" class="font-extrabold">$2,500 MXN</span></div>
+                </div>
+            </section>
+
             <!-- ========== 13. RANKING SEMANAL ========= -->
             <section id="ranking" class="active-section space-y-4">
                 <div class="flex items-center gap-4">
@@ -647,6 +658,21 @@
                     </div>
                     <div class="mt-4 p-3 bg-indigo-50 rounded-xl">
                         Puntaje: <span id="puntajeEval">0</span>/5 - Estado: <span id="estadoEval">No aprobado</span>
+                    </div>
+                </div>
+            </section>
+
+            <section id="certificacion" class="active-section space-y-4">
+                <div class="flex items-center gap-4">
+                    <div class="step-number">10</div>
+                    <h2 class="text-3xl font-extrabold text-slate-900">Examen de certificación (10 preguntas)</h2>
+                </div>
+                <div class="bg-white p-6 rounded-3xl border border-slate-200">
+                    <p class="text-sm text-slate-600 mb-3">Debes aprobar para operar cierres con clientes reales.</p>
+                    <div id="quizContainer" class="space-y-3"></div>
+                    <div class="mt-4 flex items-center gap-2">
+                        <button id="btnEvaluarQuiz" class="bg-indigo-600 text-white px-4 py-2 rounded-xl">Evaluar examen</button>
+                        <span id="quizResultado" class="text-sm font-semibold"></span>
                     </div>
                 </div>
             </section>
@@ -807,7 +833,22 @@
 
             <!-- CHECKLIST DIARIO CON PERSISTENCIA -->
             <section id="checklist" class="space-y-4 bg-white p-6 rounded-3xl border-2 border-indigo-200">
-                <h2 class="text-2xl font-extrabold text-indigo-800 flex items-center gap-2"><span>📋</span> Checklist diario</h2>
+                <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                    <div>
+                        <h2 class="text-2xl font-extrabold text-indigo-800">Fundamentos operativos</h2>
+                        <p class="text-sm text-slate-500">Debes completar 6 de 6 para desbloquear el CRM.</p>
+                    </div>
+                    <div class="fundamentos-progress">
+                        <div class="fundamentos-progress__head">
+                            <span class="fundamentos-progress__label">Avance</span>
+                            <span id="fundamentosProgressLabel" class="fundamentos-progress__value">0/6</span>
+                        </div>
+                        <div class="progress-bar progress-bar--compact">
+                            <div id="fundamentosProgressFill" class="progress-fill" style="width:0%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="fundamentosStatus" class="fundamentos-status">Completa los 6 fundamentos para desbloquear el CRM.</div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-2" id="checklistContainer">
                     <div class="checklist-item"><input type="checkbox" class="check-dia" id="chk1"> <label for="chk1">Ejercicio de voz (lápiz/respiración)</label></div>
                     <div class="checklist-item"><input type="checkbox" class="check-dia" id="chk2"> <label for="chk2">Nicho elegido</label></div>
@@ -838,23 +879,23 @@
                 <div class="flex gap-3 text-sm overflow-x-auto snap-x pb-2" id="scriptsContainer">
                     <div class="bg-white p-3 rounded-xl font-mono flex justify-between items-center min-w-[22rem] snap-start" data-script="Hola [nombre], te contacto porque vi que ofreces [servicio]. Trabajo con Servicios Digitales MX, ayudamos a negocios a organizar las solicitudes de clientes para no perder oportunidades. ¿Te puedo contar rápido cómo funciona?">
                         <span class="truncate">Primer contacto genérico...</span>
-                        <button class="copy-btn ml-2 bg-indigo-200 text-indigo-800 px-3 py-1 rounded-lg text-xs" onclick="copiarTexto(this)">Copiar</button>
+                        <button class="copy-btn ml-2 bg-indigo-200 text-indigo-800 px-3 py-1 rounded-lg text-xs" data-copy-script>Copiar</button>
                     </div>
                     <div class="bg-white p-3 rounded-xl font-mono flex justify-between items-center min-w-[22rem] snap-start" data-script="Hola, te retomo el mensaje porque justo lo que hacemos ayuda mucho cuando las cotizaciones se están manejando por WhatsApp. ¿Te puedo mostrar un ejemplo rápido?">
                         <span class="truncate">Seguimiento 2 días sin respuesta...</span>
-                        <button class="copy-btn ml-2 bg-indigo-200 text-indigo-800 px-3 py-1 rounded-lg text-xs" onclick="copiarTexto(this)">Copiar</button>
+                        <button class="copy-btn ml-2 bg-indigo-200 text-indigo-800 px-3 py-1 rounded-lg text-xs" data-copy-script>Copiar</button>
                     </div>
                     <div class="bg-white p-3 rounded-xl font-mono flex justify-between items-center min-w-[22rem] snap-start" data-script="Sin problema, lo movemos. ¿Qué día te queda mejor para retomarlo?">
                         <span class="truncate">Reagendar demo...</span>
-                        <button class="copy-btn ml-2 bg-indigo-200 text-indigo-800 px-3 py-1 rounded-lg text-xs" onclick="copiarTexto(this)">Copiar</button>
+                        <button class="copy-btn ml-2 bg-indigo-200 text-indigo-800 px-3 py-1 rounded-lg text-xs" data-copy-script>Copiar</button>
                     </div>
                     <div class="bg-white p-3 rounded-xl font-mono flex justify-between items-center min-w-[22rem] snap-start" data-script="Hola, solo te doy seguimiento a la demo de ayer. ¿Qué te pareció la idea?">
                         <span class="truncate">Post-demo...</span>
-                        <button class="copy-btn ml-2 bg-indigo-200 text-indigo-800 px-3 py-1 rounded-lg text-xs" onclick="copiarTexto(this)">Copiar</button>
+                        <button class="copy-btn ml-2 bg-indigo-200 text-indigo-800 px-3 py-1 rounded-lg text-xs" data-copy-script>Copiar</button>
                     </div>
                     <div class="bg-white p-3 rounded-xl font-mono flex justify-between items-center min-w-[22rem] snap-start" data-script="Si te hace sentido, el siguiente paso sería ver qué flujo encaja mejor con tu negocio. ¿Coordinamos una reunión breve?">
                         <span class="truncate">Cierre suave...</span>
-                        <button class="copy-btn ml-2 bg-indigo-200 text-indigo-800 px-3 py-1 rounded-lg text-xs" onclick="copiarTexto(this)">Copiar</button>
+                        <button class="copy-btn ml-2 bg-indigo-200 text-indigo-800 px-3 py-1 rounded-lg text-xs" data-copy-script>Copiar</button>
                     </div>
                 </div>
             </section>
@@ -865,15 +906,15 @@
                 <div class="space-y-3 text-sm">
                     <div class="bg-slate-50 p-3 rounded-xl font-mono flex justify-between items-start gap-3" data-script="Equipo, actualizamos la estructura de la guía. Ahora está dividida en 4 módulos lógicos para que su entrenamiento sea más rápido y ordenado. Revisen el nuevo orden en el menú principal.">
                         <span class="leading-relaxed">"Equipo, actualizamos la estructura de la guía. Ahora está dividida en 4 módulos lógicos para que su entrenamiento sea más rápido y ordenado. Revisen el nuevo orden en el menú principal."</span>
-                        <button class="copy-btn bg-indigo-200 text-indigo-800 px-3 py-1 rounded-lg text-xs whitespace-nowrap" onclick="copiarTexto(this)">Copiar</button>
+                        <button class="copy-btn bg-indigo-200 text-indigo-800 px-3 py-1 rounded-lg text-xs whitespace-nowrap" data-copy-script>Copiar</button>
                     </div>
                     <div class="bg-slate-50 p-3 rounded-xl font-mono flex justify-between items-start gap-3" data-script="Hola a todos. Notamos que la guía tenía demasiada información junta, así que la reorganizamos por etapas: desde lo básico hasta cómo escalar sus comisiones. Es mucho más intuitivo ahora, denle una vuelta.">
                         <span class="leading-relaxed">"Hola a todos. Notamos que la guía tenía demasiada información junta, así que la reorganizamos por etapas: desde lo básico hasta cómo escalar sus comisiones. Es mucho más intuitivo ahora, denle una vuelta."</span>
-                        <button class="copy-btn bg-indigo-200 text-indigo-800 px-3 py-1 rounded-lg text-xs whitespace-nowrap" onclick="copiarTexto(this)">Copiar</button>
+                        <button class="copy-btn bg-indigo-200 text-indigo-800 px-3 py-1 rounded-lg text-xs whitespace-nowrap" data-copy-script>Copiar</button>
                     </div>
                     <div class="bg-slate-50 p-3 rounded-xl font-mono flex justify-between items-start gap-3" data-script="Jesús, optimicé la arquitectura de información del Bootcamp. Reduje la fricción cognitiva agrupando las 22 secciones en 4 pilares estratégicos. Esto facilitará el onboarding de nuevos freelancers y mejorará la retención del proceso operativo. Ya está listo para implementarse.">
                         <span class="leading-relaxed">"Jesús, optimicé la arquitectura de información del Bootcamp. Reduje la fricción cognitiva agrupando las 22 secciones en 4 pilares estratégicos. Esto facilitará el onboarding de nuevos freelancers y mejorará la retención del proceso operativo. Ya está listo para implementarse."</span>
-                        <button class="copy-btn bg-indigo-200 text-indigo-800 px-3 py-1 rounded-lg text-xs whitespace-nowrap" onclick="copiarTexto(this)">Copiar</button>
+                        <button class="copy-btn bg-indigo-200 text-indigo-800 px-3 py-1 rounded-lg text-xs whitespace-nowrap" data-copy-script>Copiar</button>
                     </div>
                 </div>
             </section>
@@ -887,6 +928,27 @@
                     <div><span class="font-black text-2xl text-indigo-600" id="kpi3">0</span><br><span class="text-xs">respuestas</span></div>
                     <div><span class="font-black text-2xl text-indigo-600" id="kpi4">0</span><br><span class="text-xs">demos</span></div>
                     <div><span class="font-black text-2xl text-indigo-600" id="kpi5">0</span><br><span class="text-xs">cierres</span></div>
+                </div>
+                <div class="conversion-panel">
+                    <div class="conversion-panel__main">
+                        <div class="conversion-panel__meta">
+                            <p class="conversion-panel__eyebrow">Tasa de conversion</p>
+                            <div class="conversion-panel__headline">
+                                <span id="conversionRateValue">0%</span>
+                                <span id="conversionRateTrend" class="conversion-panel__trend">Sin cierres</span>
+                            </div>
+                            <p id="conversionRateCaption" class="conversion-panel__caption">Registra prospectos y cierres para construir tu referencia operativa.</p>
+                        </div>
+                        <div class="conversion-gauge">
+                            <div class="conversion-gauge__track">
+                                <div id="conversionRateFill" class="conversion-gauge__fill" style="width:0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="conversion-panel__side">
+                        <p class="conversion-panel__eyebrow">Relacion cierres / prospectos</p>
+                        <p id="conversionRateRatio" class="conversion-panel__ratio">0/0</p>
+                    </div>
                 </div>
                 <button id="actualizarKPIs" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm">Actualizar desde CRM</button>
             </section>
@@ -934,7 +996,7 @@
             </div>
             <div class="quick-panel">
                 <p class="text-sm font-semibold text-slate-800 mb-2">Acción principal</p>
-                <a href="#crm" class="block w-full text-center bg-indigo-600 text-white font-bold py-2 rounded-xl hover:bg-indigo-700">➕ Nuevo prospecto</a>
+                <a href="#crm" id="quickActionCrm" data-requires-crm class="block w-full text-center bg-indigo-600 text-white font-bold py-2 rounded-xl hover:bg-indigo-700">Nuevo prospecto</a>
                 <div class="mt-3">
                     <p class="text-xs text-slate-500 mb-1">Progreso del día</p>
                     <div class="progress-bar"><div id="miniProgress" class="progress-fill" style="width:0%"></div></div>
@@ -958,747 +1020,14 @@
         </div>
     </footer>
 
-    <script>
-        // ================== AUTH + BACKEND ==================
-        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxfTsZDlIuSosrVfj8fbIucl64kBqQdmyXhywjy3szq8VjZ4w7g4xkKPXWjI8S7OXk9/exec'; // Ej: https://script.google.com/macros/s/XXXX/exec
-        const APP_TOKEN = '446c0599e6fed1bd0408d31e746e727a31829fdedf957972';
-        let currentUser = null;
-        let saveTimer = null;
-        let userState = null;
-
-        function defaultState() {
-            return {
-                prospectos: [],
-                checklist: [false, false, false, false, false, false],
-                evaluacion: [false, false, false, false, false],
-                diaActual: 1
-            };
-        }
-
-        async function callBackend(payload) {
-            if (!APP_SCRIPT_URL) return null;
-            try {
-                const res = await fetch(APP_SCRIPT_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(Object.assign({ token: APP_TOKEN }, payload))
-                });
-                return await res.json();
-            } catch (e) {
-                return null;
-            }
-        }
-
-        async function validateCredentials(username, password) {
-            const remote = await callBackend({ action: 'login', username, password });
-            return !!(remote && remote.success === true);
-        }
-
-        async function cargarDatosDesdeBackend(username) {
-            const remote = await callBackend({ action: 'loadState', username });
-            if (remote && remote.success && remote.state) return remote.state;
-            return null;
-        }
-
-        async function guardarDatosEnBackend(username, state) {
-            await callBackend({ action: 'saveState', username, state });
-        }
-
-        function collectUserState() {
-            return {
-                prospectos: prospectos || [],
-                checklist: obtenerDeStorage('checklist', defaultState().checklist),
-                evaluacion: obtenerDeStorage('evaluacion', defaultState().evaluacion),
-                diaActual: obtenerDeStorage('diaActual', defaultState().diaActual)
-            };
-        }
-
-        function scheduleBackendSync() {
-            if (!currentUser) return;
-            clearTimeout(saveTimer);
-            saveTimer = setTimeout(() => {
-                guardarDatosEnBackend(currentUser, collectUserState());
-            }, 400);
-        }
-
-        // ================== FUNCIONES GLOBALES ==================
-        function copiarTexto(btn) {
-            const parent = btn.closest('[data-script]');
-            if (parent) {
-                const texto = parent.getAttribute('data-script');
-                navigator.clipboard.writeText(texto).then(() => {
-                    btn.innerText = 'Copiado!';
-                    setTimeout(() => btn.innerText = 'Copiar', 1500);
-                }).catch(() => alert('Error al copiar, selecciona manual.'));
-            }
-        }
-
-        // ================== PERSISTENCIA GENERAL ==================
-        function guardarEnStorage(key, value) {
-            if (!currentUser) return;
-            if (!userState) userState = defaultState();
-            userState[key] = value;
-            scheduleBackendSync();
-        }
-
-        function obtenerDeStorage(key, defaultValue) {
-            if (!userState) return defaultValue;
-            return (typeof userState[key] === 'undefined') ? defaultValue : userState[key];
-        }
-
-        // ================== CRM AVANZADO ==================
-        let prospectos = [];
-
-        function sanitizar(texto) {
-            if (!texto) return '';
-            return texto.replace(/[&<>"]/g, function(m) {
-                if (m === '&') return '&amp;';
-                if (m === '<') return '&lt;';
-                if (m === '>') return '&gt;';
-                if (m === '"') return '&quot;';
-                return m;
-            });
-        }
-
-        function actualizarStatsResponsable() {
-            const stats = {};
-            prospectos.forEach(p => {
-                const resp = p.responsable || 'Sin asignar';
-                stats[resp] = (stats[resp] || 0) + 1;
-            });
-            const div = document.getElementById('statsResponsable');
-            div.innerHTML = '';
-            for (let [resp, count] of Object.entries(stats)) {
-                const span = document.createElement('span');
-                span.className = 'bg-white px-3 py-1 rounded-full shadow-sm';
-                span.textContent = `${resp}: ${count}`;
-                div.appendChild(span);
-            }
-        }
-
-        function actualizarFiltrosResponsable() {
-            const select = document.getElementById('filtroResponsable');
-            const responsables = [...new Set(prospectos.map(p => p.responsable || 'Sin asignar'))];
-            select.innerHTML = '<option value="">Todos los responsables</option>';
-            responsables.forEach(r => {
-                const opt = document.createElement('option');
-                opt.value = r;
-                opt.textContent = r;
-                select.appendChild(opt);
-            });
-        }
-
-        function ordenarProspectos(lista) {
-            const hoy = new Date().toISOString().split('T')[0];
-            return lista.sort((a, b) => {
-                if (a.etapa === 'Demo agendada' && b.etapa !== 'Demo agendada') return -1;
-                if (a.etapa !== 'Demo agendada' && b.etapa === 'Demo agendada') return 1;
-                const aVencido = a.proximoSeguimiento && a.proximoSeguimiento < hoy;
-                const bVencido = b.proximoSeguimiento && b.proximoSeguimiento < hoy;
-                if (aVencido && !bVencido) return -1;
-                if (!aVencido && bVencido) return 1;
-                const aHoy = a.proximoSeguimiento === hoy;
-                const bHoy = b.proximoSeguimiento === hoy;
-                if (aHoy && !bHoy) return -1;
-                if (!aHoy && bHoy) return 1;
-                if (a.semaforo === 'Verde' && b.semaforo !== 'Verde') return -1;
-                if (a.semaforo !== 'Verde' && b.semaforo === 'Verde') return 1;
-                return (b.ultimoContacto || 0) - (a.ultimoContacto || 0);
-            });
-        }
-
-        function renderCRM() {
-            const lista = document.getElementById('crmLista');
-            const busqueda = document.getElementById('buscarCRM').value.toLowerCase();
-            const filtroEtapa = document.getElementById('filtroEtapa').value;
-            const filtroSemaforo = document.getElementById('filtroSemaforo').value;
-            const filtroResponsable = document.getElementById('filtroResponsable').value;
-            const filtroCanal = document.getElementById('filtroCanal').value.toLowerCase();
-
-            let filtrados = prospectos.filter(p => {
-                return (p.nombre.toLowerCase().includes(busqueda) || p.giro.toLowerCase().includes(busqueda)) &&
-                       (filtroEtapa === '' || p.etapa === filtroEtapa) &&
-                       (filtroSemaforo === '' || p.semaforo === filtroSemaforo) &&
-                       (filtroResponsable === '' || (p.responsable || 'Sin asignar') === filtroResponsable) &&
-                       (filtroCanal === '' || (p.canal || '').toLowerCase().includes(filtroCanal)) &&
-                       !p.archivado;
-            });
-
-            filtrados = ordenarProspectos(filtrados);
-            const hoy = new Date().toISOString().split('T')[0];
-
-            if (filtrados.length === 0) {
-                lista.innerHTML = '<div class="p-4 text-center text-slate-400">Aún no hay prospectos registrados. ¡Agrega uno arriba!</div>';
-            } else {
-                lista.innerHTML = '';
-                filtrados.forEach((p, idx) => {
-                    const indexReal = prospectos.indexOf(p);
-                    const badge = p.proximoSeguimiento === hoy ? '<span class="badge-hoy ml-1">Hoy</span>' :
-                                 (p.proximoSeguimiento && p.proximoSeguimiento < hoy ? '<span class="badge-vencido ml-1">Vencido</span>' : '');
-                    const nombre = sanitizar(p.nombre);
-                    const giro = sanitizar(p.giro);
-                    const contacto = sanitizar(p.contacto);
-                    const responsable = sanitizar(p.responsable || '');
-                    const canal = sanitizar(p.canal || '');
-                    const proximo = sanitizar(p.proximoSeguimiento || '');
-                    const problema = sanitizar(p.problema || '');
-                    const objecion = sanitizar(p.objecion || '');
-                    const nivelInteres = sanitizar(p.nivelInteres || '');
-                    const horario = sanitizar(p.horario || '');
-                    const evidencia = sanitizar(p.evidencia || '');
-                    const notas = sanitizar(p.notas || '');
-                    const fechaAlta = sanitizar(p.fechaAlta || '');
-                    const fechaAct = sanitizar(p.fechaActualizacion || '');
-                    const mensajeIcon = p.mensajeEnviado ? '📤' : '⏳';
-                    const respondioIcon = p.respondio ? '💬' : '🔇';
-                    const demoIcon = p.demoAgendada ? '📅' : '';
-                    const cerradoIcon = p.cerrado ? '✅' : '';
-
-                    const div = document.createElement('div');
-                    div.className = 'p-3 border rounded flex flex-wrap justify-between items-center gap-2';
-                    div.innerHTML = `
-                        <div class="flex-1">
-                            <div><strong>${nombre}</strong> (${giro}) - ${contacto} - ${p.semaforo} - ${p.etapa} ${mensajeIcon} ${respondioIcon} ${demoIcon} ${cerradoIcon} ${badge}</div>
-                            <div class="text-xs text-slate-500">Resp: ${responsable} | Canal: ${canal} | Próx seg: ${proximo}</div>
-                            <div class="text-xs text-slate-500">Problema: ${problema} | Objeción: ${objecion} | Interés: ${nivelInteres} | Horario: ${horario}</div>
-                            <div class="text-xs text-slate-500">Notas: ${notas}</div>
-                            <div class="text-xs text-slate-500">Evidencia: ${evidencia}</div>
-                            <div class="text-xs text-slate-400">Creado: ${fechaAlta} | Últ. act: ${fechaAct}</div>
-                        </div>
-                        <div class="flex gap-2">
-                            <button class="bg-slate-700 text-white px-3 py-1 rounded text-xs" onclick="archivarProspecto(${indexReal})">Archivar</button>
-                        </div>
-                    `;
-                    lista.appendChild(div);
-                });
-            }
-            actualizarRankingPropio();
-            actualizarKPIsReales();
-            actualizarProgresoGlobal();
-            actualizarAlertasSeguimiento();
-            actualizarStatsResponsable();
-            actualizarFiltrosResponsable();
-        }
-
-        // Coherencia etapa-checkbox
-        document.getElementById('crmCerrado').addEventListener('change', function(e) {
-            if (this.checked) document.getElementById('crmEtapa').value = 'Cerrado';
-        });
-        document.getElementById('crmDemoAgendada').addEventListener('change', function(e) {
-            if (this.checked) document.getElementById('crmEtapa').value = 'Demo agendada';
-        });
-        document.getElementById('crmRespondio').addEventListener('change', function(e) {
-            if (this.checked && document.getElementById('crmEtapa').value === 'Nuevo') {
-                document.getElementById('crmEtapa').value = 'Respondió';
-            }
-        });
-        document.getElementById('crmMensajeEnviado').addEventListener('change', function(e) {
-            if (this.checked && document.getElementById('crmEtapa').value === 'Nuevo') {
-                document.getElementById('crmEtapa').value = 'Contactado';
-            }
-        });
-
-        window.editarProspecto = function(index) {
-            const p = prospectos[index];
-            document.getElementById('crmNombre').value = p.nombre || '';
-            document.getElementById('crmGiro').value = p.giro || '';
-            document.getElementById('crmContacto').value = p.contacto || '';
-            document.getElementById('crmResponsable').value = p.responsable || 'Yo';
-            document.getElementById('crmSemaforo').value = p.semaforo || 'Verde';
-            document.getElementById('crmEtapa').value = p.etapa || 'Nuevo';
-            document.getElementById('crmCanal').value = p.canal || '';
-            document.getElementById('crmProximoSeguimiento').value = p.proximoSeguimiento || '';
-            document.getElementById('crmNotas').value = p.notas || '';
-            document.getElementById('crmProblema').value = p.problema || '';
-            document.getElementById('crmObjecion').value = p.objecion || '';
-            document.getElementById('crmNivelInteres').value = p.nivelInteres || 'Medio';
-            document.getElementById('crmHorario').value = p.horario || '';
-            document.getElementById('crmMensajeEnviado').checked = p.mensajeEnviado || false;
-            document.getElementById('crmRespondio').checked = p.respondio || false;
-            document.getElementById('crmDemoAgendada').checked = p.demoAgendada || false;
-            document.getElementById('crmCerrado').checked = p.cerrado || false;
-            document.getElementById('crmEvidencia').value = p.evidencia || '';
-            document.getElementById('crmIndex').value = index;
-            document.getElementById('btnSubmitCRM').innerText = 'Actualizar prospecto';
-            document.getElementById('modoEdicion').classList.remove('hidden');
-            document.getElementById('editandoTexto').innerText = `Editando: ${p.nombre}`;
-        };
-
-        window.archivarProspecto = function(index) {
-            if (!prospectos[index]) return;
-            prospectos[index].archivado = true;
-            prospectos[index].etapa = 'Descartado';
-            prospectos[index].fechaActualizacion = new Date().toLocaleString();
-            guardarEnStorage('prospectos', prospectos);
-            renderCRM();
-        };
-
-        document.getElementById('crmForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const nombre = document.getElementById('crmNombre').value.trim();
-            const giro = document.getElementById('crmGiro').value.trim();
-            const contacto = document.getElementById('crmContacto').value.trim();
-            const responsable = document.getElementById('crmResponsable').value.trim();
-            const semaforo = document.getElementById('crmSemaforo').value;
-            const etapa = document.getElementById('crmEtapa').value;
-            const canal = document.getElementById('crmCanal').value;
-            const proximoSeguimiento = document.getElementById('crmProximoSeguimiento').value;
-            const notas = document.getElementById('crmNotas').value;
-            const problema = document.getElementById('crmProblema').value;
-            const objecion = document.getElementById('crmObjecion').value;
-            const nivelInteres = document.getElementById('crmNivelInteres').value;
-            const horario = document.getElementById('crmHorario').value;
-            const mensajeEnviado = document.getElementById('crmMensajeEnviado').checked;
-            const respondio = document.getElementById('crmRespondio').checked;
-            const demoAgendada = document.getElementById('crmDemoAgendada').checked;
-            const cerrado = document.getElementById('crmCerrado').checked;
-            const evidencia = document.getElementById('crmEvidencia').value;
-            const index = parseInt(document.getElementById('crmIndex').value);
-
-            // Validaciones
-            if (!nombre || !giro || !contacto) {
-                alert('Nombre, giro y contacto son obligatorios.');
-                return;
-            }
-            if (!/^\d{10}$/.test(contacto)) {
-                alert('WhatsApp debe tener 10 dígitos.');
-                return;
-            }
-            const existe = prospectos.find((p, i) => p.contacto === contacto && i !== index);
-            if (existe) {
-                alert('Ya existe un prospecto con ese WhatsApp.');
-                return;
-            }
-
-            const ahora = new Date().toLocaleString();
-            const timestamp = Date.now();
-            const nuevoProspecto = {
-                nombre, giro, contacto, responsable, semaforo, etapa, canal, proximoSeguimiento, notas,
-                problema, objecion, nivelInteres, horario,
-                mensajeEnviado, respondio, demoAgendada, cerrado,
-                evidencia,
-                fechaAlta: index === -1 ? ahora : prospectos[index].fechaAlta || ahora,
-                fechaActualizacion: ahora,
-                ultimoContacto: timestamp
-            };
-
-            if (index === -1) {
-                prospectos.push(nuevoProspecto);
-            } else {
-                prospectos[index] = nuevoProspecto;
-            }
-
-            guardarEnStorage('prospectos', prospectos);
-            renderCRM();
-            e.target.reset();
-            document.getElementById('crmIndex').value = '-1';
-            document.getElementById('btnSubmitCRM').innerText = 'Guardar prospecto';
-            document.getElementById('modoEdicion').classList.add('hidden');
-        });
-
-        document.getElementById('cancelarEdicion').addEventListener('click', () => {
-            document.getElementById('crmForm').reset();
-            document.getElementById('crmIndex').value = '-1';
-            document.getElementById('btnSubmitCRM').innerText = 'Guardar prospecto';
-            document.getElementById('modoEdicion').classList.add('hidden');
-        });
-
-        document.getElementById('buscarCRM').addEventListener('input', renderCRM);
-        document.getElementById('filtroEtapa').addEventListener('change', renderCRM);
-        document.getElementById('filtroSemaforo').addEventListener('change', renderCRM);
-        document.getElementById('filtroResponsable').addEventListener('change', renderCRM);
-        document.getElementById('filtroCanal').addEventListener('input', renderCRM);
-
-        // ================== CHECKLIST DIARIO (autoguardado) ==================
-        const checkboxes = document.querySelectorAll('.check-dia');
-        const miniChecks = [
-            document.getElementById('mini-chk1'),
-            document.getElementById('mini-chk2'),
-            document.getElementById('mini-chk3')
-        ].filter(Boolean);
-        let savedChecks = [];
-
-        function cargarChecklist() {
-            savedChecks = obtenerDeStorage('checklist', [false, false, false, false, false, false]);
-            checkboxes.forEach((cb, i) => { cb.checked = savedChecks[i] || false; });
-            syncMiniChecklist();
-        }
-
-        function syncMiniChecklist() {
-            miniChecks.forEach((mini, i) => {
-                mini.checked = checkboxes[i] ? checkboxes[i].checked : false;
-            });
-        }
-        cargarChecklist();
-
-        checkboxes.forEach((cb, i) => {
-            cb.addEventListener('change', () => {
-                const estados = Array.from(checkboxes).map(c => c.checked);
-                guardarEnStorage('checklist', estados);
-                syncMiniChecklist();
-                actualizarProgresoGlobal();
-            });
-        });
-
-        miniChecks.forEach((mini, i) => {
-            mini.addEventListener('change', () => {
-                if (!checkboxes[i]) return;
-                checkboxes[i].checked = mini.checked;
-                const estados = Array.from(checkboxes).map(c => c.checked);
-                guardarEnStorage('checklist', estados);
-                actualizarProgresoGlobal();
-            });
-        });
-
-        // ================== EVALUACIÓN (autoguardado) ==================
-        const evalItems = document.querySelectorAll('.eval-item');
-        let savedEval = [];
-
-        function cargarEvaluacion() {
-            savedEval = obtenerDeStorage('evaluacion', [false, false, false, false, false]);
-            evalItems.forEach((cb, i) => { cb.checked = savedEval[i] || false; });
-            actualizarPuntajeEval();
-        }
-        cargarEvaluacion();
-
-        function actualizarPuntajeEval() {
-            const checks = Array.from(evalItems).map(cb => cb.checked);
-            const puntaje = checks.filter(Boolean).length;
-            document.getElementById('puntajeEval').innerText = puntaje;
-            const estado = puntaje === 5 ? '✅ Aprobado' : puntaje >= 3 ? '⚠️ En proceso' : '❌ No aprobado';
-            document.getElementById('estadoEval').innerText = estado;
-        }
-
-        evalItems.forEach(cb => {
-            cb.addEventListener('change', () => {
-                const estados = Array.from(evalItems).map(c => c.checked);
-                guardarEnStorage('evaluacion', estados);
-                actualizarPuntajeEval();
-                actualizarProgresoGlobal();
-            });
-        });
-
-        // ================== PROGRESO GLOBAL ==================
-        function actualizarProgresoGlobal() {
-            const checklistPct = Array.from(checkboxes).filter(cb => cb.checked).length / checkboxes.length * 30;
-            const evalPct = Array.from(evalItems).filter(cb => cb.checked).length / evalItems.length * 30;
-            const prospectosPct = Math.min(prospectos.length / 10, 1) * 40; // máx 40% con 10+
-            const total = Math.round(checklistPct + evalPct + prospectosPct);
-            document.getElementById('progresoGlobal').style.width = total + '%';
-            document.getElementById('porcentajeProgreso').innerText = total + '%';
-            document.getElementById('leyendaProgreso').innerText = `30% checklist · 30% evaluación · 40% CRM (10+ pros)`;
-            const miniProgress = document.getElementById('miniProgress');
-            if (miniProgress) miniProgress.style.width = total + '%';
-        }
-
-        // ================== RANKING PROPIO ==================
-        function actualizarRankingPropio() {
-            const totalProspectos = prospectos.length;
-            const conversaciones = prospectos.filter(p => p.respondio).length;
-            const demos = prospectos.filter(p => p.demoAgendada).length;
-            const ventas = prospectos.filter(p => p.cerrado).length;
-            document.querySelector('#tuRanking td:nth-child(2)').innerText = totalProspectos;
-            document.querySelector('#tuRanking td:nth-child(3)').innerText = conversaciones;
-            document.querySelector('#tuRanking td:nth-child(4)').innerText = demos;
-            document.querySelector('#tuRanking td:nth-child(5)').innerText = ventas;
-        }
-
-        // ================== KPIs REALES ==================
-        function actualizarKPIsReales() {
-            const total = prospectos.length;
-            const mensajes = prospectos.filter(p => p.mensajeEnviado).length;
-            const respuestas = prospectos.filter(p => p.respondio).length;
-            const demos = prospectos.filter(p => p.demoAgendada).length;
-            const cerrados = prospectos.filter(p => p.cerrado).length;
-            document.getElementById('kpi1').innerText = total;
-            document.getElementById('kpi2').innerText = mensajes;
-            document.getElementById('kpi3').innerText = respuestas;
-            document.getElementById('kpi4').innerText = demos;
-            document.getElementById('kpi5').innerText = cerrados;
-        }
-
-        document.getElementById('actualizarKPIs').addEventListener('click', () => {
-            actualizarKPIsReales();
-        });
-
-        // ================== ALERTAS DE SEGUIMIENTO ==================
-        function actualizarAlertasSeguimiento() {
-            const hoy = new Date().toISOString().split('T')[0];
-            const vencidos = prospectos.filter(p => p.proximoSeguimiento && p.proximoSeguimiento < hoy && p.etapa !== 'Cerrado' && p.etapa !== 'Descartado').length;
-            const hoyMismo = prospectos.filter(p => p.proximoSeguimiento === hoy).length;
-            const demosHoy = prospectos.filter(p => p.etapa === 'Demo agendada' && p.proximoSeguimiento === hoy).length;
-            const alertaDiv = document.getElementById('alertasSeguimiento');
-            if (vencidos > 0 || hoyMismo > 0) {
-                alertaDiv.classList.remove('hidden');
-                alertaDiv.innerHTML = `🔔 Tienes ${hoyMismo} seguimiento(s) para hoy (${demosHoy} demas) y ${vencidos} vencido(s). ¡Revisa el CRM!`;
-            } else {
-                alertaDiv.classList.add('hidden');
-            }
-        }
-
-        // ================== PLAN POR DÍAS ==================
-        let diaActual = 1;
-        const actividades = [
-            "Leer guía + practicar mensaje 5 veces",
-            "Ejercicios de voz + grabarse 2 min",
-            "Buscar 30 prospectos",
-            "Enviar 20 mensajes",
-            "Seguimiento + roleplay",
-            "Revisar KPIs y afinar",
-            "Evaluación con el equipo"
-        ];
-        const objetivos = [
-            "Meta: leer y practicar",
-            "Meta: voz clara",
-            "Meta: 30 prospectos",
-            "Meta: 20 mensajes",
-            "Meta: seguimiento",
-            "Meta: revisar números",
-            "Meta: evaluación"
-        ];
-
-        function actualizarDiaHeader() {
-            document.getElementById('diaActual').innerText = diaActual;
-            document.getElementById('actividadDia').innerText = actividades[diaActual-1];
-            document.getElementById('objetivoDia').innerText = objetivos[diaActual-1];
-            document.getElementById('selectorDia').value = diaActual;
-        }
-
-        function cargarDia() {
-            diaActual = obtenerDeStorage('diaActual', 1);
-            actualizarDiaHeader();
-        }
-
-        cargarDia();
-
-        document.getElementById('marcarDiaCompletado').addEventListener('click', () => {
-            if (diaActual < 7) {
-                diaActual++;
-                guardarEnStorage('diaActual', diaActual);
-                actualizarDiaHeader();
-                alert('¡Día marcado! Sigue con el siguiente.');
-            } else {
-                alert('¡Felicidades, completaste los 7 días!');
-            }
-        });
-
-        document.getElementById('selectorDia').addEventListener('change', (e) => {
-            diaActual = parseInt(e.target.value);
-            guardarEnStorage('diaActual', diaActual);
-            actualizarDiaHeader();
-        });
-
-        // ================== SIDEBAR MÓVIL + MÓDULOS ==================
-        const menuToggle = document.getElementById('menuToggle');
-        const mobileMenu = document.getElementById('mobileMenu');
-        const desktopNavSource = document.querySelector('#sidebar-desktop nav');
-        const desktopNav = desktopNavSource ? desktopNavSource.cloneNode(true) : null;
-        if (mobileMenu && desktopNav) mobileMenu.innerHTML = desktopNav.innerHTML;
-
-        function setupModuleAccordions(container) {
-            container.querySelectorAll('.module').forEach(module => {
-                const toggle = module.querySelector('.module-toggle');
-                if (!toggle) return;
-                toggle.addEventListener('click', () => {
-                    module.classList.toggle('is-open');
-                });
-            });
-        }
-
-        if (desktopNavSource) setupModuleAccordions(desktopNavSource);
-        if (mobileMenu) setupModuleAccordions(mobileMenu);
-
-        if (menuToggle && mobileMenu) {
-            menuToggle.addEventListener('click', () => {
-                mobileMenu.classList.toggle('open');
-            });
-        }
-
-        // ================== TABS PRINCIPALES ==================
-        const TAB_SECTIONS = {
-            entrenamiento: ['ruta', 'calificacion', 'seguimiento', 'objeciones', 'guiones-giro', 'kpis', 'disciplina', 'casos', 'rol', 'plan-dias'],
-            operacion: ['crm', 'comisiones', 'ranking', 'evaluacion', 'psicologia', 'errores', 'frases-prohibidas', 'roleplay', 'crecimiento', 'post-demo', 'handoff', 'herramientas', 'inicio-rapido', 'preguntas-frecuentes', 'scripts', 'comunicado-equipo'],
-            progreso: ['dashboard-inicio', 'checklist', 'mi-semana']
-        };
-        const tabButtons = document.querySelectorAll('[data-tab-target]');
-        const allTabSectionIds = Array.from(new Set(Object.values(TAB_SECTIONS).flat()));
-
-        function prepareSectionAccordions() {
-            allTabSectionIds.forEach((id) => {
-                const section = document.getElementById(id);
-                if (!section || section.dataset.prepared === '1') return;
-                if (section.children.length < 2) {
-                    section.dataset.prepared = '1';
-                    return;
-                }
-                const head = section.firstElementChild;
-                const body = document.createElement('div');
-                body.className = 'section-body';
-                while (section.children.length > 1) {
-                    body.appendChild(section.children[1]);
-                }
-                section.appendChild(body);
-                head.classList.add('section-head-toggle');
-                head.addEventListener('click', () => section.classList.toggle('section-collapsed'));
-                section.dataset.prepared = '1';
-            });
-        }
-
-        function expandFirstVisible(tabName) {
-            const ids = TAB_SECTIONS[tabName] || [];
-            let firstOpen = false;
-            ids.forEach((id) => {
-                const section = document.getElementById(id);
-                if (!section) return;
-                if (!firstOpen) {
-                    section.classList.remove('section-collapsed');
-                    firstOpen = true;
-                } else {
-                    section.classList.add('section-collapsed');
-                }
-            });
-        }
-
-        function setActiveTab(tabName) {
-            allTabSectionIds.forEach((id) => {
-                const section = document.getElementById(id);
-                if (!section) return;
-                section.classList.toggle('tab-hidden', !(TAB_SECTIONS[tabName] || []).includes(id));
-            });
-            tabButtons.forEach((btn) => {
-                btn.classList.toggle('is-active', btn.dataset.tabTarget === tabName);
-            });
-            expandFirstVisible(tabName);
-        }
-
-        tabButtons.forEach((btn) => {
-            btn.addEventListener('click', () => setActiveTab(btn.dataset.tabTarget));
-        });
-
-        function tabForSection(id) {
-            return Object.keys(TAB_SECTIONS).find((tab) => TAB_SECTIONS[tab].includes(id));
-        }
-
-        // Etiquetas simples + iconos para escaneo rápido
-        function decorateSectionTitles() {
-            const titleIcons = {
-                ruta: '🧭', calificacion: '🚦', seguimiento: '🔁', objeciones: '🗣️',
-                'guiones-giro': '📝', kpis: '📊', disciplina: '⚖️', casos: '📂',
-                rol: '🎯', 'plan-dias': '📅', crm: '🗃️', comisiones: '💰',
-                ranking: '🏆', evaluacion: '✅', psicologia: '🧠', errores: '❌',
-                'frases-prohibidas': '🚫', roleplay: '🎭', crecimiento: '📈',
-                'post-demo': '📞', handoff: '🤝', herramientas: '🛠️',
-                'inicio-rapido': '⚡', checklist: '📋', 'preguntas-frecuentes': '❓',
-                scripts: '📜', 'comunicado-equipo': '📣', 'mi-semana': '⭐'
-            };
-            Object.keys(titleIcons).forEach((id) => {
-                const section = document.getElementById(id);
-                if (!section) return;
-                const h2 = section.querySelector('h2');
-                if (!h2 || h2.dataset.iconified === '1') return;
-                h2.textContent = `${titleIcons[id]} ${h2.textContent}`;
-                h2.dataset.iconified = '1';
-            });
-        }
-
-        document.querySelectorAll('a[href^="#"]').forEach((link) => {
-            link.addEventListener('click', () => {
-                const targetId = (link.getAttribute('href') || '').replace('#', '');
-                const tab = tabForSection(targetId);
-                if (tab) setActiveTab(tab);
-            });
-        });
-
-        prepareSectionAccordions();
-        decorateSectionTitles();
-        setActiveTab('progreso');
-
-        // ================== INTERSECTION OBSERVER (desktop y móvil) ==================
-        const sections = document.querySelectorAll('.active-section');
-        const sidebarLinks = document.querySelectorAll('.sidebar-link');
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const id = entry.target.getAttribute('id');
-                    sidebarLinks.forEach(link => {
-                        link.classList.remove('active');
-                        if (link.getAttribute('href') === `#${id}`) {
-                            link.classList.add('active');
-                        }
-                    });
-                }
-            });
-        }, { threshold: 0.3, rootMargin: '-100px 0px -100px 0px' });
-        sections.forEach(s => observer.observe(s));
-
-        // ================== LOGIN / LOGOUT ==================
-        function setAppVisible(visible) {
-            document.getElementById('mainHeader').style.display = visible ? '' : 'none';
-            document.getElementById('sidebar-mobile').style.display = visible ? '' : 'none';
-            document.getElementById('appShell').style.display = visible ? 'flex' : 'none';
-            document.getElementById('mobileBottomNav').style.display = visible ? '' : 'none';
-            document.getElementById('mainFooter').style.display = visible ? '' : 'none';
-        }
-
-        async function hydrateUserState() {
-            const remoteState = await cargarDatosDesdeBackend(currentUser);
-            userState = Object.assign(defaultState(), remoteState || {});
-            prospectos = Array.isArray(userState.prospectos) ? userState.prospectos : [];
-            cargarChecklist();
-            cargarEvaluacion();
-            cargarDia();
-        }
-
-        async function doLogin() {
-            const username = (document.getElementById('loginUsername').value || '').trim();
-            const password = (document.getElementById('loginPassword').value || '').trim();
-            const loginError = document.getElementById('loginError');
-            const ok = await validateCredentials(username, password);
-            if (!ok) {
-                loginError.classList.remove('hidden');
-                loginError.innerText = 'Usuario o contraseña incorrectos.';
-                return;
-            }
-
-            currentUser = username;
-            loginError.classList.add('hidden');
-            document.getElementById('loggedUserDisplay').innerText = `👤 ${currentUser}`;
-            document.getElementById('loginModal').classList.add('hidden');
-            setAppVisible(true);
-
-            await hydrateUserState();
-            renderCRM();
-            actualizarProgresoGlobal();
-            actualizarKPIsReales();
-            actualizarAlertasSeguimiento();
-            setActiveTab('progreso');
-        }
-
-        document.getElementById('loginBtn').addEventListener('click', doLogin);
-        document.getElementById('loginPassword').addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') doLogin();
-        });
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            currentUser = null;
-            userState = null;
-            setAppVisible(false);
-            document.getElementById('loginUsername').value = '';
-            document.getElementById('loginPassword').value = '';
-            document.getElementById('loggedUserDisplay').innerText = '';
-            document.getElementById('loginModal').classList.remove('hidden');
-        });
-
-        // Limpieza defensiva: elimina cualquier botón viejo "Entendido, ir a ..."
-        document.querySelectorAll('a,button').forEach((el) => {
-            const txt = (el.textContent || '').trim();
-            if (txt.startsWith('Entendido, ir a')) {
-                el.remove();
-            }
-        });
-
-        // Estado inicial
-        setAppVisible(false);
-    </script>
+    <div id="pauseOverlay" class="hidden fixed inset-0 bg-slate-900/80 z-[9998] p-4">
+        <div class="max-w-xl mx-auto mt-24 bg-white rounded-2xl p-6">
+            <h3 class="text-xl font-extrabold text-slate-900">Acceso pausado por KPI de supervivencia</h3>
+            <p class="text-sm text-slate-600 mt-2">En las primeras 48 horas debías registrar al menos 5 prospectos. Tu acceso está pausado hasta validación del administrador.</p>
+            <p class="text-sm text-slate-600 mt-2">Contacta a tu líder para reactivar tu cuenta.</p>
+        </div>
+    </div>
+
+    <script src="JS/guida de capacitacion.js"></script>
 </body>
 </html>
