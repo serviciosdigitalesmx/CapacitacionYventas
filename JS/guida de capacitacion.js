@@ -1,7 +1,7 @@
 
         // ================== AUTH + BACKEND ==================
         const APP_SCRIPT_URL = ''; // Ej: https://script.google.com/macros/s/XXXX/exec
-        const APP_TOKEN = '';
+        const APP_TOKEN = '446c0599e6fed1bd0408d31e746e727a31829fdedf957972';
         const FALLBACK_USERS = [
             { username: 'freelancer1', password: 'pass1' }, { username: 'freelancer2', password: 'pass2' },
             { username: 'freelancer3', password: 'pass3' }, { username: 'freelancer4', password: 'pass4' },

@@ -16,7 +16,7 @@
 // =========================
 // Configuración
 // =========================
-const TOKEN = 'MI_TOKEN_SECRETO'; // Debe coincidir con APP_TOKEN en frontend
+const TOKEN = '446c0599e6fed1bd0408d31e746e727a31829fdedf957972'; // Debe coincidir con APP_TOKEN en frontend
 const APP_NAME = 'Backend Protocolo Operacion';
 const DEFAULT_SPREADSHEET_ID = ''; // Opcional. Si está vacío se crea automáticamente.
 
