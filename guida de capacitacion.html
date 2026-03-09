@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bootcamp de Prospección · Servicios Digitales MX</title>
+    <title>Protocolo de Operación · Servicios Digitales MX</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -26,6 +26,13 @@
         #sidebar-mobile { display: none; }
         .badge-vencido { background-color: #fee2e2; color: #b91c1c; font-size: 0.6rem; padding: 2px 6px; border-radius: 999px; }
         .badge-hoy { background-color: #fef3c7; color: #92400e; font-size: 0.6rem; padding: 2px 6px; border-radius: 999px; }
+        .module-toggle { width: 100%; display: flex; justify-content: space-between; align-items: center; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 0.65rem 0.8rem; font-size: 0.82rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; color: #334155; }
+        .module-content { display: none; padding: 0.35rem 0 0.7rem 0.35rem; border-left: 2px solid #c7d2fe; margin: 0.4rem 0 0.2rem 0.45rem; }
+        .module.is-open .module-content { display: block; }
+        .module.is-open .module-arrow { transform: rotate(180deg); }
+        .module-arrow { transition: transform 0.2s; }
+        .next-topic-btn { display: inline-flex; margin-top: 1rem; background: #4f46e5; color: #ffffff; font-size: 0.78rem; font-weight: 700; padding: 0.55rem 0.85rem; border-radius: 0.65rem; text-decoration: none; }
+        .next-topic-btn:hover { background: #4338ca; }
         @media (max-width: 1024px) {
             #sidebar-desktop { display: none; }
             #sidebar-mobile { display: block; position: sticky; top: 80px; z-index: 40; }
@@ -47,13 +54,13 @@
                     <span class="font-extrabold text-slate-800 tracking-tight text-lg">Servicios Digitales MX</span>
                 </div>
                 <div class="flex items-center gap-4">
-                    <span class="hidden md:block text-slate-400 text-sm font-medium">Bootcamp v6.0 · Profesional</span>
+                    <span class="hidden md:block text-slate-400 text-sm font-medium">Protocolo de Operación · v7</span>
                     <div class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold uppercase">Modo Bestia</div>
                 </div>
             </div>
             <!-- Mensaje de bienvenida -->
             <div class="mt-2 bg-indigo-100 p-3 rounded-xl text-indigo-900 text-sm font-medium">
-                🚀 Bienvenido al bootcamp. En 7 días pasarás de cero a máquina de prospección. Sigue el plan día a día y registra todo.
+                🚀 Protocolo de operación activo. Avanza por módulos y registra todo en CRM desde el primer día.
             </div>
             <!-- Barra de progreso dinámica -->
             <div class="mt-3 flex items-center gap-3">
@@ -96,38 +103,79 @@
         <!-- Sidebar desktop -->
         <aside class="lg:w-1/4 hidden lg:block sticky top-32 h-fit max-h-[calc(100vh-140px)] overflow-y-auto pr-2" id="sidebar-desktop">
             <nav class="space-y-1">
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 px-4">⚙️ RUTA COMPLETA</p>
-                <a href="#ruta" class="sidebar-link block px-4 py-2 rounded-r-xl text-sm font-medium">1. Ruta operativa</a>
-                <a href="#calificacion" class="sidebar-link block px-4 py-2 rounded-r-xl text-sm font-medium">2. Calificación (semáforo)</a>
-                <a href="#seguimiento" class="sidebar-link block px-4 py-2 rounded-r-xl text-sm font-medium">3. Seguimiento</a>
-                <a href="#objeciones" class="sidebar-link block px-4 py-2 rounded-r-xl text-sm font-medium">4. 10 objeciones</a>
-                <a href="#guiones-giro" class="sidebar-link block px-4 py-2 rounded-r-xl text-sm font-medium">5. Guiones por giro</a>
-                <a href="#kpis" class="sidebar-link block px-4 py-2 rounded-r-xl text-sm font-medium">6. KPIs y tablero</a>
-                <a href="#disciplina" class="sidebar-link block px-4 py-2 rounded-r-xl text-sm font-medium">7. Disciplina</a>
-                <a href="#casos" class="sidebar-link block px-4 py-2 rounded-r-xl text-sm font-medium">8. Casos reales</a>
-                <a href="#rol" class="sidebar-link block px-4 py-2 rounded-r-xl text-sm font-medium">9. Rol exacto</a>
-                <a href="#plan-dias" class="sidebar-link block px-4 py-2 rounded-r-xl text-sm font-medium">10. Plan día a día</a>
-                <a href="#crm" class="sidebar-link block px-4 py-2 rounded-r-xl text-sm font-medium">11. CRM avanzado</a>
-                <a href="#comisiones" class="sidebar-link block px-4 py-2 rounded-r-xl text-sm font-medium">12. Comisiones</a>
-                <a href="#ranking" class="sidebar-link block px-4 py-2 rounded-r-xl text-sm font-medium">13. Ranking semanal</a>
-                <a href="#evaluacion" class="sidebar-link block px-4 py-2 rounded-r-xl text-sm font-medium">14. Evaluación</a>
-                <a href="#psicologia" class="sidebar-link block px-4 py-2 rounded-r-xl text-sm font-medium">15. Psicología</a>
-                <a href="#errores" class="sidebar-link block px-4 py-2 rounded-r-xl text-sm font-medium">16. Errores comunes</a>
-                <a href="#frases-prohibidas" class="sidebar-link block px-4 py-2 rounded-r-xl text-sm font-medium">17. Frases prohibidas</a>
-                <a href="#roleplay" class="sidebar-link block px-4 py-2 rounded-r-xl text-sm font-medium">18. Roleplay</a>
-                <a href="#crecimiento" class="sidebar-link block px-4 py-2 rounded-r-xl text-sm font-medium">19. Crecimiento</a>
-                <a href="#post-demo" class="sidebar-link block px-4 py-2 rounded-r-xl text-sm font-medium">20. Flujo post-demo</a>
-                <a href="#handoff" class="sidebar-link block px-4 py-2 rounded-r-xl text-sm font-medium">21. Handoff comercial</a>
-                <a href="#herramientas" class="sidebar-link block px-4 py-2 rounded-r-xl text-sm font-medium">22. Herramientas</a>
-                <a href="#inicio-rapido" class="sidebar-link block px-4 py-2 rounded-r-xl text-sm font-medium">⚡ Inicio rápido</a>
-                <a href="#checklist" class="sidebar-link block px-4 py-2 rounded-r-xl text-sm font-medium">📋 Checklist</a>
-                <a href="#preguntas-frecuentes" class="sidebar-link block px-4 py-2 rounded-r-xl text-sm font-medium">❓ FAQ</a>
-                <a href="#scripts" class="sidebar-link block px-4 py-2 rounded-r-xl text-sm font-medium">📋 Scripts copiables</a>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 px-2">📚 Protocolo por módulos</p>
+                <a href="#dashboard-inicio" class="sidebar-link block px-4 py-2 rounded-r-xl text-sm font-medium">⚡ Dashboard de inicio</a>
+
+                <div class="module is-open">
+                    <button class="module-toggle" type="button">Módulo 1: Fundamentos <span class="module-arrow">▾</span></button>
+                    <div class="module-content space-y-1">
+                        <a href="#rol" class="sidebar-link block px-3 py-2 rounded-r-xl text-sm font-medium">9. Rol exacto</a>
+                        <a href="#psicologia" class="sidebar-link block px-3 py-2 rounded-r-xl text-sm font-medium">15. Psicología</a>
+                        <a href="#herramientas" class="sidebar-link block px-3 py-2 rounded-r-xl text-sm font-medium">22. Herramientas</a>
+                        <a href="#frases-prohibidas" class="sidebar-link block px-3 py-2 rounded-r-xl text-sm font-medium">17. Frases prohibidas</a>
+                    </div>
+                </div>
+
+                <div class="module">
+                    <button class="module-toggle" type="button">Módulo 2: Metodología <span class="module-arrow">▾</span></button>
+                    <div class="module-content space-y-1">
+                        <a href="#ruta" class="sidebar-link block px-3 py-2 rounded-r-xl text-sm font-medium">1. Ruta operativa</a>
+                        <a href="#calificacion" class="sidebar-link block px-3 py-2 rounded-r-xl text-sm font-medium">2. Calificación</a>
+                        <a href="#guiones-giro" class="sidebar-link block px-3 py-2 rounded-r-xl text-sm font-medium">5. Guiones por giro</a>
+                        <a href="#objeciones" class="sidebar-link block px-3 py-2 rounded-r-xl text-sm font-medium">4. Objeciones</a>
+                        <a href="#seguimiento" class="sidebar-link block px-3 py-2 rounded-r-xl text-sm font-medium">3. Seguimiento</a>
+                    </div>
+                </div>
+
+                <div class="module">
+                    <button class="module-toggle" type="button">Módulo 3: Operación <span class="module-arrow">▾</span></button>
+                    <div class="module-content space-y-1">
+                        <a href="#inicio-rapido" class="sidebar-link block px-3 py-2 rounded-r-xl text-sm font-medium">Inicio rápido</a>
+                        <a href="#plan-dias" class="sidebar-link block px-3 py-2 rounded-r-xl text-sm font-medium">10. Plan día a día</a>
+                        <a href="#crm" class="sidebar-link block px-3 py-2 rounded-r-xl text-sm font-medium">11. CRM avanzado</a>
+                        <a href="#kpis" class="sidebar-link block px-3 py-2 rounded-r-xl text-sm font-medium">6. KPIs y diagnóstico</a>
+                        <a href="#handoff" class="sidebar-link block px-3 py-2 rounded-r-xl text-sm font-medium">21. Handoff</a>
+                    </div>
+                </div>
+
+                <div class="module">
+                    <button class="module-toggle" type="button">Módulo 4: Resultados <span class="module-arrow">▾</span></button>
+                    <div class="module-content space-y-1">
+                        <a href="#comisiones" class="sidebar-link block px-3 py-2 rounded-r-xl text-sm font-medium">12. Comisiones</a>
+                        <a href="#ranking" class="sidebar-link block px-3 py-2 rounded-r-xl text-sm font-medium">13. Ranking semanal</a>
+                        <a href="#crecimiento" class="sidebar-link block px-3 py-2 rounded-r-xl text-sm font-medium">19. Niveles de crecimiento</a>
+                        <a href="#evaluacion" class="sidebar-link block px-3 py-2 rounded-r-xl text-sm font-medium">14. Evaluación</a>
+                    </div>
+                </div>
             </nav>
         </aside>
 
         <!-- Main Content -->
         <main class="lg:w-3/4 space-y-16 pb-20" id="mainContent">
+            <section id="dashboard-inicio" class="active-section space-y-4 bg-gradient-to-r from-indigo-50 to-blue-50 p-6 rounded-3xl border border-indigo-200">
+                <div class="flex items-center gap-4">
+                    <div class="step-number">▶</div>
+                    <h2 class="text-3xl font-extrabold text-slate-900">Protocolo de Operación: Servicios Digitales MX</h2>
+                </div>
+                <p class="text-slate-700">Empieza por este panel: define tu día, abre herramientas y arranca ejecución en CRM.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <a href="#inicio-rapido" class="bg-white border border-slate-200 rounded-2xl p-4 hover:border-indigo-400">
+                        <p class="text-xs text-indigo-600 font-bold uppercase">Paso 1</p>
+                        <p class="font-bold">Inicio rápido</p>
+                        <p class="text-xs text-slate-500 mt-1">Acciones de arranque para hoy.</p>
+                    </a>
+                    <a href="#plan-dias" class="bg-white border border-slate-200 rounded-2xl p-4 hover:border-indigo-400">
+                        <p class="text-xs text-indigo-600 font-bold uppercase">Paso 2</p>
+                        <p class="font-bold">Plan día a día</p>
+                        <p class="text-xs text-slate-500 mt-1">Ruta semanal con foco operativo.</p>
+                    </a>
+                    <a href="#crm" class="bg-white border border-slate-200 rounded-2xl p-4 hover:border-indigo-400">
+                        <p class="text-xs text-indigo-600 font-bold uppercase">Paso 3</p>
+                        <p class="font-bold">CRM avanzado</p>
+                        <p class="text-xs text-slate-500 mt-1">Registrar para medir y cobrar.</p>
+                    </a>
+                </div>
+            </section>
 
             <!-- ========== 1. RUTA OPERATIVA ========= -->
             <section id="ruta" class="active-section space-y-4">
@@ -529,7 +577,7 @@
             <section id="evaluacion" class="active-section space-y-4">
                 <div class="flex items-center gap-4">
                     <div class="step-number">14</div>
-                    <h2 class="text-3xl font-extrabold text-slate-900">Evaluación del Bootcamp</h2>
+                    <h2 class="text-3xl font-extrabold text-slate-900">Evaluación del Protocolo</h2>
                 </div>
                 <div class="bg-white p-6 rounded-3xl border border-slate-200">
                     <p class="font-semibold mb-3">Marca lo que ya dominas (se guarda automáticamente):</p>
@@ -801,7 +849,7 @@
     <!-- Footer -->
     <footer class="bg-white border-t border-slate-200 py-8">
         <div class="max-w-7xl mx-auto px-4 text-center">
-            <p class="text-slate-400 text-xs font-bold uppercase tracking-widest italic mb-2">Servicios Digitales MX · Bootcamp v6.0</p>
+            <p class="text-slate-400 text-xs font-bold uppercase tracking-widest italic mb-2">Servicios Digitales MX · Protocolo de Operación v7</p>
             <p class="text-slate-300 text-[10px]">Sistema de entrenamiento persistente y operativo. Todos los datos se guardan localmente. Para uso en equipo, el siguiente paso natural es sincronizar con Google Sheets / Firebase.</p>
         </div>
     </footer>
@@ -1310,34 +1358,79 @@
             }
         });
 
-        // ================== SIDEBAR MÓVIL ==================
+        // ================== SIDEBAR MÓVIL + MÓDULOS ==================
         const menuToggle = document.getElementById('menuToggle');
         const mobileMenu = document.getElementById('mobileMenu');
         const desktopNav = document.querySelector('#sidebar-desktop nav').cloneNode(true);
-        // Asegurar que los enlaces tengan la clase sidebar-link
-        desktopNav.querySelectorAll('a').forEach(a => a.classList.add('sidebar-link'));
         mobileMenu.innerHTML = desktopNav.innerHTML;
+
+        function setupModuleAccordions(container) {
+            container.querySelectorAll('.module').forEach(module => {
+                const toggle = module.querySelector('.module-toggle');
+                if (!toggle) return;
+                toggle.addEventListener('click', () => {
+                    module.classList.toggle('is-open');
+                });
+            });
+        }
+
+        setupModuleAccordions(document.querySelector('#sidebar-desktop nav'));
+        setupModuleAccordions(mobileMenu);
 
         menuToggle.addEventListener('click', () => {
             mobileMenu.classList.toggle('open');
         });
 
-        // ================== INTERSECTION OBSERVER (actualiza también en móvil) ==================
+        // ================== BOTONES "SIGUIENTE TEMA" ==================
+        const flowOrder = [
+            'dashboard-inicio', 'rol', 'psicologia', 'herramientas', 'frases-prohibidas',
+            'ruta', 'calificacion', 'guiones-giro', 'objeciones', 'seguimiento',
+            'inicio-rapido', 'plan-dias', 'crm', 'kpis', 'handoff',
+            'comisiones', 'ranking', 'crecimiento', 'evaluacion'
+        ];
+        const sectionTitleMap = {
+            'rol': 'Rol exacto',
+            'psicologia': 'Psicología',
+            'herramientas': 'Herramientas',
+            'frases-prohibidas': 'Frases prohibidas',
+            'ruta': 'Ruta operativa',
+            'calificacion': 'Calificación',
+            'guiones-giro': 'Guiones por giro',
+            'objeciones': 'Objeciones',
+            'seguimiento': 'Seguimiento',
+            'inicio-rapido': 'Inicio rápido',
+            'plan-dias': 'Plan día a día',
+            'crm': 'CRM avanzado',
+            'kpis': 'KPIs y diagnóstico',
+            'handoff': 'Handoff',
+            'comisiones': 'Comisiones',
+            'ranking': 'Ranking semanal',
+            'crecimiento': 'Niveles de crecimiento',
+            'evaluacion': 'Evaluación final'
+        };
+
+        flowOrder.forEach((id, idx) => {
+            const current = document.getElementById(id);
+            const nextId = flowOrder[idx + 1];
+            const next = nextId ? document.getElementById(nextId) : null;
+            if (!current || !next) return;
+
+            const btn = document.createElement('a');
+            btn.href = `#${nextId}`;
+            btn.className = 'next-topic-btn';
+            btn.innerText = `Entendido, ir a ${sectionTitleMap[nextId] || 'siguiente tema'}`;
+            current.appendChild(btn);
+        });
+
+        // ================== INTERSECTION OBSERVER (desktop y móvil) ==================
         const sections = document.querySelectorAll('.active-section');
         const sidebarLinks = document.querySelectorAll('.sidebar-link');
-        const mobileLinks = mobileMenu.querySelectorAll('.sidebar-link');
 
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     const id = entry.target.getAttribute('id');
                     sidebarLinks.forEach(link => {
-                        link.classList.remove('active');
-                        if (link.getAttribute('href') === `#${id}`) {
-                            link.classList.add('active');
-                        }
-                    });
-                    mobileLinks.forEach(link => {
                         link.classList.remove('active');
                         if (link.getAttribute('href') === `#${id}`) {
                             link.classList.add('active');

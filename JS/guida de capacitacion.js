@@ -502,34 +502,79 @@
             }
         });
 
-        // ================== SIDEBAR MÓVIL ==================
+        // ================== SIDEBAR MÓVIL + MÓDULOS ==================
         const menuToggle = document.getElementById('menuToggle');
         const mobileMenu = document.getElementById('mobileMenu');
         const desktopNav = document.querySelector('#sidebar-desktop nav').cloneNode(true);
-        // Asegurar que los enlaces tengan la clase sidebar-link
-        desktopNav.querySelectorAll('a').forEach(a => a.classList.add('sidebar-link'));
         mobileMenu.innerHTML = desktopNav.innerHTML;
+
+        function setupModuleAccordions(container) {
+            container.querySelectorAll('.module').forEach(module => {
+                const toggle = module.querySelector('.module-toggle');
+                if (!toggle) return;
+                toggle.addEventListener('click', () => {
+                    module.classList.toggle('is-open');
+                });
+            });
+        }
+
+        setupModuleAccordions(document.querySelector('#sidebar-desktop nav'));
+        setupModuleAccordions(mobileMenu);
 
         menuToggle.addEventListener('click', () => {
             mobileMenu.classList.toggle('open');
         });
 
-        // ================== INTERSECTION OBSERVER (actualiza también en móvil) ==================
+        // ================== BOTONES "SIGUIENTE TEMA" ==================
+        const flowOrder = [
+            'dashboard-inicio', 'rol', 'psicologia', 'herramientas', 'frases-prohibidas',
+            'ruta', 'calificacion', 'guiones-giro', 'objeciones', 'seguimiento',
+            'inicio-rapido', 'plan-dias', 'crm', 'kpis', 'handoff',
+            'comisiones', 'ranking', 'crecimiento', 'evaluacion'
+        ];
+        const sectionTitleMap = {
+            'rol': 'Rol exacto',
+            'psicologia': 'Psicología',
+            'herramientas': 'Herramientas',
+            'frases-prohibidas': 'Frases prohibidas',
+            'ruta': 'Ruta operativa',
+            'calificacion': 'Calificación',
+            'guiones-giro': 'Guiones por giro',
+            'objeciones': 'Objeciones',
+            'seguimiento': 'Seguimiento',
+            'inicio-rapido': 'Inicio rápido',
+            'plan-dias': 'Plan día a día',
+            'crm': 'CRM avanzado',
+            'kpis': 'KPIs y diagnóstico',
+            'handoff': 'Handoff',
+            'comisiones': 'Comisiones',
+            'ranking': 'Ranking semanal',
+            'crecimiento': 'Niveles de crecimiento',
+            'evaluacion': 'Evaluación final'
+        };
+
+        flowOrder.forEach((id, idx) => {
+            const current = document.getElementById(id);
+            const nextId = flowOrder[idx + 1];
+            const next = nextId ? document.getElementById(nextId) : null;
+            if (!current || !next) return;
+
+            const btn = document.createElement('a');
+            btn.href = `#${nextId}`;
+            btn.className = 'next-topic-btn';
+            btn.innerText = `Entendido, ir a ${sectionTitleMap[nextId] || 'siguiente tema'}`;
+            current.appendChild(btn);
+        });
+
+        // ================== INTERSECTION OBSERVER (desktop y móvil) ==================
         const sections = document.querySelectorAll('.active-section');
         const sidebarLinks = document.querySelectorAll('.sidebar-link');
-        const mobileLinks = mobileMenu.querySelectorAll('.sidebar-link');
 
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     const id = entry.target.getAttribute('id');
                     sidebarLinks.forEach(link => {
-                        link.classList.remove('active');
-                        if (link.getAttribute('href') === `#${id}`) {
-                            link.classList.add('active');
-                        }
-                    });
-                    mobileLinks.forEach(link => {
                         link.classList.remove('active');
                         if (link.getAttribute('href') === `#${id}`) {
                             link.classList.add('active');
