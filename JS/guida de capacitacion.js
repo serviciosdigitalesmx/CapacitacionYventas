@@ -1204,8 +1204,40 @@ const SECTION_TO_MODULE = {
 };
 
 const TAB_SECTIONS = {
-    entrenamiento: ['ruta', 'calificacion', 'seguimiento', 'objeciones', 'battle-cards', 'guiones-giro', 'generador-guiones', 'kpis', 'disciplina', 'casos', 'rol', 'plan-dias'],
-    operacion: ['crm', 'comisiones', 'calculadora-comision', 'ranking', 'evaluacion', 'certificacion', 'psicologia', 'errores', 'frases-prohibidas', 'roleplay', 'crecimiento', 'post-demo', 'handoff', 'herramientas', 'inicio-rapido', 'preguntas-frecuentes', 'scripts', 'comunicado-equipo'],
+    entrenamiento: [
+        'rol',
+        'psicologia',
+        'herramientas',
+        'frases-prohibidas',
+        'ruta',
+        'calificacion',
+        'guiones-giro',
+        'generador-guiones',
+        'objeciones',
+        'battle-cards',
+        'seguimiento',
+        'inicio-rapido',
+        'plan-dias'
+    ],
+    operacion: [
+        'crm',
+        'kpis',
+        'handoff',
+        'certificacion',
+        'comisiones',
+        'calculadora-comision',
+        'ranking',
+        'crecimiento',
+        'evaluacion',
+        'post-demo',
+        'disciplina',
+        'casos',
+        'errores',
+        'roleplay',
+        'preguntas-frecuentes',
+        'scripts',
+        'comunicado-equipo'
+    ],
     progreso: ['dashboard-inicio', 'checklist', 'mi-semana']
 };
 
