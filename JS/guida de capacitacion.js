@@ -738,48 +738,6 @@
         decorateSectionTitles();
         setActiveTab('progreso');
 
-        // ================== BOTONES "SIGUIENTE TEMA" ==================
-        const flowOrder = [
-            'dashboard-inicio', 'rol', 'psicologia', 'herramientas', 'frases-prohibidas',
-            'ruta', 'calificacion', 'guiones-giro', 'objeciones', 'seguimiento',
-            'inicio-rapido', 'plan-dias', 'crm', 'kpis', 'handoff',
-            'comisiones', 'ranking', 'crecimiento', 'evaluacion', 'comunicado-equipo'
-        ];
-        const sectionTitleMap = {
-            'rol': 'Rol exacto',
-            'psicologia': 'Psicología',
-            'herramientas': 'Herramientas',
-            'frases-prohibidas': 'Frases prohibidas',
-            'ruta': 'Ruta operativa',
-            'calificacion': 'Calificación',
-            'guiones-giro': 'Guiones por giro',
-            'objeciones': 'Objeciones',
-            'seguimiento': 'Seguimiento',
-            'inicio-rapido': 'Inicio rápido',
-            'plan-dias': 'Plan día a día',
-            'crm': 'CRM avanzado',
-            'kpis': 'KPIs y diagnóstico',
-            'handoff': 'Handoff',
-            'comisiones': 'Comisiones',
-            'ranking': 'Ranking semanal',
-            'crecimiento': 'Niveles de crecimiento',
-            'evaluacion': 'Evaluación final',
-            'comunicado-equipo': 'comunicado al equipo'
-        };
-
-        flowOrder.forEach((id, idx) => {
-            const current = document.getElementById(id);
-            const nextId = flowOrder[idx + 1];
-            const next = nextId ? document.getElementById(nextId) : null;
-            if (!current || !next) return;
-
-            const btn = document.createElement('a');
-            btn.href = `#${nextId}`;
-            btn.className = 'next-topic-btn';
-            btn.innerText = `Entendido, ir a ${sectionTitleMap[nextId] || 'siguiente tema'}`;
-            current.appendChild(btn);
-        });
-
         // ================== INTERSECTION OBSERVER (desktop y móvil) ==================
         const sections = document.querySelectorAll('.active-section');
         const sidebarLinks = document.querySelectorAll('.sidebar-link');
