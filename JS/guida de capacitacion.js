@@ -473,7 +473,7 @@
         // ================== PLAN POR DÍAS ==================
         let diaActual = obtenerDeStorage('diaActual', 1);
         const actividades = [
-            "Leer manual + practicar speech 5 veces",
+            "Leer guía + practicar mensaje 5 veces",
             "Ejercicios de voz + grabarse 2 min",
             "Buscar 30 prospectos",
             "Enviar 20 mensajes",
@@ -482,13 +482,13 @@
             "Evaluación con el equipo"
         ];
         const objetivos = [
-            "Objetivo: leer y practicar",
-            "Objetivo: ejercicios de voz",
-            "Objetivo: 30 prospectos",
-            "Objetivo: 20 mensajes",
-            "Objetivo: seguimiento",
-            "Objetivo: revisar KPIs",
-            "Objetivo: evaluación"
+            "Meta: leer y practicar",
+            "Meta: voz clara",
+            "Meta: 30 prospectos",
+            "Meta: 20 mensajes",
+            "Meta: seguimiento",
+            "Meta: revisar números",
+            "Meta: evaluación"
         ];
 
         function actualizarDiaHeader() {
@@ -615,6 +615,28 @@
             return Object.keys(TAB_SECTIONS).find((tab) => TAB_SECTIONS[tab].includes(id));
         }
 
+        // Etiquetas simples + iconos para escaneo rápido
+        function decorateSectionTitles() {
+            const titleIcons = {
+                ruta: '🧭', calificacion: '🚦', seguimiento: '🔁', objeciones: '🗣️',
+                'guiones-giro': '📝', kpis: '📊', disciplina: '⚖️', casos: '📂',
+                rol: '🎯', 'plan-dias': '📅', crm: '🗃️', comisiones: '💰',
+                ranking: '🏆', evaluacion: '✅', psicologia: '🧠', errores: '❌',
+                'frases-prohibidas': '🚫', roleplay: '🎭', crecimiento: '📈',
+                'post-demo': '📞', handoff: '🤝', herramientas: '🛠️',
+                'inicio-rapido': '⚡', checklist: '📋', 'preguntas-frecuentes': '❓',
+                scripts: '📜', 'comunicado-equipo': '📣', 'mi-semana': '⭐'
+            };
+            Object.keys(titleIcons).forEach((id) => {
+                const section = document.getElementById(id);
+                if (!section) return;
+                const h2 = section.querySelector('h2');
+                if (!h2 || h2.dataset.iconified === '1') return;
+                h2.textContent = `${titleIcons[id]} ${h2.textContent}`;
+                h2.dataset.iconified = '1';
+            });
+        }
+
         document.querySelectorAll('a[href^="#"]').forEach((link) => {
             link.addEventListener('click', () => {
                 const targetId = (link.getAttribute('href') || '').replace('#', '');
@@ -624,6 +646,7 @@
         });
 
         prepareSectionAccordions();
+        decorateSectionTitles();
         setActiveTab('progreso');
 
         // ================== BOTONES "SIGUIENTE TEMA" ==================

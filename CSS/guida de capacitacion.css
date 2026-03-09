@@ -1,5 +1,9 @@
 
         body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        body.kid-mode { background: linear-gradient(180deg, #f8fbff 0%, #eef3ff 100%); }
+        body.kid-mode .active-section { margin-bottom: 1.6rem; }
+        body.kid-mode h2 { letter-spacing: -0.01em; }
+        body.kid-mode .section-body { margin-top: 0.45rem; }
         .step-number { background: #6366f1; color: white; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: bold; font-size: 14px; flex-shrink: 0; }
         .sidebar-link { transition: all 0.2s; }
         .sidebar-link:hover, .sidebar-link.active { background: #f1f5f9; border-left: 4px solid #6366f1; font-weight: 600; color: #1e293b; }
@@ -25,6 +29,8 @@
         .module-arrow { transition: transform 0.2s; }
         .next-topic-btn { display: inline-flex; margin-top: 1rem; background: #4f46e5; color: #ffffff; font-size: 0.78rem; font-weight: 700; padding: 0.55rem 0.85rem; border-radius: 0.65rem; text-decoration: none; }
         .next-topic-btn:hover { background: #4338ca; }
+        .kid-tip { background: #ecfeff; border: 1px solid #a5f3fc; border-radius: 1rem; padding: 0.7rem 0.9rem; font-size: 0.84rem; color: #0f766e; }
+        .kid-chip { display: inline-flex; align-items: center; gap: 0.35rem; border-radius: 999px; background: #ffffff; border: 1px solid #dbeafe; padding: 0.35rem 0.6rem; font-size: 0.72rem; font-weight: 700; color: #1e3a8a; }
         .tab-btn { padding: 0.55rem 0.9rem; border-radius: 9999px; border: 1px solid #e2e8f0; background: #ffffff; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #475569; }
         .tab-btn.is-active { background: #4f46e5; color: #ffffff; border-color: #4f46e5; }
         .tab-hidden { display: none !important; }
