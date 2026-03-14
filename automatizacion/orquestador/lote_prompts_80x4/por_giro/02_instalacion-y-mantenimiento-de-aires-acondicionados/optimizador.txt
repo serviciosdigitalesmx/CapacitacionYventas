@@ -1,0 +1,22 @@
+Optimiza esta plantilla para conversion, velocidad y UX movil para el giro instalacion y mantenimiento de aires acondicionados.
+
+Entrada actual:
+{{DEBUG_JSON}}
+
+Reglas:
+- Devuelve JSON valido con la misma estructura files.
+- Conserva los mismos nombres de archivo.
+- Mejorar claridad de CTA y tiempos de carga.
+- No agregues texto fuera del JSON.
+
+Formato estricto:
+{
+  "files": {
+    "index.html": "...",
+    "cotizador.html": "...",
+    "portal.html": "...",
+    "Code.gs": "...",
+    "config.json": "..."
+  },
+  "notes": "..."
+}

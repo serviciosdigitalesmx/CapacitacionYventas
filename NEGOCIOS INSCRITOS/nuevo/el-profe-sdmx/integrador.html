@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EL PROFE - Integrador Interno</title>
+    <style>
+        :root {
+            --bg: #1e1e1e;
+            --panel: #2b2b2b;
+            --text: #f2f2f2;
+            --muted: #8a8f95;
+            --blue: #1f7edc;
+            --orange: #ff6a2a;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+        .bar {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--blue);
+            background: #161616;
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+        .left { display: flex; align-items: center; gap: 8px; }
+        .logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: #fff;
+            padding: 4px;
+            object-fit: contain;
+        }
+        .title { font-weight: 700; letter-spacing: .3px; }
+        .tabs { display: flex; gap: 8px; }
+        .tab {
+            border: 1px solid var(--blue);
+            background: var(--panel);
+            color: var(--text);
+            padding: 8px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .tab.active {
+            background: var(--orange);
+            border-color: var(--orange);
+        }
+        .wrap { height: calc(100vh - 62px); }
+        .panel {
+            display: none;
+            height: 100%;
+        }
+        .panel.active {
+            display: block;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+            background: var(--bg);
+        }
+        .fallback {
+            padding: 8px 16px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+        .fallback a { color: var(--blue); }
+        .login-screen {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 10, 10, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            padding: 16px;
+        }
+        .login-card {
+            width: 100%;
+            max-width: 360px;
+            background: var(--panel);
+            border: 1px solid var(--blue);
+            border-radius: 14px;
+            padding: 22px;
+        }
+        .login-card h2 {
+            margin: 0 0 6px 0;
+            color: var(--blue);
+            font-size: 22px;
+        }
+        .login-card p {
+            margin: 0 0 14px 0;
+            color: var(--muted);
+            font-size: 13px;
+        }
+        .login-input {
+            width: 100%;
+            background: #1a1a1a;
+            border: 1px solid var(--blue);
+            color: var(--text);
+            border-radius: 10px;
+            padding: 12px;
+            outline: none;
+            margin-bottom: 10px;
+        }
+        .login-btn {
+            width: 100%;
+            border: 1px solid var(--orange);
+            background: var(--orange);
+            color: #fff;
+            font-weight: 700;
+            border-radius: 10px;
+            padding: 12px;
+            cursor: pointer;
+        }
+        .login-error {
+            color: #ef4444;
+            font-size: 13px;
+            min-height: 18px;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div id="login-screen" class="login-screen">
+        <div class="login-card">
+            <h2>Acceso interno</h2>
+            <p>Ingresa una sola vez para Operativo, Técnico y Solicitudes</p>
+            <input id="master-password" class="login-input" type="password" placeholder="Contraseña" autocomplete="current-password">
+            <button id="master-login-btn" class="login-btn" type="button">Entrar</button>
+            <div id="master-error" class="login-error"></div>
+        </div>
+    </div>
+
+    <header class="bar">
+        <div class="left">
+            <img src="./logo.webp" alt="EL PROFE" class="logo" onerror="this.src='./logo.png'">
+            <div class="title">EL PROFE Integrador Interno</div>
+        </div>
+        <nav class="tabs">
+            <button id="tab-operativo" class="tab" type="button">Operativo</button>
+            <button id="tab-tecnico" class="tab" type="button">Técnico</button>
+            <button id="tab-solicitudes" class="tab" type="button">Solicitudes</button>
+            <button id="tab-archivo" class="tab" type="button">Archivo</button>
+        </nav>
+    </header>
+    <div class="wrap">
+        <section id="panel-operativo" class="panel" aria-label="Módulo Operativo">
+            <iframe id="frame-operativo" title="Modulo Operativo" src="about:blank"></iframe>
+        </section>
+        <section id="panel-tecnico" class="panel" aria-label="Módulo Técnico">
+            <iframe id="frame-tecnico" title="Modulo Técnico" src="about:blank"></iframe>
+        </section>
+        <section id="panel-solicitudes" class="panel" aria-label="Módulo Solicitudes">
+            <iframe id="frame-solicitudes" title="Modulo Solicitudes" src="about:blank"></iframe>
+        </section>
+        <section id="panel-archivo" class="panel" aria-label="Módulo Archivo">
+            <iframe id="frame-archivo" title="Modulo Archivo" src="about:blank"></iframe>
+        </section>
+    </div>
+    <div class="fallback">
+        Si algo falla: <a href="./panel-operativo.html" target="_blank">Operativo</a> |
+        <a href="./panel-tecnico.html" target="_blank">Técnico</a> |
+        <a href="./panel-solicitudes.html" target="_blank">Solicitudes</a> |
+        <a href="./panel-archivo.html" target="_blank">Archivo</a>
+    </div>
+
+    <script>
+        const PANEL_OP = document.getElementById('panel-operativo');
+        const PANEL_TE = document.getElementById('panel-tecnico');
+        const PANEL_SO = document.getElementById('panel-solicitudes');
+        const PANEL_AR = document.getElementById('panel-archivo');
+        const BTN_OP = document.getElementById('tab-operativo');
+        const BTN_TE = document.getElementById('tab-tecnico');
+        const BTN_SO = document.getElementById('tab-solicitudes');
+        const BTN_AR = document.getElementById('tab-archivo');
+        const FRAME_OP = document.getElementById('frame-operativo');
+        const FRAME_TE = document.getElementById('frame-tecnico');
+        const FRAME_SO = document.getElementById('frame-solicitudes');
+        const FRAME_AR = document.getElementById('frame-archivo');
+        const LOGIN_SCREEN = document.getElementById('login-screen');
+        const MASTER_INPUT = document.getElementById('master-password');
+        const MASTER_BTN = document.getElementById('master-login-btn');
+        const MASTER_ERROR = document.getElementById('master-error');
+        const MASTER_PASS = 'Admin1';
+        const FRAME_SRC = {
+            operativo: './panel-operativo.html',
+            tecnico: './panel-tecnico.html',
+            solicitudes: './panel-solicitudes.html',
+            archivo: './panel-archivo.html'
+        };
+
+        function asegurarCargaIframe(modulo) {
+            if (modulo === 'operativo' && FRAME_OP.src === 'about:blank') {
+                FRAME_OP.src = FRAME_SRC.operativo;
+            }
+            if (modulo === 'tecnico' && FRAME_TE.src === 'about:blank') {
+                FRAME_TE.src = FRAME_SRC.tecnico;
+            }
+            if (modulo === 'solicitudes' && FRAME_SO.src === 'about:blank') {
+                FRAME_SO.src = FRAME_SRC.solicitudes;
+            }
+            if (modulo === 'archivo' && FRAME_AR.src === 'about:blank') {
+                FRAME_AR.src = FRAME_SRC.archivo;
+            }
+        }
+
+        function mostrarModulo(modulo) {
+            const actual = ['operativo', 'tecnico', 'solicitudes', 'archivo'].includes(modulo) ? modulo : 'operativo';
+            asegurarCargaIframe(actual);
+            PANEL_OP.classList.toggle('active', actual === 'operativo');
+            PANEL_TE.classList.toggle('active', actual === 'tecnico');
+            PANEL_SO.classList.toggle('active', actual === 'solicitudes');
+            PANEL_AR.classList.toggle('active', actual === 'archivo');
+            BTN_OP.classList.toggle('active', actual === 'operativo');
+            BTN_TE.classList.toggle('active', actual === 'tecnico');
+            BTN_SO.classList.toggle('active', actual === 'solicitudes');
+            BTN_AR.classList.toggle('active', actual === 'archivo');
+
+            const url = new URL(window.location.href);
+            url.searchParams.set('modulo', actual);
+            window.history.replaceState({}, '', url);
+        }
+
+        BTN_OP.addEventListener('click', () => mostrarModulo('operativo'));
+        BTN_TE.addEventListener('click', () => mostrarModulo('tecnico'));
+        BTN_SO.addEventListener('click', () => mostrarModulo('solicitudes'));
+        BTN_AR.addEventListener('click', () => mostrarModulo('archivo'));
+
+        function entrarIntegrador() {
+            sessionStorage.setItem('srfix_pass_master', MASTER_PASS);
+            sessionStorage.setItem('srfix_pass_operativo', MASTER_PASS);
+            sessionStorage.setItem('srfix_pass_tecnico', MASTER_PASS);
+            LOGIN_SCREEN.style.display = 'none';
+            const modulo = new URLSearchParams(window.location.search).get('modulo');
+            mostrarModulo(modulo || 'operativo');
+        }
+
+        function validarMaster() {
+            MASTER_ERROR.textContent = '';
+            const pass = (MASTER_INPUT.value || '').trim();
+            if (pass !== MASTER_PASS) {
+                MASTER_ERROR.textContent = 'Contraseña incorrecta';
+                return;
+            }
+            entrarIntegrador();
+        }
+
+        MASTER_BTN.addEventListener('click', validarMaster);
+        MASTER_INPUT.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') validarMaster();
+        });
+
+        if (sessionStorage.getItem('srfix_pass_master') === MASTER_PASS) {
+            entrarIntegrador();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "brand": "Demo Estado Entregado",
+  "city": "Monterrey, N.L.",
+  "whatsapp": "528112345678",
+  "backend_url": "https://script.google.com/macros/s/DEMO/exec",
+  "maps_url": "https://maps.app.goo.gl/DEMO",
+  "password_operativo": "",
+  "password_tecnico": "",
+  "color_primary": "#1F7EDC",
+  "color_accent": "#FF6A2A",
+  "modules": {},
+  "vertical": "tecnico",
+  "onboarding_status": "entregado",
+  "created_at": "2026-03-13T04:01:05.910588"
+}

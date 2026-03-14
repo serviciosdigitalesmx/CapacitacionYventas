@@ -1,0 +1,8 @@
+GIRO: redes y cableado
+SLUG: redes-y-cableado
+
+OBJETIVO:
+- Diseñar arquitectura de plantilla replicable para este giro.
+
+NOTAS:
+- Pega aqui la respuesta final optimizada de la IA para este giro.

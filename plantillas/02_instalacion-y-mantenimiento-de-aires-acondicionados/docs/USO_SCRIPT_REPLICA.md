@@ -1,0 +1,32 @@
+# Uso Rápido: Script de Réplica
+
+## 1) Editar variables
+Duplica `scripts/client-config.example.env` a `scripts/client-config.env` y cambia los valores.
+
+## 2) Ejecutar
+Desde la carpeta del proyecto:
+
+```bash
+source scripts/client-config.env
+bash scripts/create-client-copy.sh \
+  --source "$SOURCE" \
+  --target "$TARGET" \
+  --brand "$BRAND" \
+  --city "$CITY" \
+  --whatsapp "$WHATSAPP" \
+  --backend-url "$BACKEND_URL" \
+  --maps-url "$MAPS_URL" \
+  --vertical "${VERTICAL:-tecnico}" \
+  --color-primary "${COLOR_PRIMARY:-{{COLOR_PRIMARY}}}" \
+  --color-accent "${COLOR_ACCENT:-{{COLOR_ACCENT}}}"
+```
+
+## 3) Validar en la copia
+- `index.html`: marca y enlaces.
+- `portal-cliente.js`: backend/WhatsApp.
+- `panel-operativo.js`: backend/WhatsApp/PDF footer.
+- `panel-tecnico.js`: mensajes/footers.
+- `panel-solicitudes.js`: mensajes/footers.
+
+## Alcance actual
+Este script deja una copia funcional base para nuevo cliente y aplica perfil por vertical (`tecnico`, `abarrotes`, `barberia`, `academia`). No configura Apps Script ni DNS automáticamente; eso sigue manual con checklist.

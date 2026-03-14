@@ -1,0 +1,6 @@
+Pega aqui el resumen/manual insight de DeepSeek (o cualquier otra IA sin API).
+
+Ejemplo:
+- Priorizar flujo corto: landing -> cotizar -> folio -> portal.
+- Mantener maximo 5 campos obligatorios en formulario principal.
+- Incluir WhatsApp como CTA principal y estado por folio.

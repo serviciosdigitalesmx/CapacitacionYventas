@@ -1,0 +1,30 @@
+Genera una plantilla base para el giro destape y drenaje usando esta arquitectura:
+
+{{ARQUITECTURA_JSON}}
+
+Contexto adicional opcional (si existe):
+{{EXTERNAL_HINT}}
+
+Reglas:
+- Responde en JSON valido con estructura files.
+- Debes generar exactamente estos archivos:
+  - index.html
+  - cotizador.html
+  - portal.html
+  - Code.gs
+  - config.json
+- Usa variables de configuracion: BUSINESS_NAME, WHATSAPP, COLORS, SERVICES.
+- El HTML debe ser utilizable en movil y desktop.
+- No incluyas explicaciones fuera del JSON.
+
+Formato estricto:
+{
+  "files": {
+    "index.html": "...",
+    "cotizador.html": "...",
+    "portal.html": "...",
+    "Code.gs": "...",
+    "config.json": "..."
+  },
+  "notes": "..."
+}

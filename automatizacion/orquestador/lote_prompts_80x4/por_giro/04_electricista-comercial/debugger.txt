@@ -1,0 +1,27 @@
+Revisa y corrige esta plantilla para el giro electricista comercial.
+
+Entrada actual:
+{{CODIGO_JSON}}
+
+Busca y corrige:
+- errores funcionales
+- variables hardcodeadas
+- problemas de seguridad basicos
+- problemas de replicacion
+
+Reglas:
+- Devuelve JSON valido con la misma estructura files.
+- Conserva los mismos nombres de archivo.
+- No agregues texto fuera del JSON.
+
+Formato estricto:
+{
+  "files": {
+    "index.html": "...",
+    "cotizador.html": "...",
+    "portal.html": "...",
+    "Code.gs": "...",
+    "config.json": "..."
+  },
+  "notes": "..."
+}

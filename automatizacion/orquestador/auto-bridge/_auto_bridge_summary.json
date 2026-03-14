@@ -1,0 +1,12 @@
+{
+  "timestamp": "2026-03-13T04:36:49.529647",
+  "total": 1,
+  "ok": 0,
+  "failed": [
+    {
+      "giro": "floreria",
+      "error": "No encontre caja de texto visible tras 15019ms"
+    }
+  ],
+  "mode": "auto_triple_bridge_playwright"
+}

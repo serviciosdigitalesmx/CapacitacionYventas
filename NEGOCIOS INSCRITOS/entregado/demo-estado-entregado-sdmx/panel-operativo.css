@@ -1,0 +1,28 @@
+/* Operativo: estilos especificos del flujo por pasos */
+
+.step-active {
+  background-color: #1F7EDC;
+  color: #F2F2F2;
+}
+
+.step-completed {
+  background-color: #22c55e;
+  color: #F2F2F2;
+}
+
+.step-inactive {
+  background-color: #2B2B2B;
+  color: #8A8F95;
+  border: 1px solid #1F7EDC;
+}
+
+.input-srf.input-error,
+.input-tech.input-error {
+  border-color: #ef4444;
+}
+
+.error-message {
+  color: #ef4444;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}

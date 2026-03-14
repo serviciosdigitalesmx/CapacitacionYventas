@@ -1,0 +1,8 @@
+GIRO: agencia de viajes
+SLUG: agencia-de-viajes
+
+OBJETIVO:
+- Diseñar arquitectura de plantilla replicable para este giro.
+
+NOTAS:
+- Pega aqui la respuesta final optimizada de la IA para este giro.

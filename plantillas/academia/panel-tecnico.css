@@ -1,0 +1,71 @@
+/* Tecnico: estilos especificos del semaforo */
+
+@keyframes pulse-red {
+  0% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 12px rgba(239, 68, 68, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}
+
+.animate-pulse-red {
+  animation: pulse-red 2s infinite;
+}
+
+.card-rojo {
+  background: #2B2B2B;
+  border-left: 4px solid #ef4444;
+  border: 1px solid #1F7EDC;
+  box-shadow: 0 4px 12px rgba(31, 126, 220, 0.2);
+}
+
+.card-amarillo {
+  background: #2B2B2B;
+  border-left: 4px solid #eab308;
+  border: 1px solid #1F7EDC;
+  box-shadow: 0 4px 12px rgba(31, 126, 220, 0.2);
+}
+
+.card-verde {
+  background: #2B2B2B;
+  border-left: 4px solid #22c55e;
+  border: 1px solid #1F7EDC;
+  box-shadow: 0 4px 12px rgba(31, 126, 220, 0.2);
+}
+
+.badge-estado {
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge-recibido,
+.badge-diagnostico {
+  background-color: #1F7EDC20;
+  color: #1F7EDC;
+  border: 1px solid #1F7EDC;
+}
+
+.badge-reparacion,
+.badge-esperando {
+  background-color: #FF6A2A20;
+  color: #FF6A2A;
+  border: 1px solid #FF6A2A;
+}
+
+.badge-listo {
+  background-color: #22c55e20;
+  color: #22c55e;
+  border: 1px solid #22c55e;
+}
+
+.badge-entregado {
+  background-color: #8A8F9520;
+  color: #8A8F95;
+  border: 1px solid #8A8F95;
+}

@@ -1,0 +1,78 @@
+{
+  "giro": "pasteleria",
+  "giro_slug": "pasteleria",
+  "created_at": "2026-03-13T04:12:29.704918",
+  "dry_run": true,
+  "providers": {
+    "arquitecto": {
+      "type": "openai_compatible",
+      "model": "gpt-4.1",
+      "base_url": "https://api.openai.com/v1",
+      "api_key_env": "OPENAI_API_KEY"
+    },
+    "codificador": {
+      "type": "openai_compatible",
+      "model": "deepseek-chat",
+      "base_url": "https://api.deepseek.com/v1",
+      "api_key_env": "DEEPSEEK_API_KEY"
+    },
+    "debugger": {
+      "type": "openai_compatible",
+      "model": "gpt-4.1-mini",
+      "base_url": "https://api.openai.com/v1",
+      "api_key_env": "OPENAI_API_KEY"
+    },
+    "optimizador": {
+      "type": "openai_compatible",
+      "model": "gemini-2.0-flash",
+      "base_url": "https://generativelanguage.googleapis.com/v1beta/openai",
+      "api_key_env": "GEMINI_API_KEY"
+    }
+  },
+  "architecture": {
+    "resumen": "Plantilla replicable para pasteleria",
+    "modulos": [
+      "landing page",
+      "cotizador",
+      "portal cliente",
+      "panel operativo",
+      "historial"
+    ],
+    "flujo_cliente": [
+      "entra a landing",
+      "solicita cotizacion",
+      "recibe folio",
+      "consulta estatus"
+    ],
+    "flujo_operativo": [
+      "recibe solicitud",
+      "genera orden",
+      "actualiza estatus",
+      "cierra servicio"
+    ],
+    "datos_necesarios": [
+      "nombre negocio",
+      "telefono whatsapp",
+      "direccion",
+      "servicios",
+      "colores"
+    ],
+    "reglas_cotizacion": [
+      "subtotal",
+      "descuento opcional",
+      "total"
+    ],
+    "estructura_ordenes": [
+      "folio",
+      "cliente",
+      "servicio",
+      "estado",
+      "fecha"
+    ]
+  },
+  "notes": {
+    "coder": "Generado por modo mock",
+    "debugger": "Generado por modo mock",
+    "optimizador": "Generado por modo mock"
+  }
+}

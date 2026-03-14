@@ -1,0 +1,4 @@
+# Sanitizado core
+
+| plantilla | estado |
+|---|---|

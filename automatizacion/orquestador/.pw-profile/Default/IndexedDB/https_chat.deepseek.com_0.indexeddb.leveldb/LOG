@@ -1,0 +1,7 @@
+2026/03/13-04:37:21.189 3f529 Reusing MANIFEST /Users/jesusvilla/Desktop/SERVICIOS DIGITALES MX ESTRUCTURA/automatizacion/orquestador/.pw-profile/Default/IndexedDB/https_chat.deepseek.com_0.indexeddb.leveldb/MANIFEST-000001
+2026/03/13-04:37:21.190 3f529 Recovering log #3
+2026/03/13-04:37:21.190 3f529 Reusing old log /Users/jesusvilla/Desktop/SERVICIOS DIGITALES MX ESTRUCTURA/automatizacion/orquestador/.pw-profile/Default/IndexedDB/https_chat.deepseek.com_0.indexeddb.leveldb/000003.log 
+2026/03/13-04:37:21.192 3f52a Level-0 table #5: started
+2026/03/13-04:37:21.193 3f52a Level-0 table #5: 1646 bytes OK
+2026/03/13-04:37:21.195 3f52a Delete type=0 #3
+2026/03/13-04:37:21.195 3f52a Manual compaction at level-0 from '\x00\x01\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x02\x00\x00\x00' @ 0 : 0; will stop at (end)

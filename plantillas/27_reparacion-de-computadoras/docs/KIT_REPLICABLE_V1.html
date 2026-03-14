@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KIT Replicable V1 - SDMX</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --soft: #1f2937;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --accent: #22c55e;
+      --accent2: #38bdf8;
+      --border: #334155;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(180deg, var(--bg), #020617);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    .hero {
+      background: linear-gradient(135deg, rgba(34,197,94,.15), rgba(56,189,248,.15));
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    h1, h2, h3 { margin: 0 0 10px; }
+    h1 { font-size: 28px; }
+    h2 {
+      font-size: 20px;
+      margin-top: 20px;
+      color: var(--accent2);
+    }
+    h3 {
+      font-size: 16px;
+      margin-top: 14px;
+      color: var(--accent);
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 14px;
+    }
+    ul, ol { margin: 8px 0 0 20px; }
+    li { margin: 4px 0; }
+    code {
+      background: var(--soft);
+      border: 1px solid var(--border);
+      padding: 1px 6px;
+      border-radius: 6px;
+      color: #bfdbfe;
+      font-size: .95em;
+    }
+    pre {
+      background: #020617;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      overflow-x: auto;
+      color: #d1d5db;
+      margin-top: 10px;
+      font-size: 13px;
+    }
+    .muted { color: var(--muted); }
+    .grid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="hero">
+      <h1>KIT Replicable V1 - SDMX</h1>
+      <p class="muted">Documento único con: proceso de alta, checklist, script de réplica, archivo de variables y guía de uso.</p>
+    </section>
+
+    <section class="card">
+      <h2>1) Proceso Operativo de Alta</h2>
+      <h3>Objetivo</h3>
+      <p>Activar un negocio nuevo usando la base {{BRAND}} sin decisiones raras.</p>
+
+      <h3>Datos mínimos de entrada</h3>
+      <ul>
+        <li>Nombre comercial</li>
+        <li>Ciudad/estado para pie de página</li>
+        <li>WhatsApp de atención (formato internacional, ejemplo: <code>528112345678</code>)</li>
+        <li>URL de Google Maps</li>
+        <li>URL de Apps Script (<code>.../exec</code>)</li>
+        <li>Contraseña operativo</li>
+        <li>Contraseña técnico</li>
+        <li>Logo (PNG/WebP)</li>
+      </ul>
+
+      <h3>Flujo de activación</h3>
+      <ol>
+        <li>Crear copia del proyecto base con script <code>scripts/create-client-copy.sh</code>.</li>
+        <li>Reemplazar logo del cliente en la carpeta nueva (<code>logo.png</code>/<code>logo.webp</code>).</li>
+        <li>Confirmar URLs en front (home, portal, operativo, técnico, solicitudes, archivo).</li>
+        <li>Publicar Apps Script del cliente y copiar URL <code>exec</code>.</li>
+        <li>Configurar Script Properties (passwords y secuencias).</li>
+        <li>Publicar front (GitHub Pages o hosting).</li>
+        <li>Conectar subdominio.</li>
+        <li>Ejecutar pruebas de humo.</li>
+        <li>Entregar con demo de 20 minutos.</li>
+      </ol>
+
+      <h3>Pruebas de humo obligatorias</h3>
+      <ul>
+        <li>Cotizador crea folio <code>COT-*</code>.</li>
+        <li>Solicitud aparece en módulo <code>Solicitudes</code>.</li>
+        <li>Operativo registra orden y genera <code>SRF-*</code>.</li>
+        <li>Operativo genera PDF y link de WhatsApp.</li>
+        <li>Portal cliente consulta folio y muestra estado.</li>
+        <li>Técnico actualiza estado y el cambio se refleja en portal cliente.</li>
+        <li>Archivo lista elementos archivados.</li>
+      </ul>
+
+      <h3>Criterio de listo para vender</h3>
+      <p>Cliente nuevo completa su primer flujo real en menos de 10 minutos: alta de servicio, folio generado y consulta en portal.</p>
+
+      <h3>Tiempo meta por alta</h3>
+      <ul>
+        <li>Meta inicial: 60-90 min por cliente.</li>
+        <li>Meta después de 5 altas: 30-45 min por cliente.</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>2) Checklist de Activación</h2>
+      <div class="grid">
+        <div>
+          <h3>Brief</h3>
+          <ul>
+            <li>[ ] Nombre comercial confirmado</li>
+            <li>[ ] Giro confirmado</li>
+            <li>[ ] Ciudad/estado confirmados</li>
+            <li>[ ] WhatsApp de atención confirmado</li>
+            <li>[ ] URL Google Maps confirmada</li>
+            <li>[ ] URL Apps Script <code>exec</code> confirmada</li>
+          </ul>
+
+          <h3>Branding</h3>
+          <ul>
+            <li>[ ] <code>logo.png</code> actualizado</li>
+            <li>[ ] <code>logo.webp</code> actualizado</li>
+            <li>[ ] Nombre en encabezados validado</li>
+            <li>[ ] Footer validado</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Configuración funcional</h3>
+          <ul>
+            <li>[ ] Contraseña operativo configurada</li>
+            <li>[ ] Contraseña técnico configurada</li>
+            <li>[ ] Backend URL válida en todos los módulos</li>
+            <li>[ ] WhatsApp válido en cotizador y portal</li>
+            <li>[ ] Maps válido en portal y home</li>
+          </ul>
+
+          <h3>Pruebas y entrega</h3>
+          <ul>
+            <li>[ ] Cotización crea <code>COT-*</code></li>
+            <li>[ ] Solicitud visible en panel solicitudes</li>
+            <li>[ ] Alta de orden crea <code>SRF-*</code></li>
+            <li>[ ] PDF preorden funciona</li>
+            <li>[ ] PDF orden final funciona</li>
+            <li>[ ] Link WhatsApp de orden funciona</li>
+            <li>[ ] Consulta de folio en portal funciona</li>
+            <li>[ ] Cambio de estado en técnico visible en portal</li>
+            <li>[ ] Subdominio activo</li>
+            <li>[ ] Accesos entregados</li>
+            <li>[ ] Demo grabada o realizada</li>
+            <li>[ ] Aprobación del cliente</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>3) Script para Clonar y Personalizar Cliente Nuevo</h2>
+      <p class="muted">Archivo: <code>scripts/create-client-copy.sh</code></p>
+      <pre>#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat &lt;&lt;USAGE
+Uso:
+  $(basename "$0") \
+    --source "/ruta/proyecto-base" \
+    --target "/ruta/proyecto-cliente" \
+    --brand "Nombre Comercial" \
+    --city "Ciudad, Estado" \
+    --whatsapp "528112345678" \
+    --backend-url "https://script.google.com/macros/s/.../exec" \
+    --maps-url "https://maps.app.goo.gl/..."
+USAGE
+}
+
+SOURCE=""
+TARGET=""
+BRAND=""
+CITY=""
+WHATSAPP=""
+BACKEND_URL=""
+MAPS_URL=""
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --source) SOURCE="$2"; shift 2 ;;
+    --target) TARGET="$2"; shift 2 ;;
+    --brand) BRAND="$2"; shift 2 ;;
+    --city) CITY="$2"; shift 2 ;;
+    --whatsapp) WHATSAPP="$2"; shift 2 ;;
+    --backend-url) BACKEND_URL="$2"; shift 2 ;;
+    --maps-url) MAPS_URL="$2"; shift 2 ;;
+    -h|--help) usage; exit 0 ;;
+    *) echo "Argumento desconocido: $1"; usage; exit 1 ;;
+  esac
+done
+
+if [[ -z "$SOURCE" || -z "$TARGET" || -z "$BRAND" || -z "$CITY" || -z "$WHATSAPP" || -z "$BACKEND_URL" || -z "$MAPS_URL" ]]; then
+  echo "Faltan argumentos requeridos."
+  usage
+  exit 1
+fi
+
+if [[ ! -d "$SOURCE" ]]; then
+  echo "No existe SOURCE: $SOURCE"
+  exit 1
+fi
+
+if [[ -e "$TARGET" ]]; then
+  echo "TARGET ya existe: $TARGET"
+  exit 1
+fi
+
+rsync -a --exclude='.git' --exclude='.DS_Store' "$SOURCE/" "$TARGET/"
+
+replace_in_file() {
+  local old="$1"
+  local new="$2"
+  local file="$3"
+  OLD="$old" NEW="$new" perl -0pi -e 's/\Q$ENV{OLD}\E/$ENV{NEW}/g' "$file"
+}
+
+BRAND_UPPER=$(echo "$BRAND" | tr '[:lower:]' '[:upper:]')
+
+FILES=(
+  "$TARGET/index.html"
+  "$TARGET/Pagina-principal.html"
+  "$TARGET/Pagina-principal.js"
+  "$TARGET/integrador.html"
+  "$TARGET/portal-cliente.html"
+  "$TARGET/portal-cliente.js"
+  "$TARGET/panel-operativo.html"
+  "$TARGET/panel-operativo.js"
+  "$TARGET/panel-tecnico.html"
+  "$TARGET/panel-tecnico.js"
+  "$TARGET/panel-solicitudes.html"
+  "$TARGET/panel-solicitudes.js"
+  "$TARGET/panel-archivo.html"
+  "$TARGET/panel-archivo.js"
+)
+
+for f in "${FILES[@]}"; do
+  [[ -f "$f" ]] || continue
+
+  replace_in_file "{{BACKEND_URL}}" "$BACKEND_URL" "$f"
+  replace_in_file "{{WHATSAPP}}" "$WHATSAPP" "$f"
+  replace_in_file "{{MAPS_URL}}" "$MAPS_URL" "$f"
+  replace_in_file "https://maps.google.com/?q={{BRAND}}+Oficial+Plaza+Chapultepec" "$MAPS_URL" "$f"
+  replace_in_file "https://maps.google.com/?q={{BRAND}}+Oficial" "$MAPS_URL" "$f"
+
+  replace_in_file "{{BRAND}}" "$BRAND" "$f"
+  replace_in_file "{{BRAND_UPPER}}" "$BRAND_UPPER" "$f"
+  replace_in_file "{{BRAND}}" "$BRAND" "$f"
+  replace_in_file "{{CITY}}" "$CITY" "$f"
+done
+
+echo ""
+echo "Copia de cliente creada: $TARGET"
+echo ""
+echo "Siguientes pasos manuales recomendados:"
+echo "1) Reemplazar logo.png y logo.webp en $TARGET"
+echo "2) Revisar textos comerciales/testimonios en index.html"
+echo "3) Probar flujo: cotización -&gt; solicitud -&gt; orden SRF -&gt; portal"
+echo "4) Configurar passwords en Apps Script"</pre>
+    </section>
+
+    <section class="card">
+      <h2>4) Archivo Base de Variables</h2>
+      <p class="muted">Archivo: <code>scripts/client-config.example.env</code></p>
+      <pre># Copia este archivo como client-config.env y ajusta valores.
+
+SOURCE="/Users/jesusvilla/Desktop/{{BRAND}}"
+TARGET="/Users/jesusvilla/Desktop/CLIENTE-NUEVO"
+BRAND="Mi Negocio Tecnico"
+CITY="{{CITY}}"
+WHATSAPP="528112345678"
+BACKEND_URL="{{BACKEND_URL}}"
+MAPS_URL="https://maps.app.goo.gl/REEMPLAZAR"</pre>
+    </section>
+
+    <section class="card">
+      <h2>5) Guía de Uso</h2>
+      <h3>1) Editar variables</h3>
+      <p>Duplica <code>scripts/client-config.example.env</code> a <code>scripts/client-config.env</code> y cambia los valores.</p>
+
+      <h3>2) Ejecutar</h3>
+      <pre>source scripts/client-config.env
+bash scripts/create-client-copy.sh \
+  --source "$SOURCE" \
+  --target "$TARGET" \
+  --brand "$BRAND" \
+  --city "$CITY" \
+  --whatsapp "$WHATSAPP" \
+  --backend-url "$BACKEND_URL" \
+  --maps-url "$MAPS_URL"</pre>
+
+      <h3>3) Validar en la copia</h3>
+      <ul>
+        <li><code>index.html</code>: marca y enlaces.</li>
+        <li><code>portal-cliente.js</code>: backend/WhatsApp.</li>
+        <li><code>panel-operativo.js</code>: backend/WhatsApp/PDF footer.</li>
+        <li><code>panel-tecnico.js</code>: mensajes/footers.</li>
+        <li><code>panel-solicitudes.js</code>: mensajes/footers.</li>
+      </ul>
+
+      <h3>Alcance actual</h3>
+      <p>El script deja una copia funcional base para nuevo cliente. Apps Script y DNS siguen manuales con checklist.</p>
+    </section>
+  </main>
+</body>
+</html>

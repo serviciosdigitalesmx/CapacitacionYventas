@@ -1,0 +1,28 @@
+{
+  "timestamp": "2026-03-13T04:32:46.566141",
+  "total": 1,
+  "ok": 0,
+  "pending": [
+    {
+      "giro": "floreria",
+      "giro_slug": "floreria",
+      "status": "pending_manual_input",
+      "pending": [
+        {
+          "stage": "arquitecto",
+          "provider": "deepseek",
+          "prompt_file": "/Users/jesusvilla/Desktop/SERVICIOS DIGITALES MX ESTRUCTURA/automatizacion/orquestador/manual-bridge/floreria/prompts/01_arquitecto.deepseek.prompt.md",
+          "response_file": "/Users/jesusvilla/Desktop/SERVICIOS DIGITALES MX ESTRUCTURA/automatizacion/orquestador/manual-bridge/floreria/responses/01_arquitecto.deepseek.response.json"
+        }
+      ],
+      "used_providers": []
+    }
+  ],
+  "failed": [],
+  "mode": "manual_triple_bridge",
+  "required_providers": [
+    "deepseek",
+    "chatgpt",
+    "gemini"
+  ]
+}

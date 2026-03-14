@@ -1,0 +1,21 @@
+Disena la arquitectura digital de una plantilla para el giro: agencia de viajes.
+
+Contexto adicional opcional (si existe):
+{{EXTERNAL_HINT}}
+
+Reglas:
+- Responde en JSON valido.
+- Incluye: modulos, flujo_cliente, flujo_operativo, datos_necesarios, reglas_cotizacion, estructura_ordenes.
+- Debe ser replicable para multiples negocios del mismo giro.
+- Evita referencias a una marca especifica.
+
+Formato estricto:
+{
+  "resumen": "...",
+  "modulos": ["..."],
+  "flujo_cliente": ["..."],
+  "flujo_operativo": ["..."],
+  "datos_necesarios": ["..."],
+  "reglas_cotizacion": ["..."],
+  "estructura_ordenes": ["..."]
+}

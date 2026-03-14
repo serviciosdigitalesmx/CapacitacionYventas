@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KIT Replicable Interactivo V1</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --card: #121a2b;
+      --border: #25324a;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --accent: #22c55e;
+      --accent-2: #38bdf8;
+      --danger: #ef4444;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color: var(--text);
+      background: radial-gradient(circle at top right, #0f1b33, var(--bg));
+      line-height: 1.45;
+    }
+    .wrap { max-width: 1150px; margin: 0 auto; padding: 24px; }
+    .hero {
+      background: linear-gradient(135deg, rgba(34,197,94,.18), rgba(56,189,248,.14));
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 16px;
+    }
+    h1 { margin: 0 0 6px; font-size: 28px; }
+    h2 { margin: 0 0 10px; font-size: 20px; color: var(--accent-2); }
+    h3 { margin: 0 0 8px; font-size: 16px; color: var(--accent); }
+    .muted { color: var(--muted); }
+    .card {
+      border: 1px solid var(--border);
+      background: var(--card);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    }
+    label { display: block; font-size: 13px; color: #cbd5e1; margin-bottom: 5px; }
+    input[type="text"], input[type="url"], input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #0a1324;
+      color: var(--text);
+      outline: none;
+    }
+    input[type="file"] {
+      width: 100%;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px dashed var(--border);
+      background: #0a1324;
+      color: var(--muted);
+    }
+    .row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    button {
+      border: 1px solid var(--border);
+      background: #18243c;
+      color: var(--text);
+      padding: 9px 12px;
+      border-radius: 9px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    button.primary { background: #14532d; border-color: #166534; }
+    button.alt { background: #1e3a8a; border-color: #1d4ed8; }
+    button.warn { background: #7f1d1d; border-color: #991b1b; }
+    .checks { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 8px; }
+    .check-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px;
+      background: #0a1324;
+    }
+    .log {
+      white-space: pre-wrap;
+      background: #020617;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+      min-height: 120px;
+      max-height: 260px;
+      overflow: auto;
+    }
+    .ok { color: #86efac; }
+    .error { color: #fca5a5; }
+    .pill {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #0a1324;
+      color: var(--muted);
+      font-size: 12px;
+      margin-right: 6px;
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="hero">
+      <h1>KIT Replicable Interactivo V1</h1>
+      <p class="muted">Llena datos, define módulos por plan y clona cliente con un botón.</p>
+      <p class="muted">Servidor requerido: <code>bash scripts/run-kit-ui.sh</code> y abrir <code>http://127.0.0.1:8787</code>.</p>
+    </section>
+
+    <section class="card">
+      <h2>Datos del Cliente</h2>
+      <div class="grid">
+        <div>
+          <label>Nombre comercial</label>
+          <input id="brand" type="text" placeholder="Ej: TechNova Servicio" />
+        </div>
+        <div>
+          <label>Ciudad / Estado</label>
+          <input id="city" type="text" placeholder="Ej: Monterrey, N.L." />
+        </div>
+        <div>
+          <label>WhatsApp (internacional)</label>
+          <input id="whatsapp" type="text" placeholder="Ej: 528112345678" />
+        </div>
+        <div>
+          <label>URL Google Maps</label>
+          <input id="maps_url" type="url" placeholder="https://maps.app.goo.gl/..." />
+        </div>
+        <div>
+          <label>URL Apps Script (exec)</label>
+          <input id="backend_url" type="url" placeholder="https://script.google.com/macros/s/.../exec" />
+        </div>
+        <div>
+          <label>Vertical / Giro</label>
+          <select id="vertical" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:#0a1324;color:var(--text);">
+            <option value="tecnico">Técnico (base SrFix)</option>
+            <option value="abarrotes">Abarrotes</option>
+            <option value="barberia">Barbería</option>
+            <option value="academia">Academia</option>
+          </select>
+        </div>
+        <div>
+          <label>Color primario</label>
+          <input id="color_primary" type="color" value="#1f7edc" />
+        </div>
+        <div>
+          <label>Color acento</label>
+          <input id="color_accent" type="color" value="#ff6a2a" />
+        </div>
+        <div>
+          <label>Ruta proyecto base (opcional)</label>
+          <input id="source" type="text" placeholder="Si se deja vacío, usa plantilla por giro" />
+        </div>
+        <div>
+          <label>Ruta destino (opcional)</label>
+          <input id="target" type="text" placeholder="/Users/jesusvilla/Desktop/SERVICIOS DIGITALES MX ESTRUCTURA/NEGOCIOS INSCRITOS/cliente-sdmx" />
+        </div>
+        <div>
+          <label>Password operativo (referencia)</label>
+          <input id="password_operativo" type="password" placeholder="No se publica; se guarda en JSON de alta" />
+        </div>
+        <div>
+          <label>Password técnico (referencia)</label>
+          <input id="password_tecnico" type="password" placeholder="No se publica; se guarda en JSON de alta" />
+        </div>
+        <div>
+          <label>Logo del negocio (JPG/JPEG/PNG/WebP)</label>
+          <input id="logo_file" type="file" accept="image/png,image/jpeg,image/jpg,image/webp" />
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Módulos por Plan</h2>
+      <div class="row">
+        <button type="button" onclick="applyPlan('basico')">Plan Básico</button>
+        <button type="button" onclick="applyPlan('pro')">Plan Pro</button>
+        <button type="button" onclick="applyPlan('full')">Plan Full</button>
+      </div>
+      <div class="row" style="margin-top:8px;">
+        <span class="pill">Básico: captación + operativo + portal</span>
+        <span class="pill">Pro: básico + técnico + solicitudes</span>
+        <span class="pill">Full: todo</span>
+      </div>
+      <div class="checks" style="margin-top:10px;">
+        <label class="check-item"><input type="checkbox" data-module="pagina_principal" checked /> Página principal</label>
+        <label class="check-item"><input type="checkbox" data-module="cotizador" checked /> Cotizador</label>
+        <label class="check-item"><input type="checkbox" data-module="portal_cliente" checked /> Portal cliente</label>
+        <label class="check-item"><input type="checkbox" data-module="operativo" checked /> Operativo</label>
+        <label class="check-item"><input type="checkbox" data-module="tecnico" /> Técnico</label>
+        <label class="check-item"><input type="checkbox" data-module="solicitudes" /> Solicitudes</label>
+        <label class="check-item"><input type="checkbox" data-module="archivo" /> Archivo</label>
+        <label class="check-item"><input type="checkbox" data-module="live_cam" /> Live cam</label>
+        <label class="check-item"><input type="checkbox" data-module="pdf_preorden" checked /> PDF preorden</label>
+        <label class="check-item"><input type="checkbox" data-module="pdf_cotizacion" /> PDF cotización</label>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Acciones</h2>
+      <div class="row">
+        <button type="button" onclick="saveDraft()">Guardar borrador</button>
+        <button type="button" onclick="loadDraft()">Cargar borrador</button>
+        <button type="button" class="alt" onclick="generateCommand()">Generar comando</button>
+        <button type="button" class="primary" onclick="cloneNow()">Clonar cliente ahora</button>
+      </div>
+      <h3 style="margin-top:12px;">Comando sugerido</h3>
+      <div id="cmd" class="log"></div>
+      <h3 style="margin-top:12px;">Resultado / logs</h3>
+      <div id="logs" class="log"></div>
+    </section>
+
+    <section class="card">
+      <h2>Pruebas de Humo (manuales)</h2>
+      <p class="muted">Estas sí se validan en vivo con el cliente, una por una.</p>
+      <div class="checks">
+        <label class="check-item"><input type="checkbox" /> Cotizador crea COT-*</label>
+        <label class="check-item"><input type="checkbox" /> Solicitud aparece en panel solicitudes</label>
+        <label class="check-item"><input type="checkbox" /> Operativo crea SRF-*</label>
+        <label class="check-item"><input type="checkbox" /> PDF preorden funciona</label>
+        <label class="check-item"><input type="checkbox" /> PDF orden final funciona</label>
+        <label class="check-item"><input type="checkbox" /> WhatsApp de orden funciona</label>
+        <label class="check-item"><input type="checkbox" /> Portal consulta folio correctamente</label>
+        <label class="check-item"><input type="checkbox" /> Técnico actualiza estado y se refleja</label>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const DRAFT_KEY = 'sdmx-kit-draft-v1';
+
+    function collectModules() {
+      const modules = {};
+      document.querySelectorAll('[data-module]').forEach(el => {
+        modules[el.getAttribute('data-module')] = !!el.checked;
+      });
+      return modules;
+    }
+
+    function applyPlan(type) {
+      const set = (id, val) => {
+        const el = document.querySelector(`[data-module="${id}"]`);
+        if (el) el.checked = !!val;
+      };
+
+      if (type === 'basico') {
+        set('pagina_principal', true);
+        set('cotizador', true);
+        set('portal_cliente', true);
+        set('operativo', true);
+        set('tecnico', false);
+        set('solicitudes', false);
+        set('archivo', false);
+        set('live_cam', false);
+        set('pdf_preorden', true);
+        set('pdf_cotizacion', false);
+      }
+
+      if (type === 'pro') {
+        set('pagina_principal', true);
+        set('cotizador', true);
+        set('portal_cliente', true);
+        set('operativo', true);
+        set('tecnico', true);
+        set('solicitudes', true);
+        set('archivo', false);
+        set('live_cam', false);
+        set('pdf_preorden', true);
+        set('pdf_cotizacion', true);
+      }
+
+      if (type === 'full') {
+        document.querySelectorAll('[data-module]').forEach(el => el.checked = true);
+      }
+    }
+
+    function getPayload() {
+      return {
+        brand: document.getElementById('brand').value.trim(),
+        city: document.getElementById('city').value.trim(),
+        whatsapp: document.getElementById('whatsapp').value.trim(),
+        maps_url: document.getElementById('maps_url').value.trim(),
+        backend_url: document.getElementById('backend_url').value.trim(),
+        vertical: document.getElementById('vertical').value,
+        color_primary: document.getElementById('color_primary').value,
+        color_accent: document.getElementById('color_accent').value,
+        source: document.getElementById('source').value.trim(),
+        target: document.getElementById('target').value.trim(),
+        password_operativo: document.getElementById('password_operativo').value,
+        password_tecnico: document.getElementById('password_tecnico').value,
+        modules: collectModules()
+      };
+    }
+
+    function setLog(msg, cls='') {
+      const el = document.getElementById('logs');
+      el.className = 'log ' + cls;
+      el.textContent = msg;
+    }
+
+    function generateCommand() {
+      const p = getPayload();
+      const cmd = [
+        'bash scripts/create-client-copy.sh \\\n  --source "' + (p.source || 'auto') + '" \\\n  --target "' + (p.target || '/Users/jesusvilla/Desktop/SERVICIOS DIGITALES MX ESTRUCTURA/NEGOCIOS INSCRITOS/' + (p.brand || 'cliente-nuevo').toLowerCase().replace(/[^a-z0-9]+/g, '-')) + '" \\\n  --brand "' + (p.brand || 'Mi Negocio') + '" \\\n  --city "' + (p.city || 'Monterrey, N.L.') + '" \\\n  --whatsapp "' + (p.whatsapp || '528112345678') + '" \\\n  --backend-url "' + (p.backend_url || 'https://script.google.com/macros/s/REEMPLAZAR/exec') + '" \\\n  --maps-url "' + (p.maps_url || 'https://maps.app.goo.gl/REEMPLAZAR') + '" \\\n  --vertical "' + (p.vertical || 'tecnico') + '" \\\n  --color-primary "' + (p.color_primary || '#2563eb') + '" \\\n  --color-accent "' + (p.color_accent || '#f97316') + '"'
+      ].join('');
+      document.getElementById('cmd').textContent = cmd;
+      return cmd;
+    }
+
+    function saveDraft() {
+      const p = getPayload();
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(p));
+      setLog('Borrador guardado localmente.', 'ok');
+      generateCommand();
+    }
+
+    function loadDraft() {
+      const raw = localStorage.getItem(DRAFT_KEY);
+      if (!raw) {
+        setLog('No hay borrador guardado.', 'error');
+        return;
+      }
+      try {
+        const p = JSON.parse(raw);
+        document.getElementById('brand').value = p.brand || '';
+        document.getElementById('city').value = p.city || '';
+        document.getElementById('whatsapp').value = p.whatsapp || '';
+        document.getElementById('maps_url').value = p.maps_url || '';
+        document.getElementById('backend_url').value = p.backend_url || '';
+        document.getElementById('vertical').value = p.vertical || 'tecnico';
+        document.getElementById('color_primary').value = p.color_primary || '#1f7edc';
+        document.getElementById('color_accent').value = p.color_accent || '#ff6a2a';
+        document.getElementById('source').value = p.source || '';
+        document.getElementById('target').value = p.target || '';
+        document.getElementById('password_operativo').value = p.password_operativo || '';
+        document.getElementById('password_tecnico').value = p.password_tecnico || '';
+
+        if (p.modules) {
+          document.querySelectorAll('[data-module]').forEach(el => {
+            const key = el.getAttribute('data-module');
+            if (Object.prototype.hasOwnProperty.call(p.modules, key)) {
+              el.checked = !!p.modules[key];
+            }
+          });
+        }
+
+        setLog('Borrador cargado.', 'ok');
+        generateCommand();
+      } catch (e) {
+        setLog('No se pudo cargar borrador: ' + e.message, 'error');
+      }
+    }
+
+    function fileToDataURL(inputEl) {
+      const file = inputEl.files && inputEl.files[0];
+      if (!file) return Promise.resolve('');
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ''));
+        reader.onerror = () => reject(new Error('No se pudo leer archivo: ' + file.name));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function cloneNow() {
+      const payload = getPayload();
+      if (!payload.brand || !payload.city || !payload.whatsapp || !payload.maps_url || !payload.backend_url) {
+        setLog('Faltan campos obligatorios (nombre, ciudad, WhatsApp, maps y backend).', 'error');
+        return;
+      }
+
+      setLog('Procesando clonación...');
+
+      try {
+        payload.logo_data_url = await fileToDataURL(document.getElementById('logo_file'));
+
+        const res = await fetch('/api/clone', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        if (!res.ok || !data.ok) {
+          setLog((data.error || 'Error de clonación') + '\n\n' + (data.stderr || ''), 'error');
+          return;
+        }
+
+        generateCommand();
+        setLog('Cliente clonado correctamente.\nRuta: ' + data.target + '\n\n' + (data.stdout || ''), 'ok');
+      } catch (err) {
+        setLog('No se pudo completar la clonación: ' + err.message, 'error');
+      }
+    }
+
+    applyPlan('basico');
+    generateCommand();
+  </script>
+</body>
+</html>

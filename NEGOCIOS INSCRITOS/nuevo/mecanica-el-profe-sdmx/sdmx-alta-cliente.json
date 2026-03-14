@@ -1,0 +1,27 @@
+{
+  "brand": "Mecanica El Profe",
+  "city": "Apodaca",
+  "whatsapp": "528131590917",
+  "backend_url": "https://script.google.com/macros/s/AKfycbwJHmU1OkZmN1p9uhkATnUWCwzBCo6AxotcYc8EvkVPwXyP8Yl5KtO4ABtBh_2ndgs_/exec",
+  "maps_url": "https://maps.app.goo.gl/KiCHJ2Da5PbEAs249",
+  "password_operativo": "Admin1",
+  "password_tecnico": "Admin1",
+  "color_primary": "#9d231b",
+  "color_accent": "#933e1a",
+  "modules": {
+    "pagina_principal": true,
+    "cotizador": true,
+    "portal_cliente": true,
+    "operativo": true,
+    "tecnico": true,
+    "solicitudes": true,
+    "archivo": true,
+    "live_cam": true,
+    "pdf_preorden": true,
+    "pdf_cotizacion": true
+  },
+  "vertical": "tecnico",
+  "giro_id": "07_taller-mecanico",
+  "onboarding_status": "nuevo",
+  "created_at": "2026-03-13T22:19:41.531344"
+}

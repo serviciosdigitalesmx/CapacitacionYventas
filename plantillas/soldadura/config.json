@@ -1,0 +1,14 @@
+{
+  "BUSINESS_NAME": "{{BUSINESS_NAME}}",
+  "WHATSAPP": "{{WHATSAPP}}",
+  "COLORS": {
+    "primary": "{{COLORS.primary}}",
+    "accent": "{{COLORS.accent}}"
+  },
+  "SERVICES": [
+    "{{SERVICES.0}}",
+    "{{SERVICES.1}}",
+    "{{SERVICES.2}}"
+  ],
+  "VERTICAL": "soldadura"
+}

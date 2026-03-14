@@ -1,0 +1,8 @@
+GIRO: reparacion de celulares
+SLUG: reparacion-de-celulares
+
+OBJETIVO:
+- Diseñar arquitectura de plantilla replicable para este giro.
+
+NOTAS:
+- Pega aqui la respuesta final optimizada de la IA para este giro.

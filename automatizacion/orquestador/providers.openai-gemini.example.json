@@ -1,0 +1,29 @@
+{
+  "output_dir": "output/plantillas-generadas",
+  "providers": {
+    "arquitecto": {
+      "type": "openai_compatible",
+      "model": "gpt-4.1",
+      "base_url": "https://api.openai.com/v1",
+      "api_key_env": "OPENAI_API_KEY"
+    },
+    "codificador": {
+      "type": "openai_compatible",
+      "model": "gemini-2.0-flash",
+      "base_url": "https://generativelanguage.googleapis.com/v1beta/openai",
+      "api_key_env": "GEMINI_API_KEY"
+    },
+    "debugger": {
+      "type": "openai_compatible",
+      "model": "gpt-4.1-mini",
+      "base_url": "https://api.openai.com/v1",
+      "api_key_env": "OPENAI_API_KEY"
+    },
+    "optimizador": {
+      "type": "openai_compatible",
+      "model": "gemini-2.0-flash",
+      "base_url": "https://generativelanguage.googleapis.com/v1beta/openai",
+      "api_key_env": "GEMINI_API_KEY"
+    }
+  }
+}
