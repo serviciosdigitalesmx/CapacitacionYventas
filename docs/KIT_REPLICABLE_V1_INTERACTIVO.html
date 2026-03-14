@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>KIT Replicable Interactivo V1</title>
+  <title>Kit Clonador SDMX</title>
   <style>
     :root {
       --bg: #0b1220;
@@ -117,9 +117,9 @@
 <body>
   <main class="wrap">
     <section class="hero">
-      <h1>KIT Replicable Interactivo V1</h1>
+      <h1>Kit Clonador SDMX</h1>
       <p class="muted">Llena datos, define módulos por plan y clona cliente con un botón.</p>
-      <p class="muted">Servidor requerido: <code>bash scripts/run-kit-ui.sh</code> y abrir <code>http://127.0.0.1:8787</code>.</p>
+      <p class="muted">Servidor local: <code>bash scripts/iniciar-kit-clonador.sh</code> y abrir <code>http://127.0.0.1:8787</code>.</p>
     </section>
 
     <section class="card">
@@ -445,6 +445,13 @@
         setLog('Faltan campos obligatorios (nombre, ciudad, WhatsApp, maps y backend).', 'error');
         return;
       }
+
+      const pin = window.prompt('Contraseña para clonar:');
+      if (pin === null) {
+        setLog('Clonación cancelada.', 'error');
+        return;
+      }
+      payload.clone_pin = String(pin).trim();
 
       setLog('Procesando clonación...');
 

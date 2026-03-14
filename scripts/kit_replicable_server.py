@@ -24,6 +24,7 @@ STATUS_DIR_MAP = {
     "mantenimiento": "mantenimiento",
 }
 PREVIEW_SERVERS = {}
+CLONE_PIN = os.environ.get("KIT_CLONE_PIN", "537877")
 
 
 def json_response(handler, code, payload):
@@ -279,6 +280,10 @@ class Handler(BaseHTTPRequestHandler):
             payload = self._read_json()
         except Exception:
             return json_response(self, 400, {"ok": False, "error": "JSON invalido"})
+
+        clone_pin = str(payload.get("clone_pin", "")).strip()
+        if clone_pin != CLONE_PIN:
+            return json_response(self, 401, {"ok": False, "error": "Contraseña incorrecta para clonar"})
 
         brand = str(payload.get("brand", "")).strip()
         city = str(payload.get("city", "")).strip()
